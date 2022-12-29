@@ -1,0 +1,47 @@
+:root {
+    --background: hsl(49, 58%, 93%);
+    --powder-blue: hsl(194, 50%, 80%);
+    --powder-pink: hsl(317, 48%, 84%);
+    --accent-blue: hsl(211, 48%, 52%);
+    --accent-pink: hsl(320, 44%, 57%);
+    --powder-gradient: linear-gradient(
+        90deg,
+        var(--powder-pink) 0%,
+        var(--powder-blue) 100%
+    );
+    --text-general: hsl(37, 100%, 16%);
+    --text-caption: hsl(37, 44%, 44%);
+}
+
+body {
+    background-color: var(--background);
+}
+
+nav {
+    background: var(--powder-gradient);
+    color: var(--text-general);
+}
+
+footer {
+    background: var(--powder-gradient);
+    color: var(--text-general);
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--accent-pink);
+}
+
+.nav-item .nav-link {
+    color: var(--text-general);
+    background-blend-mode: darken;
+    background-color: rgba(20, 20, 20, 0.1);
+    border: 1px solid var(--text-general);
+}
+
+.nav-link:hover,
+.nav-link:focus,
+.nav-link.active:hover,
+.nav-link.active:focus {
+    background-color: var(--powder-pink);
+    background-blend-mode: lighten;
+}
