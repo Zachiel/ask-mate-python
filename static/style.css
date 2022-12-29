@@ -11,6 +11,7 @@
     );
     --text-general: hsl(37, 100%, 16%);
     --text-caption: hsl(37, 44%, 44%);
+    --default-border: 1px solid var(--text-general);
 }
 
 body {
@@ -35,7 +36,7 @@ footer {
     color: var(--text-general);
     background-blend-mode: darken;
     background-color: rgba(20, 20, 20, 0.1);
-    border: 1px solid var(--text-general);
+    border: var(--default-border);
 }
 
 .nav-link:hover,
@@ -44,4 +45,13 @@ footer {
 .nav-link.active:focus {
     background-color: var(--powder-pink);
     background-blend-mode: lighten;
+}
+
+.btn-dropdown {
+    background-color: var(--powder-blue) !important;
+    border: var(--default-border) !important;
+}
+
+.accordion-button::after {
+    display: none;
 }
