@@ -16,12 +16,18 @@
             integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
             crossorigin="anonymous"
         />
+        <!-- jQuerry -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <!-- Custom javascript -->
+        <script src="{{ url_for('static', filename='app.js') }}"></script>
         <!-- Custom stylesheet -->
         <link
             rel="stylesheet"
             href="{{ url_for('static', filename='style.css') }}"
         />
+        <!-- Font Awesome icons -->
         <script src="https://kit.fontawesome.com/a52c965a3f.js" crossorigin="anonymous"></script>
+        <!-- Favicons -->
         <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='/favicon/apple-touch-icon.png') }}">
         <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='/favicon/favicon-32x32.png') }}">
         <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='/favicon/favicon-16x16.png') }}">
@@ -44,7 +50,7 @@
                     </a>
                     <!-- Small screen hamburger icon -->
                     <button
-                        class="navbar-toggler hidden-lg-up"
+                        class="shadow navbar-toggler hidden-lg-up"
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target="#collapsibleNavId"
@@ -61,14 +67,11 @@
                         class="collapse navbar-collapse justify-content-end"
                         id="collapsibleNavId">
                         <ul class="nav nav-pills">
-                            <li class="nav-item mx-1">
+                            <li class="shadow nav-item mx-1">
                                 <a href="/" class="nav-link active">Home</a>
                             </li>
-                            <li class="nav-item mx-1">
-                                <a href="#" class="nav-link">Link</a>
-                            </li>
-                            <li class="nav-item mx-1">
-                                <a href="#" class="nav-link">link2</a>
+                            <li class="shadow nav-item mx-1">
+                                <a href="/add-question" class="nav-link">Add question</a>
                             </li>
                         </ul>
                     </div>
@@ -78,12 +81,12 @@
             </nav>
             <!-- Sticky top navbar -->
         </header>
-        <main class="p-5">{% block content %}{% endblock %}</main>
+        <main class="p-5 mb-5">{% block content %}{% endblock %}</main>
         <footer class="text-center fixed-bottom">
             <!-- Grid container -->
-            <div class="container p-4 pb-0">
+            <div class="container p-1">
                 <!-- Section: Social media -->
-                <section class="mb-4">
+                <section class="">
                     <!-- Facebook -->
                     <a
                     class="btn text-white btn-floating m-1"
@@ -137,7 +140,7 @@
             </div>
             <!-- Grid container -->
                 <!-- Copyright -->
-                <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+                <div class="text-center p-1" style="background-color: rgba(0, 0, 0, 0.2);">
                     © 2022 Copyright:
                     <a class="text-white" href="https://i.pinimg.com/originals/0a/bb/e5/0abbe546e479edc1eb62f5a8ccd66328.jpg">
                     Shrek is love, Shrek is life

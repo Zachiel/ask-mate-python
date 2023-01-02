@@ -1,6 +1,6 @@
 """Data read/write and manipulation functions."""
 import csv
-import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 HEADERS_QUESTION: list[str] = ['id', 'submission_time', 'view_number',
@@ -27,8 +27,11 @@ def sorter(data_dict: list[dict[str, str]], sort_by='submission_time',
     """Sort given data by specific header."""
 
 
-def convert_date(unix_date: str) -> str:
+def convert_date(unix_date: int) -> str:
     """Convert unix date into human format."""
+    epoch_time = datetime.datetime.strftime(datetime.datetime.fromtimestamp(unix_date), '%d/%m/%Y, %H:%M:%S')
+    print(epoch_time)
+    return 'ok'
 
 
 def generate_id() -> str:

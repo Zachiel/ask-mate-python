@@ -12,6 +12,7 @@
     --text-general: hsl(37, 100%, 16%);
     --text-caption: hsl(37, 44%, 44%);
     --default-border: 1px solid var(--text-general);
+    --default-shadow: 5px 5px 10px rgba(20, 20, 20, 0.5);
 }
 
 body {
@@ -37,6 +38,7 @@ footer {
     background-blend-mode: darken;
     background-color: rgba(20, 20, 20, 0.1);
     border: var(--default-border);
+    /* box-shadow: var(--default-shadow); */
 }
 
 .nav-link:hover,
@@ -54,4 +56,54 @@ footer {
 
 .accordion-button::after {
     display: none;
+}
+
+.accordion-button {
+    background-color: var(--powder-blue) !important;
+    color: var(--text-general) !important;
+}
+
+.accordion-header > button {
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding-left: 100px;
+    color: var(--text-general);
+}
+
+.accordion-body {
+    color: var(--text-caption);
+}
+
+.voting {
+    font-size: 1rem;
+    flex-wrap: nowrap;
+    position: absolute;
+    z-index: 4;
+    margin-top: 10px;
+}
+
+.voting > div {
+    /* background-color: red; */
+    min-width: auto;
+    margin: 0px;
+    padding: 0px;
+}
+
+.btn-downvote:focus,
+.btn-upvote:focus,
+.accordion-button:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.btn-upvote:hover {
+    color: orangered !important;
+}
+
+.btn-downvote:hover {
+    color: blue !important;
+}
+
+.btn-info {
+    background-color: var(--powder-blue);
 }
