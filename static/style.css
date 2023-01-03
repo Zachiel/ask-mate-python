@@ -29,6 +29,12 @@ footer {
     color: var(--text-general);
 }
 
+span.detail {
+    color: var(--text-caption);
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
 .nav-pills .nav-link.active {
     background-color: var(--accent-pink);
 }
@@ -61,6 +67,7 @@ footer {
 .accordion-button {
     background-color: var(--powder-blue) !important;
     color: var(--text-general) !important;
+    min-height: 50px;
 }
 
 .accordion-header > button {
@@ -79,7 +86,7 @@ footer {
     flex-wrap: nowrap;
     position: absolute;
     z-index: 4;
-    margin-top: 10px;
+    margin-top: 0.6rem;
 }
 
 .voting > div {
@@ -91,7 +98,8 @@ footer {
 
 .btn-downvote:focus,
 .btn-upvote:focus,
-.accordion-button:focus {
+.accordion-button:focus,
+.form-select:focus {
     outline: none;
     box-shadow: none;
 }
@@ -106,4 +114,12 @@ footer {
 
 .btn-info {
     background-color: var(--powder-blue);
+    border: var(--default-border);
+}
+
+.form-select,
+.input-group > button {
+    border: var(--default-border);
+    background-color: var(--powder-blue);
+    color: black;
 }

@@ -4,17 +4,21 @@ import data_handler
 
 app = Flask(__name__, static_url_path='/static')
 
+HEADERS_QUESTION = data_handler.HEADERS_QUESTION
+HEADERS_ANSWER = data_handler.HEADERS_ANSWER
 
 @app.route("/")
 @app.route("/list")
 def hello():
     """Main page route."""
     questions = data_handler.get_data_from_file('sample_data/question.csv')
-    headers_question = data_handler.HEADERS_QUESTION
-    headers_answer = data_handler.HEADERS_ANSWER
-    return render_template('index.html', headers_question=headers_question,
-                           headers_answer=headers_answer,
-                           questions=questions)
+    answers = data_handler.get_data_from_file('sample_data/answer.csv')
+    comment_count = data_handler.count_comments(questions, answers)
+    return render_template('index.html', headers_question=HEADERS_QUESTION,
+                           headers_answer=HEADERS_ANSWER,
+                           questions=questions,
+                           time_passed=data_handler.how_much_time_passed,
+                           comment_count=comment_count)
 
 @app.route("/question/<question_id>")
 def question(question_id):
