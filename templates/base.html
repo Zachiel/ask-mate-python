@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}{% endblock %} - AskMate</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+
+        <!-- Bootstrap CSS v5.2.1 -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+            crossorigin="anonymous"
+        />
+        <!-- jQuerry -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <!-- Custom javascript -->
+        <script src="{{ url_for('static', filename='app.js') }}"></script>
+        <!-- Custom stylesheet -->
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+        <!-- Font Awesome icons -->
+        <script src="https://kit.fontawesome.com/a52c965a3f.js" crossorigin="anonymous"></script>
+        <!-- Favicons -->
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='/favicon/apple-touch-icon.png') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='/favicon/favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='/favicon/favicon-16x16.png') }}">
+        <link rel="manifest" href="{{ url_for('static', filename='/favicon/site.webmanifest') }}">
+    </head>
+    <body>
+        <header>
+            <!-- Sticky top navbar -->
+            <nav class="navbar navbar-expand-lg fixed-top">
+                <!-- Flexbox container -->
+                <div class="container-fluid w-75">
+                    <!-- AskMate logo -->
+                    <a class="navbar-brand" href="/">
+                        <img
+                            class="img-fluid"
+                            src="{{ url_for('static', filename='images/logo.png') }}"
+                            alt="AskMate"
+                            style="max-height: 10vh"
+                        />
+                    </a>
+                    <!-- Small screen hamburger icon -->
+                    <button
+                        class="shadow navbar-toggler hidden-lg-up"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapsibleNavId"
+                        aria-controls="collapsibleNavId"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                        <img
+                            src="{{ url_for('static', filename='icons/hamburger_icon.svg') }}"
+                            alt="menu"
+                        />
+                    </button>
+                    <!-- Site navigation -->
+                    <div
+                        class="collapse navbar-collapse justify-content-end"
+                        id="collapsibleNavId">
+                        <ul class="nav nav-pills">
+                            <li class="shadow nav-item mx-1">
+                                <a href="/" class="nav-link active">Home</a>
+                            </li>
+                            <li class="shadow nav-item mx-1">
+                                <a href="/add-question" class="nav-link">Add question</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Site navigation -->
+                </div>
+                <!-- Flexbox container -->
+            </nav>
+            <!-- Sticky top navbar -->
+        </header>
+        <main class="p-5 mb-5">{% block content %}{% endblock %}</main>
+        <footer class="text-center fixed-bottom">
+            <!-- Grid container -->
+            <div class="container p-1">
+                <!-- Section: Social media -->
+                <section class="">
+                    <!-- Facebook -->
+                    <a
+                    class="btn text-white btn-floating m-1"
+                    style="background-color: #3b5998;"
+                    href="#!"
+                    role="button">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <!-- Twitter -->
+                    <a
+                    class="btn text-white btn-floating m-1"
+                    style="background-color: #55acee;"
+                    href="#!"
+                    role="button">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <!-- Google -->
+                    <a
+                    class="btn text-white btn-floating m-1"
+                    style="background-color: #dd4b39;"
+                    href="#!"
+                    role="button">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <!-- Instagram -->
+                    <a
+                    class="btn text-white btn-floating m-1"
+                    style="background-color: #ac2bac;"
+                    href="#!"
+                    role="button">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <!-- Linkedin -->
+                    <a
+                    class="btn text-white btn-floating m-1"
+                    style="background-color: #0082ca;"
+                    href="#!"
+                    role="button">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <!-- Github -->
+                    <a
+                    class="btn text-white btn-floating m-1"
+                    style="background-color: #333333;"
+                    href="#!"
+                    role="button">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </section>
+                <!-- Section: Social media -->
+            </div>
+            <!-- Grid container -->
+                <!-- Copyright -->
+                <div class="text-center p-1" style="background-color: rgba(0, 0, 0, 0.2);">
+                    © 2022 Copyright:
+                    <a class="text-white" href="https://i.pinimg.com/originals/0a/bb/e5/0abbe546e479edc1eb62f5a8ccd66328.jpg">
+                    Shrek is love, Shrek is life
+                    </a>
+                </div>
+            </div>
+        </footer>
+        <!-- Bootstrap JavaScript Libraries -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+            integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
+            integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz"
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>
