@@ -48,7 +48,7 @@ def add_new_question():
         new_question['message'] = request.form.get("question")
 
  
-        data_handler.write_data_to_file(data_handler.HEADERS_QUESTION, 'question.csv', new_question)
+        data_handler.write_data_to_file(data_handler.HEADERS_QUESTION, data_handler.QUESTION_PATH, new_question)
         return redirect('/list')
 
 if __name__ == "__main__":
