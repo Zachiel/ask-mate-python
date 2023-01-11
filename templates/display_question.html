@@ -1,0 +1,39 @@
+{% extends 'base.html' %} {% block title %} Display a question {% endblock %}
+{% block content %}
+<!--notes
+displays a question and the answers for it 
+the page displays the QUESTION TITLE and MESSAGE
+displays ALL answers to the question
+-->
+<div class="container-fluid my-5 pt-5 w-100">
+    <h1>{{question['title']}}</h1><br>
+    <h2>{{question['message']}}</h2><br>
+    <div class="container text-center">
+        {% for answer in answers %}
+        
+            <div
+                class="row justify-content-center align-items-center voting"
+            >
+                <div class="col ms-3">
+                    <button class="btn btn-upvote" href="#">
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                </div>
+                    <div class="col">{{ answer['vote_number'] }}</div>
+                <div class="col">
+                    <button class="btn btn-downvote" href="#">
+                        <i class="fas fa-arrow-down"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="row-fluid justify-content-between align-items-center g-2">
+                <div class="col text-wrap">{{ answer['message'] }}</div>
+                <div class="col">{{ answer['image'] }}</div>
+            </div><br>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock %}
+
