@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New question</title>
+</head>
+<body>
+    <h1>Fill the form to ask your question</h1>
+    <hr>
+    <form action="/add_question" method="POST">
+        <label for="title">Write title of your question here</label>
+        <textarea id="title" name="title" minlength="5"></textarea>
+        
+        <label for="question">Write your question here</label>
+        <textarea id="question" name="question" minlength="5"></textarea>
+        <hr>
+        <input type="submit"  value="Ask a question">
+        
+    </form>
+    
+</body>
+</html>
