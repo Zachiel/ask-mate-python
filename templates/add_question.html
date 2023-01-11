@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>New question</title>
-</head>
-<body>
+{%extends 'base.html' %} {%block title%} New question {%endblock%}
+{%block content%}
     <h1>Fill the form to ask your question</h1>
     <hr>
     <form action="/add_question" method="POST">
@@ -17,6 +12,4 @@
         <input type="submit"  value="Ask a question">
         
     </form>
-    
-</body>
-</html>
+{%endblock%}
