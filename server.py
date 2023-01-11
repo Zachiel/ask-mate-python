@@ -1,5 +1,5 @@
 """AskMate server route management."""
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 import data_handler
 
 app = Flask(__name__, static_url_path='/static')
@@ -32,6 +32,24 @@ def hello():
 def question(question_id):
     return 'Hello there!'
 
+
+@app.route('/add_question', methods=['GET', 'POST'])
+def add_new_question():
+    if request.method == "GET":
+        return render_template('/add_question.html')
+    else:
+        new_question = {}
+
+        new_question['id'] = data_handler.generate_id()
+        new_question['submission_time'] = ''
+        new_question['view_number'] = ''
+        new_question['vote_number'] = ''
+        new_question['title'] = request.form.get("title")
+        new_question['message'] = request.form.get("question")
+
+ 
+        data_handler.write_data_to_file(data_handler.HEADERS_QUESTION, 'question.csv', new_question)
+        return redirect('/list')
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
