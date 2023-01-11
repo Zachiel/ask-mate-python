@@ -2,6 +2,8 @@
 import csv
 from datetime import datetime, timedelta
 from typing import Any
+import string
+import random
 
 HEADERS_QUESTION: list[str] = ['id', 'submission_time', 'view_number',
                     'vote_number', 'title', 'message', 'image']
@@ -18,9 +20,31 @@ def get_data_from_file(filename: str) -> list[Any]:
         return data_list
 
 
-def write_data_to_file(filename: str, data_dict: list[dict[str, str]]) -> None:
+def write_data_to_file(headers, filename: str, data_dict: dict[str, str]):
     """Write dictionaries to file."""
+    with open(filename, 'a+', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=headers)
+        writer.writerow(data_dict)
+    print('end')
 
+
+dict_1 = {'id': '1', 'submission_time': '2', 'view_number': '3', 'vote_number': '4', 'title': '5', 'message': '6', 'image': '7'}
+print(dict_1)
+write_data_to_file(HEADERS_QUESTION, 'question.csv', dict_1 )
+
+
+def generate_id():
+    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    alphabet = list(string.ascii_lowercase)
+    data = get_data_from_file('question.csv')
+    ids = []
+    for question in data:
+        ids.append(question['id'])
+    id = random.choice(numbers) + random.choice(numbers) +random.choice(alphabet)
+    if id in ids:
+        generate_id()
+    else:
+        return id
 
 def count_comments() -> dict[str, int]:
     """Get comment count for each question."""
