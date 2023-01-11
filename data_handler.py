@@ -9,6 +9,7 @@ HEADERS_QUESTION: list[str] = ['id', 'submission_time', 'view_number',
                     'vote_number', 'title', 'message', 'image']
 HEADERS_ANSWER: list[str] = ['id', 'submission_time', 'vote_number',
                             'question_id', 'message', 'image']
+QUESTION_PATH = 'sample_data\question.csv'
 
 def get_data_from_file(filename: str) -> list[Any]:
     """Read data from file into list of dictionaries."""
@@ -28,17 +29,18 @@ def write_data_to_file(headers, filename: str, data_dict: dict[str, str]):
     print('end')
 
 
-dict_1 = {'id': '1', 'submission_time': '2', 'view_number': '3', 'vote_number': '4', 'title': '5', 'message': '6', 'image': '7'}
-print(dict_1)
-write_data_to_file(HEADERS_QUESTION, 'question.csv', dict_1 )
+# dict_1 = {'id': '1', 'submission_time': '2', 'view_number': '3', 'vote_number': '4', 'title': '5', 'message': '6', 'image': '7'}
+# print(dict_1)
+# write_data_to_file(HEADERS_QUESTION, 'question.csv', dict_1 )
 
 
 def generate_id():
     numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     alphabet = list(string.ascii_lowercase)
-    data = get_data_from_file('question.csv')
+    data = get_data_from_file(QUESTION_PATH)
     ids = []
     for question in data:
+        print(question)
         ids.append(question['id'])
     id = random.choice(numbers) + random.choice(numbers) +random.choice(alphabet)
     if id in ids:
@@ -49,7 +51,7 @@ def generate_id():
 def count_comments() -> dict[str, int]:
     """Get comment count for each question."""
     comments_count = {}
-    questions = get_data_from_file('sample_data/question.csv')
+    questions = get_data_from_file(QUESTION_PATH)
     answers = get_data_from_file('sample_data/answer.csv')
     for question in questions:
         for key, value in question.items():
@@ -115,5 +117,4 @@ def how_much_time_passed(unix_date: int) -> str:
 
 
 
-def generate_id() -> str:
-    """Generate new id."""
+
