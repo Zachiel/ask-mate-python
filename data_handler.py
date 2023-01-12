@@ -9,7 +9,7 @@ HEADERS_QUESTION: list[str] = ['id', 'submission_time', 'view_number',
                     'vote_number', 'title', 'message', 'image']
 HEADERS_ANSWER: list[str] = ['id', 'submission_time', 'vote_number',
                             'question_id', 'message', 'image']
-QUESTION_PATH = 'sample_data\question.csv'
+QUESTION_PATH = 'sample_data/question.csv'
 
 def get_data_from_file(filename: str) -> list[Any]:
     """Read data from file into list of dictionaries."""
@@ -26,12 +26,26 @@ def write_data_to_file(headers, filename: str, data_dict: dict[str, str]):
     with open(filename, 'a+', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=headers)
         writer.writerow(data_dict)
-    print('end')
 
 
-# dict_1 = {'id': '1', 'submission_time': '2', 'view_number': '3', 'vote_number': '4', 'title': '5', 'message': '6', 'image': '7'}
-# print(dict_1)
-# write_data_to_file(HEADERS_QUESTION, 'question.csv', dict_1 )
+def delete_data_from_file(filename, id):
+    data = get_data_from_file(filename)
+    lines = []
+    if filename == QUESTION_PATH:
+        headers = HEADERS_QUESTION
+    else:
+        headers = HEADERS_ANSWER
+    for element in data:
+        if element['id'] != id:
+            lines.append(element)
+    f = open(filename, "w+")
+    f.close()
+    with open(filename, 'w') as file:
+        writer = csv.writer(file)
+        writer.writerow(headers)
+    for line in lines:
+        write_data_to_file(headers, filename, line)
+
 
 
 def generate_id():
@@ -40,7 +54,6 @@ def generate_id():
     data = get_data_from_file(QUESTION_PATH)
     ids = []
     for question in data:
-        print(question)
         ids.append(question['id'])
     id = random.choice(numbers) + random.choice(numbers) +random.choice(alphabet)
     if id in ids:
@@ -117,4 +130,5 @@ def how_much_time_passed(unix_date: int) -> str:
 
 
 
-
+def generate_id() -> str:
+    """Generate new id."""
