@@ -1,0 +1,23 @@
+{% extends 'base.html' %} {% block title %} Display a question {% endblock %}
+{% block content %}
+<div class="container-fluid my-5 pt-5 w-100">
+    <div class="row"><h1>{{question['title']}}</h1></div><br>
+    <div class="row"><h3>{{question['message']}}</h3></div><br>
+    {% for answer in answers %}
+    <div class="row">
+        <div class="col-1">
+            <button class="btn btn-upvote" href="#">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            {{ answer['vote_number'] }}
+            <button class="btn btn-downvote" href="#">
+                <i class="fas fa-arrow-down"></i>
+            </button>
+        </div>
+        <div class="col">{{ answer['message'] }}</div>
+        <!--<div class="col">{{ answer['image'] }}</div>-->
+    </div><br>
+    {% endfor %}
+</div>
+{% endblock %}
+

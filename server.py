@@ -30,7 +30,22 @@ def hello():
 
 @app.route("/question/<question_id>")
 def question(question_id):
-    return 'Hello there!'
+    questions = data_handler.get_data_from_file(
+        'sample_data/question.csv')
+    answers = data_handler.get_data_from_file(
+        'sample_data/answer.csv')
+    question_send = ''
+    answers_send_list = []
+    for question in questions:
+        if question['id'] == question_id:
+            question_send = question
+            break
+        else:
+            continue
+    for answer in answers:
+        if answer['question_id'] == question_id:
+            answers_send_list.append(answer)
+    return render_template('display_question.html', question=question_send, answers=answers_send_list)
 
 @app.route("/question/<question_id>/new-answer", methods=['POST', 'GET'])
 def new_answer(question_id):
