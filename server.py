@@ -28,7 +28,7 @@ def hello():
                            time_passed=data_handler.how_much_time_passed,
                            comment_count=comment_count)
 
-@app.route("/question/<question_id>")
+@app.route("/question/<question_id>/")
 def question(question_id):
     questions = data_handler.get_data_from_file(
         'sample_data/question.csv')
