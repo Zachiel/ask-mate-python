@@ -41,13 +41,12 @@ def add_new_question():
         new_question = {}
 
         new_question['id'] = data_handler.generate_id()
-        new_question['submission_time'] = ''
-        new_question['view_number'] = ''
-        new_question['vote_number'] = ''
+        new_question['submission_time'] = data_handler.time_now()
+        new_question['view_number'] = '0'
+        new_question['vote_number'] = '0'
         new_question['title'] = request.form.get("title")
         new_question['message'] = request.form.get("question")
 
- 
         data_handler.write_data_to_file(data_handler.HEADERS_QUESTION, data_handler.QUESTION_PATH, new_question)
         return redirect('/list')
 
