@@ -28,7 +28,7 @@ def hello():
                            time_passed=data_handler.how_much_time_passed,
                            comment_count=comment_count)
 
-@app.route("/question/<question_id>")
+@app.route("/question/<question_id>/")
 def question(question_id):
     questions = data_handler.get_data_from_file(
         'sample_data/question.csv')
@@ -47,9 +47,12 @@ def question(question_id):
             answers_send_list.append(answer)
     return render_template('display_question.html', question=question_send, answers=answers_send_list)
 
-@app.route("/question/<question_id>/delete")
+@app.route("/question/<question_id>/delete", methods=["POST"])
 def delete_question(question_id):
-    print("delete")
+    data_handler.delete_question_from_file_by_id(
+        'sample_data/question.csv', question_id)
+    data_handler.delete_answers_for_question_id(
+        'sample_data/answer.csv', question_id)
     return redirect("/list")
 
 if __name__ == "__main__":
