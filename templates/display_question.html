@@ -18,6 +18,11 @@
         <!--<div class="col">{{ answer['image'] }}</div>-->
     </div><br>
     {% endfor %}
+    <div class="row">
+        <form action="new-answer" method="GET">
+            <button type="submit" class="btn btn-primary">Post new answer</button>
+        </form>
+    </div>
 </div>
 {% endblock %}
 
