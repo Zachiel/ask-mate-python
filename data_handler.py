@@ -28,26 +28,6 @@ def write_data_to_file(headers, filename: str, data_dict: dict[str, str]):
         writer.writerow(data_dict)
 
 
-def delete_data_from_file(filename, id):
-    data = get_data_from_file(filename)
-    lines = []
-    if filename == QUESTION_PATH:
-        headers = HEADERS_QUESTION
-    else:
-        headers = HEADERS_ANSWER
-    for element in data:
-        if element['id'] != id:
-            lines.append(element)
-    f = open(filename, "w+")
-    f.close()
-    with open(filename, 'w') as file:
-        writer = csv.writer(file)
-        writer.writerow(headers)
-    for line in lines:
-        write_data_to_file(headers, filename, line)
-
-
-
 def generate_id():
     numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     alphabet = list(string.ascii_lowercase)
@@ -107,6 +87,11 @@ def sorter(data_dict: list[dict[str, str]], sort_by='date',
             ordered_set.add(item)
     return list(ordered_set)
 
+def time_now():
+    time_now  = datetime.now()
+    time_now = int(round(datetime.timestamp(time_now), 0))
+    return time_now
+
 
 def how_much_time_passed(unix_date: int) -> str:
     """Calculate how much time has passed since date."""
@@ -123,12 +108,8 @@ def how_much_time_passed(unix_date: int) -> str:
             return f'{minutes} minutes ago'
         if seconds > 0:
             return f'{seconds} seconds ago'
-    days = int(time_list[0].split(' ')[0])
+    days_1 = time_list[0].split(' ')
+    days = int(days_1[0])
     if (days // 365) > 0:
         return f'{days // 365} years ago'
     return f'{days} days ago'
-
-
-
-def generate_id() -> str:
-    """Generate new id."""
