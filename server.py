@@ -79,14 +79,23 @@ def new_answer(question_id):
 
 @app.route("/question/<question_id>/edit", methods=['POST','GET'])
 def edit(question_id):
-    # from question page
-    # POST form with at least title and message
-    # fields pre-field with exisiting question data
-    # redirects to "Display a question" page
+    questions = data_handler.get_data_from_file(
+        'sample_data/question.csv')
+    question_to_send = ''
+    for question in questions:
+        if question['id'] == question_id:
+            question_to_send = question
+            break
+        
     if request.method == 'POST':
+        question['title'] = request.form.get("title")
+        question['message'] = request.form.get("message")
+        data_handler.delete_question_from_file_by_id('sample_data/question.csv', question_id)
+        data_handler.write_data_to_file(HEADERS_QUESTION, data_handler.QUESTION_PATH, question)
         return redirect('/question/'+question_id)
-    return render_template('edit_question.html')
     
+    return render_template('edit_question.html',
+                           question=question_to_send)
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
