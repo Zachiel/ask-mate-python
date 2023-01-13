@@ -56,9 +56,9 @@ def delete_question(question_id):
         'sample_data/answer.csv', question_id)
     return redirect("/list")
 
-@app.route("/question/<id>/delete_answer", methods=["POST"])
-def delete_answer(id):
-    data_handler.delete_specific_answer(id)
+@app.route("/question/<question_id>/<aid>/delete_answer", methods=["POST"])
+def delete_answer(question_id, aid):
+    data_handler.delete_specific_answer(aid)
     return redirect("/list")
 
 
