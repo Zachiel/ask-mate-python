@@ -1,5 +1,5 @@
 """AskMate server route management."""
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 import data_handler
 
 app = Flask(__name__, static_url_path='/static')
@@ -47,6 +47,13 @@ def question(question_id):
             answers_send_list.append(answer)
     return render_template('display_question.html', question=question_send, answers=answers_send_list)
 
+@app.route("/question/<question_id>/delete", methods=["POST"])
+def delete_question(question_id):
+    data_handler.delete_question_from_file_by_id(
+        'sample_data/question.csv', question_id)
+    data_handler.delete_answers_for_question_id(
+        'sample_data/answer.csv', question_id)
+    return redirect("/list")
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
