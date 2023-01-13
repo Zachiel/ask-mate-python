@@ -51,7 +51,7 @@ def delete_answers_for_question_id(filename: str, question_id):
         writer.writerows(lines)
 
 
-def write_data_to_file(filename: str, data_dict: list[dict[str, str]]) -> None:
+def write_data_to_file(headers, filename: str, data_dict: dict[str, str]):
     """Write dictionaries to file."""
     with open(filename, 'a+', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=headers)
