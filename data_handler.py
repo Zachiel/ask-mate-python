@@ -7,6 +7,8 @@ HEADERS_QUESTION: list[str] = ['id', 'submission_time', 'view_number',
                     'vote_number', 'title', 'message', 'image']
 HEADERS_ANSWER: list[str] = ['id', 'submission_time', 'vote_number',
                             'question_id', 'message', 'image']
+QUESTION_PATH = 'sample_data/question.csv'
+ANSWER_PATH = 'sample_data/answer.csv'
 
 def get_data_from_file(filename: str) -> list[Any]:
     """Read data from file into list of dictionaries."""
@@ -116,6 +118,3 @@ def how_much_time_passed(unix_date: int) -> str:
     return f'{days} days ago'
 
 
-
-def generate_id() -> str:
-    """Generate new id."""
