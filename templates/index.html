@@ -57,15 +57,19 @@
                             class="row justify-content-center align-items-center voting"
                         >
                             <div class="col ms-3">
-                                <button class="btn btn-upvote" href="#">
-                                    <i class="fas fa-arrow-up"></i>
-                                </button>
+                                <form action="question/{{item['id']}}/vote-up" method="POST">
+                                    <button type="submit" class="btn btn-upvote" href="#">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                </form>
                             </div>
                             <div class="col">{{ item['vote_number'] }}</div>
                             <div class="col">
-                                <button class="btn btn-downvote" href="#">
-                                    <i class="fas fa-arrow-down"></i>
-                                </button>
+                                <form action="question/{{item['id']}}/vote-down" method="POST">
+                                    <button type="submit" class="btn btn-downvote" href="#">
+                                        <i class="fas fa-arrow-down"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         <button
