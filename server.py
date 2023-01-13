@@ -120,5 +120,34 @@ def edit(question_id):
     return render_template('edit_question.html',
                            question=question_to_send)
 
+@app.route("/question/<question_id>/vote-up", methods=['POST'])
+def vote_question_up(question_id):
+    questions = data_handler.get_data_from_file(
+        'sample_data/question.csv')
+    for question in questions:
+        if question['id'] == question_id:
+            num = int(question['vote_number'])
+            num += 1
+            question['vote_number'] = str(num)
+            data_handler.delete_question_from_file_by_id('sample_data/question.csv', question_id)
+            data_handler.write_data_to_file(HEADERS_QUESTION, data_handler.QUESTION_PATH, question)
+            break
+    
+    return redirect("/list")
+
+@app.route("/question/<question_id>/vote-down", methods=['POST'])
+def vote_question_down(question_id):
+    questions = data_handler.get_data_from_file(
+        'sample_data/question.csv')
+    for question in questions:
+        if question['id'] == question_id:
+            num = int(question['vote_number'])
+            num -= 1
+            question['vote_number'] = str(num)
+            data_handler.delete_question_from_file_by_id('sample_data/question.csv', question_id)
+            data_handler.write_data_to_file(HEADERS_QUESTION, data_handler.QUESTION_PATH, question)
+            break
+    return redirect("/list")
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
