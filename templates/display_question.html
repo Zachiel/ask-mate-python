@@ -20,7 +20,7 @@
             </button>
         </div>
         <div class="col">{{ answer['message'] }}</div>
-        <form id="{{answer['id']}}" action="delete_answer"  method="POST">
+        <form action="{{answer['id']}}/delete_answer" method="POST">
             <button type="submit" class="btn btn-danger">Delete answer</button>
         </form>
         <!-- <div class="col">{{ answer['image'] }}</div> -->
