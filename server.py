@@ -56,6 +56,12 @@ def delete_question(question_id):
         'sample_data/answer.csv', question_id)
     return redirect("/list")
 
+@app.route("/question/<id>/delete_answer", methods=["POST"])
+def delete_answer(id):
+    data_handler.delete_specific_answer(id)
+    return redirect("/list")
+
+
 @app.route("/question/<question_id>/new-answer", methods=['POST', 'GET'])
 def new_answer(question_id):
     # The page has a POST form with a form field called message
