@@ -77,5 +77,22 @@ def new_answer(question_id):
         return redirect("/question/"+question_id)
     return render_template('new_answer.html')
 
+@app.route('/add_question', methods=['GET', 'POST'])
+def add_new_question():
+    if request.method == "GET":
+        return render_template('/add_question.html')
+    else:
+        new_question = {}
+
+        new_question['id'] = data_handler.generate_id()
+        new_question['submission_time'] = data_handler.time_now()
+        new_question['view_number'] = '0'
+        new_question['vote_number'] = '0'
+        new_question['title'] = request.form.get("title")
+        new_question['message'] = request.form.get("question")
+
+        data_handler.write_data_to_file(data_handler.HEADERS_QUESTION, data_handler.QUESTION_PATH, new_question)
+        return redirect('/list')
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
