@@ -51,6 +51,19 @@ def delete_answers_for_question_id(filename: str, question_id):
         writer.writerows(lines)
 
 
+def delete_specific_answer(answer_id, filename=ANSWER_PATH):
+    lines = []
+    with open(filename, 'r') as readFile:
+        reader = csv.DictReader(readFile, fieldnames=HEADERS_ANSWER)
+        for row in reader:
+            if row['id'] != answer_id:
+                lines.append(row)
+    with open(filename, 'w') as writeFile:
+        writer = csv.DictWriter(writeFile, fieldnames=HEADERS_ANSWER)
+        writer.writerows(lines)
+
+
+
 def write_data_to_file(headers, filename: str, data_dict: dict[str, str]):
     """Write dictionaries to file."""
     with open(filename, 'a+', newline='') as file:
@@ -86,7 +99,7 @@ def count_comments() -> dict[str, int]:
                 comments_count[value] += 1
     return comments_count
 
-
+#print(count_comments())
 def sorter(data_dict: list[dict[str, str]], sort_by='date',
            direction='descending') -> list[dict[str, str]]:
     """Sort given data by specific header."""
