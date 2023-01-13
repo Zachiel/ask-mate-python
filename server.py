@@ -77,5 +77,16 @@ def new_answer(question_id):
         return redirect("/question/"+question_id)
     return render_template('new_answer.html')
 
+@app.route("/question/<question_id>/edit", methods=['POST','GET'])
+def edit(question_id):
+    # from question page
+    # POST form with at least title and message
+    # fields pre-field with exisiting question data
+    # redirects to "Display a question" page
+    if request.method == 'POST':
+        return redirect('/question/'+question_id)
+    return render_template('edit_question.html')
+    
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
