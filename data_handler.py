@@ -11,6 +11,9 @@ HEADERS_ANSWER: list[str] = ['id', 'submission_time', 'vote_number',
                             'question_id', 'message', 'image']
 QUESTION_PATH = 'sample_data/question.csv'
 
+ANSWER_PATH = 'sample_data/answer.csv'
+
+
 def get_data_from_file(filename: str) -> list[Any]:
     """Read data from file into list of dictionaries."""
     with open(filename, 'r', encoding='UTF-8') as data:
@@ -21,7 +24,34 @@ def get_data_from_file(filename: str) -> list[Any]:
         return data_list
 
 
-def write_data_to_file(headers, filename: str, data_dict: dict[str, str]):
+
+def delete_question_from_file_by_id(filename: str, id):
+    lines = []
+    with open(filename, 'r') as readFile:
+        reader = csv.DictReader(readFile, fieldnames=HEADERS_QUESTION)
+        for row in reader:
+            lines.append(row)
+            if row['id'] == id:
+                lines.remove(row)
+    with open(filename, 'w') as writeFile:
+        writer = csv.DictWriter(writeFile, fieldnames=HEADERS_QUESTION)
+        writer.writerows(lines)
+                
+
+def delete_answers_for_question_id(filename: str, question_id):
+    lines = []
+    with open(filename, 'r') as readFile:
+        reader = csv.DictReader(readFile, fieldnames=HEADERS_ANSWER)
+        for row in reader:
+            lines.append(row)
+            if row['question_id'] == question_id:
+                lines.remove(row)
+    with open(filename, 'w') as writeFile:
+        writer = csv.DictWriter(writeFile, fieldnames=HEADERS_ANSWER)
+        writer.writerows(lines)
+
+
+def write_data_to_file(filename: str, data_dict: list[dict[str, str]]) -> None:
     """Write dictionaries to file."""
     with open(filename, 'a+', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=headers)
@@ -113,3 +143,4 @@ def how_much_time_passed(unix_date: int) -> str:
     if (days // 365) > 0:
         return f'{days // 365} years ago'
     return f'{days} days ago'
+
