@@ -46,7 +46,7 @@ def question(question_id):
     for answer in answers:
         if answer['question_id'] == question_id:
             answers_send_list.append(answer)
-    return render_template('display_question.html', question=question_send, answers=answers_send_list)
+    return render_template('display_question.html', question=question_send, answers=answers_send_list, count_answers=len(answers_send_list))
 
 @app.route("/question/<question_id>/delete", methods=["POST"])
 def delete_question(question_id):
