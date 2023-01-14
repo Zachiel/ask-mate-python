@@ -22,7 +22,7 @@
                         class="form-select shadow"
                         name="order_by"
                         id="order_by"
-                    >{% set order_by = ['date', 'title', 'message', 'views', 'votes', 'comments'] %}
+                    >{% set order_by = ['date', 'title', 'message', 'views', 'votes'] %}
                         {% for order in order_by %}
                         <option {% if order == request.args.get('order_by') %}selected{% endif %} value="{{order}}">{{order}}</option>
                         {% endfor %}
