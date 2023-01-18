@@ -20,7 +20,35 @@ def get_question_by_id(question_id):
         if question['id'] == question_id:
             question_to_send = question
             return question_to_send
+
+
+def add_data_to_file(mode, question_id='', message='', title=''):
+    if mode == 'answer':
+        new_answer = {}
+        new_answer['id'] = generate_id()
+        new_answer['submission_time'] = time_now()
+        new_answer['vote_number'] = '0'
+        new_answer['question_id'] = question_id
+        new_answer['message'] = message
         
+        write_data_to_file(HEADERS_ANSWER,
+                            ANSWER_PATH,
+                            new_answer)
+        
+    elif mode == 'question':
+        new_question = {}
+        new_question['id'] = generate_id()
+        new_question['submission_time'] = time_now()
+        new_question['view_number'] = '0'
+        new_question['vote_number'] = '0'
+        new_question['title'] = title
+        new_question['message'] = message
+        write_data_to_file(HEADERS_QUESTION,
+                                        QUESTION_PATH,
+                                        new_question)
+    else:
+        print('Wrong mode!')
+
         
 def voting_questions(question_id, mode):
     questions = get_data_from_file(QUESTION_PATH)

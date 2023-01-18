@@ -68,19 +68,10 @@ def new_answer(question_id):
     # The page has a POST form with a form field called message
     # Posting an answer redirects to the question detail page
     if request.method == "POST":
-        new_answer = {}
-        new_answer['id'] = data_handler.generate_id()
-        
-        now = datetime.now()
-        timestamp = datetime.timestamp(now)
-        without_ms = int(timestamp)
-        new_answer['submission_time'] = without_ms
-        
-        new_answer['vote_number'] = '0'
-        new_answer['question_id'] = question_id
-        new_answer['message'] = request.form.get("message")
-        
-        data_handler.write_data_to_file(HEADERS_ANSWER, data_handler.ANSWER_PATH, new_answer)
+        message = request.form.get("message")
+        data_handler.add_data_to_file(question_id=question_id,
+                                      mode='answer',
+                                      message=message)
         return redirect("/question/"+question_id)
     return render_template('new_answer.html')
 
@@ -90,16 +81,11 @@ def add_new_question():
     if request.method == "GET":
         return render_template('/add_question.html')
     else:
-        new_question = {}
-
-        new_question['id'] = data_handler.generate_id()
-        new_question['submission_time'] = data_handler.time_now()
-        new_question['view_number'] = '0'
-        new_question['vote_number'] = '0'
-        new_question['title'] = request.form.get("title")
-        new_question['message'] = request.form.get("question")
-
-        data_handler.write_data_to_file(data_handler.HEADERS_QUESTION, data_handler.QUESTION_PATH, new_question)
+        message = request.form.get("question")
+        title = request.form.get("title")
+        data_handler.add_data_to_file(mode='question',
+                                      message=message,
+                                      title=title)
         return redirect('/list')
 
 
