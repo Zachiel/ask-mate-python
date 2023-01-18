@@ -29,8 +29,9 @@ def hello():
                            time_passed=data_handler.how_much_time_passed,
                            comment_count=comment_count)
 
+
 @app.route("/question/<question_id>/")
-def question(question_id):
+def display_question(question_id):
     
     answers = data_handler.get_data_from_file(
         'sample_data/answer.csv')
@@ -46,6 +47,7 @@ def question(question_id):
         answers=answers_send_list,
         count_answers=len(answers_send_list))
 
+
 @app.route("/question/<question_id>/delete", methods=["POST"])
 def delete_question(question_id):
     data_handler.delete_question_from_file_by_id(
@@ -53,6 +55,7 @@ def delete_question(question_id):
     data_handler.delete_answers_for_question_id(
         'sample_data/answer.csv', question_id)
     return redirect("/list")
+
 
 @app.route("/question/<question_id>/<aid>/delete_answer", methods=["POST"])
 def delete_answer(question_id, aid):
@@ -81,6 +84,7 @@ def new_answer(question_id):
         return redirect("/question/"+question_id)
     return render_template('new_answer.html')
 
+
 @app.route('/add_question', methods=['GET', 'POST'])
 def add_new_question():
     if request.method == "GET":
@@ -100,28 +104,34 @@ def add_new_question():
 
 
 @app.route("/question/<question_id>/edit", methods=['POST','GET'])
-def edit(question_id):
-    question_to_send = data_handler.get_question_by_id(question_id)
+def edit_question(question_id):
+    question = data_handler.get_question_by_id(question_id)
 
     if request.method == 'POST':
         question['title'] = request.form.get("title")
         question['message'] = request.form.get("message")
-        data_handler.delete_question_from_file_by_id('sample_data/question.csv', question_id)
-        data_handler.write_data_to_file(HEADERS_QUESTION, data_handler.QUESTION_PATH, question)
+        data_handler.delete_question_from_file_by_id('sample_data/question.csv',
+                                                     question_id)
+        data_handler.write_data_to_file(HEADERS_QUESTION,
+                                        data_handler.QUESTION_PATH,
+                                        question)
         return redirect('/question/'+question_id)
 
     return render_template('edit_question.html',
-                        question=question_to_send)
+                        question=question)
+
 
 @app.route("/question/<question_id>/vote-up", methods=['POST'])
 def vote_question_up(question_id):
     data_handler.voting_questions(question_id, 'up')
     return redirect("/list")
 
+
 @app.route("/question/<question_id>/vote-down", methods=['POST'])
 def vote_question_down(question_id):
     data_handler.voting_questions(question_id, 'down')
     return redirect("/list")
+
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
