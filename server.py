@@ -31,22 +31,20 @@ def hello():
 
 @app.route("/question/<question_id>/")
 def question(question_id):
-    questions = data_handler.get_data_from_file(
-        'sample_data/question.csv')
+    
     answers = data_handler.get_data_from_file(
         'sample_data/answer.csv')
-    question_send = ''
+    question_to_send = data_handler.get_question_by_id(
+        question_id)
     answers_send_list = []
-    for question in questions:
-        if question['id'] == question_id:
-            question_send = question
-            break
-        else:
-            continue
     for answer in answers:
         if answer['question_id'] == question_id:
             answers_send_list.append(answer)
-    return render_template('display_question.html', question=question_send, answers=answers_send_list, count_answers=len(answers_send_list))
+    return render_template(
+        'display_question.html',
+        question=question_to_send,
+        answers=answers_send_list,
+        count_answers=len(answers_send_list))
 
 @app.route("/question/<question_id>/delete", methods=["POST"])
 def delete_question(question_id):
@@ -103,13 +101,7 @@ def add_new_question():
 
 @app.route("/question/<question_id>/edit", methods=['POST','GET'])
 def edit(question_id):
-    questions = data_handler.get_data_from_file(
-         'sample_data/question.csv')
-    question_to_send = ''
-    for question in questions:
-        if question['id'] == question_id:
-            question_to_send = question
-            break
+    question_to_send = data_handler.get_question_by_id(question_id)
 
     if request.method == 'POST':
         question['title'] = request.form.get("title")
@@ -123,31 +115,12 @@ def edit(question_id):
 
 @app.route("/question/<question_id>/vote-up", methods=['POST'])
 def vote_question_up(question_id):
-    questions = data_handler.get_data_from_file(
-        'sample_data/question.csv')
-    for question in questions:
-        if question['id'] == question_id:
-            num = int(question['vote_number'])
-            num += 1
-            question['vote_number'] = str(num)
-            data_handler.delete_question_from_file_by_id('sample_data/question.csv', question_id)
-            data_handler.write_data_to_file(HEADERS_QUESTION, data_handler.QUESTION_PATH, question)
-            break
-    
+    data_handler.voting_questions(question_id, 'up')
     return redirect("/list")
 
 @app.route("/question/<question_id>/vote-down", methods=['POST'])
 def vote_question_down(question_id):
-    questions = data_handler.get_data_from_file(
-        'sample_data/question.csv')
-    for question in questions:
-        if question['id'] == question_id:
-            num = int(question['vote_number'])
-            num -= 1
-            question['vote_number'] = str(num)
-            data_handler.delete_question_from_file_by_id('sample_data/question.csv', question_id)
-            data_handler.write_data_to_file(HEADERS_QUESTION, data_handler.QUESTION_PATH, question)
-            break
+    data_handler.voting_questions(question_id, 'down')
     return redirect("/list")
 
 if __name__ == "__main__":
