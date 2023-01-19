@@ -1,0 +1,150 @@
+{% extends 'base.html' %} {% block title %} Display a question {% endblock %} {%
+block content %}
+<div class="container-fluid m-5 p-5">
+    <div class="row justify-content-center align-items-center g-2">
+        <div class="col-8">
+            <div class="card border-dark p-3">
+                <div class="card-body">
+                    <div class="row justify-content-end align-items-start mb-2">
+                        <div class="col">
+                            <span class="detail text-nowrap"
+                                >{{ question['submission_time']}}</span
+                            >
+                            <span class="detail text-nowrap px-2">
+                                <i class="far fa-eye"></i> {{
+                                question['view_number'] }}
+                            </span>
+                            <span class="detail text-nowrap">
+                                <i class="fa-regular fa-comment-dots"></i>
+                                {{ count_answers }}
+                            </span>
+                        </div>
+                        <div class="col-1 mx-1">
+                            <form action="edit" method="GET">
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm btn-info text-nowrap shadow"
+                                >
+                                    Edit question
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-1 mx-1 me-5">
+                            <form action="delete" method="POST">
+                                <!-- Button trigger modal -->
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-danger text-nowrap border-dark shadow"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal"
+                                >
+                                    Delete question
+                                </button>
+                                <!-- Modal -->
+                                <div
+                                    class="modal fade"
+                                    id="exampleModal"
+                                    tabindex="-1"
+                                    aria-labelledby="exampleModalLabel"
+                                    aria-hidden="true"
+                                >
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1
+                                                    class="modal-title fs-5"
+                                                    id="exampleModalLabel"
+                                                >
+                                                    Are you sure you want to
+                                                    delete?
+                                                </h1>
+                                                <button
+                                                    type="button"
+                                                    class="btn-close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Close"
+                                                ></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                This action is irreversible. The
+                                                question with all its answers
+                                                will be permanently deleted. Do
+                                                you want to continue?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-secondary"
+                                                    data-bs-dismiss="modal"
+                                                >
+                                                    Close
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-danger"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h2 class="card-title">{{question['title']}}</h2>
+                        <hr class="border border-warning border-2 opacity-50" />
+                        <p class="card-text">{{question['message']}}</p>
+                        <div class="text-end">
+                            <form action="new-answer" method="GET">
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm btn-info"
+                                >
+                                    Post new answer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% for answer in answers %}
+    <div class="row justify-content-center align-items-center g-2">
+        <div class="col-8">
+            <div class="card border-dark p-1">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-1 text-nowrap me-5">
+                            <button class="btn btn-upvote" href="#">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            {{ answer['vote_number'] }}
+                            <button class="btn btn-downvote" href="#">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                        <div class="col">{{ answer['message'] }}</div>
+                        <div class="col-1 text-nowrap me-5">
+                            <form
+                                action="{{answer['id']}}/delete_answer"
+                                method="POST"
+                            >
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger btn-sm shadow border-dark"
+                                >
+                                    Delete answer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

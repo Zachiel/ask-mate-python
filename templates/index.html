@@ -1,0 +1,132 @@
+{% extends 'base.html'%} {% block title %}Home{% endblock %} {% block content %}
+<!-- Grid container -->
+<div class="container-fluid my-5 pt-5 w-100">
+    <!-- Grid row 1 -->
+    <div class="row justify-content-between align-items-center g-2 mb-3">
+        <div class="col">
+            <h2 class="ms-5">
+                {% if request.args.get('order_by') == None %}Latest questions{%
+                else %}{{ request.args.get('order_by') }} {{
+                request.args.get('order_direction')}}{% endif %}
+            </h2>
+        </div>
+        <!-- Question sorting button -->
+        <div class="col-4 me-3 ps-5">
+            <form
+                class="input-group justify-content-end"
+                action="/"
+                method="get"
+            >
+                <div class="col">
+                    <select
+                        class="form-select shadow"
+                        name="order_by"
+                        id="order_by"
+                    >{% set order_by = ['date', 'title', 'message', 'views', 'votes'] %}
+                        {% for order in order_by %}
+                        <option {% if order == request.args.get('order_by') %}selected{% endif %} value="{{order}}">{{order}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col mx-1">
+                    <select
+                        class="form-select shadow"
+                        name="order_direction"
+                        id="order_direction"
+                    >{% set order_direction = ['descending', 'ascending'] %}
+                        {% for direction in order_direction %}
+                        <option {% if direction == request.args.get('order_direction') %}selected{% endif %} value="{{direction}}">{{direction}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-info shadow">Sort</button>
+            </form>
+            <!-- Question sorting button -->
+        </div>
+        <!-- Grid row 2 -->
+        <div class="row justify-content-center align-items-center g-2">
+            <!-- Listed questions --->
+            <div class="accordion" id="question-accordion">
+                {% for item in questions %}
+                <div class="accordion-item">
+                    <h2
+                        class="accordion-header"
+                        id="panelsStayOpen-heading{{ item['id'] }}"
+                    >
+                        <div
+                            class="row justify-content-center align-items-center voting"
+                        >
+                            <div class="col ms-3">
+                                <form action="question/{{item['id']}}/vote-up" method="POST">
+                                    <button type="submit" class="btn btn-upvote" href="#">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col">{{ item['vote_number'] }}</div>
+                            <div class="col">
+                                <form action="question/{{item['id']}}/vote-down" method="POST">
+                                    <button type="submit" class="btn btn-downvote" href="#">
+                                        <i class="fas fa-arrow-down"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <button
+                            class="accordion-button"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#panelsStayOpen-collapse{{ item['id'] }}"
+                            aria-expanded="true"
+                            aria-controls="panelsStayOpen-collapse{{ item['id'] }}"
+                        >
+                            <div
+                                class="row-fluid justify-content-between align-items-center g-2"
+                            >
+                                <div class="col">
+                                    <span>{{ item['title'] }}</span>
+                                </div>
+                                <div class="col-3">
+                                    <span class="detail text-nowrap"
+                                        >{{ time_passed(item['submission_time'])
+                                        }}</span
+                                    ><span class="detail text-nowrap px-2"
+                                        ><i class="far fa-eye"></i> {{
+                                        item['view_number'] }}</span
+                                    ><span class="detail text-nowrap"
+                                        ><i
+                                            class="fa-regular fa-comment-dots"
+                                        ></i>
+                                        {{ comment_count[item['id']] }}</span
+                                    >
+                                </div>
+                            </div>
+                        </button>
+                    </h2>
+                    <div>
+                        <div
+                            id="panelsStayOpen-collapse{{ item['id'] }}"
+                            class="accordion-collapse collapse"
+                            aria-labelledby="panelsStayOpen-heading{{ item['id'] }}"
+                        >
+                            <div class="accordion-body">
+                                {{ item['message'].replace('\n', '<br />')|safe
+                                }}
+                            </div>
+                            <div>
+                                <a href="/question/{{ item['id'] }}">
+                                    <button class="btn btn-info ms-3 mb-2">
+                                        Open question
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- Grid container -->
+            {% endblock %}
+        </div>
+    </div>
+</div>

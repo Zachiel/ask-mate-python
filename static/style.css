@@ -1,0 +1,125 @@
+:root {
+    --background: hsl(49, 58%, 93%);
+    --powder-blue: hsl(194, 50%, 80%);
+    --powder-pink: hsl(317, 48%, 84%);
+    --accent-blue: hsl(211, 48%, 52%);
+    --accent-pink: hsl(320, 44%, 57%);
+    --powder-gradient: linear-gradient(
+        90deg,
+        var(--powder-pink) 0%,
+        var(--powder-blue) 100%
+    );
+    --text-general: hsl(37, 100%, 16%);
+    --text-caption: hsl(37, 44%, 44%);
+    --default-border: 1px solid var(--text-general);
+    --default-shadow: 5px 5px 10px rgba(20, 20, 20, 0.5);
+}
+
+body {
+    background-color: var(--background);
+}
+
+nav {
+    background: var(--powder-gradient);
+    color: var(--text-general);
+}
+
+footer {
+    background: var(--powder-gradient);
+    color: var(--text-general);
+}
+
+span.detail {
+    color: var(--text-caption);
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--accent-pink);
+}
+
+.nav-item .nav-link {
+    color: var(--text-general);
+    background-blend-mode: darken;
+    background-color: rgba(20, 20, 20, 0.1);
+    border: var(--default-border);
+    /* box-shadow: var(--default-shadow); */
+}
+
+.nav-link:hover,
+.nav-link:focus,
+.nav-link.active:hover,
+.nav-link.active:focus {
+    background-color: var(--powder-pink);
+    background-blend-mode: lighten;
+}
+
+.btn-dropdown {
+    background-color: var(--powder-blue) !important;
+    border: var(--default-border) !important;
+}
+
+.accordion-button::after {
+    display: none;
+}
+
+.accordion-button {
+    background-color: var(--powder-blue) !important;
+    color: var(--text-general) !important;
+    min-height: 50px;
+}
+
+.accordion-header > button {
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding-left: 100px;
+    color: var(--text-general);
+}
+
+.accordion-body {
+    color: var(--text-caption);
+}
+
+.voting {
+    font-size: 1rem;
+    flex-wrap: nowrap;
+    position: absolute;
+    z-index: 4;
+    margin-top: 0.6rem;
+}
+
+.voting > div {
+    /* background-color: red; */
+    min-width: auto;
+    margin: 0px;
+    padding: 0px;
+}
+
+.btn-downvote:focus,
+.btn-upvote:focus,
+.accordion-button:focus,
+.form-select:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.btn-upvote:hover {
+    color: orangered !important;
+}
+
+.btn-downvote:hover {
+    color: blue !important;
+}
+
+.btn-info {
+    background-color: var(--powder-blue);
+    border: var(--default-border);
+}
+
+.form-select,
+.input-group > button {
+    border: var(--default-border);
+    background-color: var(--powder-blue);
+    color: black;
+}
