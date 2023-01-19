@@ -1,6 +1,6 @@
 CREATE TABLE answer
 (
-    answer_id INTEGER PRIMARY KEY IDENTITY(1,1),
+    answer_id INTEGER PRIMARY KEY SERIAL,
     submission_time INTEGER NOT NULL,
     vote_number INTEGER NOT NULL,
     question_id INTEGER NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE answer
 
 CREATE TABLE question
 (
-    question_id INTEGER PRIMARY KEY IDENTITY(1,1)
+    question_id INTEGER PRIMARY KEY SERIAL,
     submission_time INTEGER NOT NULL,
     view_number INTEGER NOT NULL,
     vote_number INTEGER NOT NULL,
@@ -24,7 +24,7 @@ INSERT INTO answer VALUES
 (1493398154,4,1,'You need to use brackets: my_list = []',NULL),
 (1493088154,35,1,'Look it up in the Python docs',NULL),
 (1673739903,0,5,'Step 1 - Apply to a course at Codecool',NULL),
-(1673739911,0,28p,'Step 2 - Git gud',NULL);
+(1673739911,0,5,'Step 2 - Git gud',NULL);
 
 
 
