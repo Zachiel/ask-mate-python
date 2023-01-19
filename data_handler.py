@@ -7,6 +7,20 @@ import random
 import psycopg2
 
 
+conn = psycopg2.connect("dbname=cc_ask_mate user=cc_ask_mate password=test123")
+cur = conn.cursor()
+cur.execute("SELECT * FROM answer;")
+desc = cur.description
+column_names = [col[0] for col in desc]
+answers_sql = [dict(zip(column_names, row))  
+        for row in cur.fetchall()]
+cur.execute("SELECT * FROM question;")
+desc = cur.description
+column_names = [col[0] for col in desc]
+question_sql = [dict(zip(column_names, row))  
+        for row in cur.fetchall()]
+conn.close()
+
 
 HEADERS_QUESTION: list[str] = ['id', 'submission_time', 'view_number',
                     'vote_number', 'title', 'message', 'image']
@@ -16,13 +30,12 @@ QUESTION_PATH = 'sample_data/question.csv'
 
 ANSWER_PATH = 'sample_data/answer.csv'
 
-def get_question_by_id(question_id):
-    questions = get_data_from_file(QUESTION_PATH)
-    question_to_send = ''
+def get_question_by_id(question_ids):
+    questions = question_sql
     for question in questions:
-        if question['id'] == question_id:
-            question_to_send = question
-            return question_to_send
+        if question['question_id'] == int(question_ids):
+            return question
+
 
 
 def add_data_to_file(mode, question_id='', message='', title=''):

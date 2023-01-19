@@ -1,5 +1,6 @@
 import psycopg2
 import psycopg2.extras
+import data_handler
 
 # dict_cur.execute("SELECT * FROM answer")
 # rec = dict_cur.fetchall()
@@ -10,7 +11,16 @@ cur = conn.cursor()
 cur.execute("SELECT * FROM answer;")
 desc = cur.description
 column_names = [col[0] for col in desc]
-data = [dict(zip(column_names, row))  
+answers_sql = [dict(zip(column_names, row))  
         for row in cur.fetchall()]
-print((data))
+cur.execute("SELECT * FROM question;")
+desc = cur.description
+column_names = [col[0] for col in desc]
+question_sql = [dict(zip(column_names, row))  
+        for row in cur.fetchall()]
 conn.close()
+
+# print(question_sql)
+# print(data_handler.get_data_from_file(data_handler.QUESTION_PATH))
+print(data_handler.get_question_by_id(1))
+

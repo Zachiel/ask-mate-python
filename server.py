@@ -39,7 +39,7 @@ def display_question(question_id):
         question_id)
     answers_send_list = []
     for answer in answers:
-        if answer['question_id'] == question_id:
+        if answer['question_id'] == str(question_id):
             answers_send_list.append(answer)
     return render_template(
         'display_question.html',
