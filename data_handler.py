@@ -4,6 +4,9 @@ from datetime import datetime, timedelta
 from typing import Any
 import string
 import random
+import psycopg2
+
+
 
 HEADERS_QUESTION: list[str] = ['id', 'submission_time', 'view_number',
                     'vote_number', 'title', 'message', 'image']
