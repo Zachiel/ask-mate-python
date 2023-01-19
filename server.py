@@ -29,24 +29,24 @@ def hello():
                            time_passed=data_handler.how_much_time_passed,
                            comment_count=comment_count)
 
+
 @app.route("/question/<question_id>/")
-def question(question_id):
-    questions = data_handler.get_data_from_file(
-        'sample_data/question.csv')
+def display_question(question_id):
+    
     answers = data_handler.get_data_from_file(
         'sample_data/answer.csv')
-    question_send = ''
+    question_to_send = data_handler.get_question_by_id(
+        question_id)
     answers_send_list = []
-    for question in questions:
-        if question['id'] == question_id:
-            question_send = question
-            break
-        else:
-            continue
     for answer in answers:
         if answer['question_id'] == question_id:
             answers_send_list.append(answer)
-    return render_template('display_question.html', question=question_send, answers=answers_send_list, count_answers=len(answers_send_list))
+    return render_template(
+        'display_question.html',
+        question=question_to_send,
+        answers=answers_send_list,
+        count_answers=len(answers_send_list))
+
 
 @app.route("/question/<question_id>/delete", methods=["POST"])
 def delete_question(question_id):
@@ -55,6 +55,7 @@ def delete_question(question_id):
     data_handler.delete_answers_for_question_id(
         'sample_data/answer.csv', question_id)
     return redirect("/list")
+
 
 @app.route("/question/<question_id>/<aid>/delete_answer", methods=["POST"])
 def delete_answer(question_id, aid):
@@ -67,88 +68,56 @@ def new_answer(question_id):
     # The page has a POST form with a form field called message
     # Posting an answer redirects to the question detail page
     if request.method == "POST":
-        new_answer = {}
-        new_answer['id'] = data_handler.generate_id()
-        
-        now = datetime.now()
-        timestamp = datetime.timestamp(now)
-        without_ms = int(timestamp)
-        new_answer['submission_time'] = without_ms
-        
-        new_answer['vote_number'] = '0'
-        new_answer['question_id'] = question_id
-        new_answer['message'] = request.form.get("message")
-        
-        data_handler.write_data_to_file(HEADERS_ANSWER, data_handler.ANSWER_PATH, new_answer)
+        message = request.form.get("message")
+        data_handler.add_data_to_file(question_id=question_id,
+                                      mode='answer',
+                                      message=message)
         return redirect("/question/"+question_id)
     return render_template('new_answer.html')
+
 
 @app.route('/add_question', methods=['GET', 'POST'])
 def add_new_question():
     if request.method == "GET":
         return render_template('/add_question.html')
     else:
-        new_question = {}
-
-        new_question['id'] = data_handler.generate_id()
-        new_question['submission_time'] = data_handler.time_now()
-        new_question['view_number'] = '0'
-        new_question['vote_number'] = '0'
-        new_question['title'] = request.form.get("title")
-        new_question['message'] = request.form.get("question")
-
-        data_handler.write_data_to_file(data_handler.HEADERS_QUESTION, data_handler.QUESTION_PATH, new_question)
+        message = request.form.get("question")
+        title = request.form.get("title")
+        data_handler.add_data_to_file(mode='question',
+                                      message=message,
+                                      title=title)
         return redirect('/list')
 
 
 @app.route("/question/<question_id>/edit", methods=['POST','GET'])
-def edit(question_id):
-    questions = data_handler.get_data_from_file(
-         'sample_data/question.csv')
-    question_to_send = ''
-    for question in questions:
-        if question['id'] == question_id:
-            question_to_send = question
-            break
+def edit_question(question_id):
+    question = data_handler.get_question_by_id(question_id)
 
     if request.method == 'POST':
         question['title'] = request.form.get("title")
         question['message'] = request.form.get("message")
-        data_handler.delete_question_from_file_by_id('sample_data/question.csv', question_id)
-        data_handler.write_data_to_file(HEADERS_QUESTION, data_handler.QUESTION_PATH, question)
+        data_handler.delete_question_from_file_by_id('sample_data/question.csv',
+                                                     question_id)
+        data_handler.write_data_to_file(HEADERS_QUESTION,
+                                        data_handler.QUESTION_PATH,
+                                        question)
         return redirect('/question/'+question_id)
 
     return render_template('edit_question.html',
-                        question=question_to_send)
+                        question=question)
+
 
 @app.route("/question/<question_id>/vote-up", methods=['POST'])
 def vote_question_up(question_id):
-    questions = data_handler.get_data_from_file(
-        'sample_data/question.csv')
-    for question in questions:
-        if question['id'] == question_id:
-            num = int(question['vote_number'])
-            num += 1
-            question['vote_number'] = str(num)
-            data_handler.delete_question_from_file_by_id('sample_data/question.csv', question_id)
-            data_handler.write_data_to_file(HEADERS_QUESTION, data_handler.QUESTION_PATH, question)
-            break
-    
+    data_handler.voting_questions(question_id, 'up')
     return redirect("/list")
+
 
 @app.route("/question/<question_id>/vote-down", methods=['POST'])
 def vote_question_down(question_id):
-    questions = data_handler.get_data_from_file(
-        'sample_data/question.csv')
-    for question in questions:
-        if question['id'] == question_id:
-            num = int(question['vote_number'])
-            num -= 1
-            question['vote_number'] = str(num)
-            data_handler.delete_question_from_file_by_id('sample_data/question.csv', question_id)
-            data_handler.write_data_to_file(HEADERS_QUESTION, data_handler.QUESTION_PATH, question)
-            break
+    data_handler.voting_questions(question_id, 'down')
     return redirect("/list")
+
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
