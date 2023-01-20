@@ -52,13 +52,11 @@ def get_question_by_id(question_ids):
 @database_common.connection_handler
 def add_data_to_file(cursor, mode, question_id='', message='', title=''):
     if mode == 'answer':
-        query = 'INSERT INTO answer (submission_time, vote_number, question_id, msg) VALUES  (%s, %s, %s, %s)', (time_now(), 0, question_id, message)
         cursor.execute('INSERT INTO answer (submission_time, vote_number, question_id, msg) VALUES  (%s, %s, %s, %s)',
         (time_now(), 0, question_id, message))
         database_common.open_database().commit()
        
     elif mode == 'question':
-        query = "INSERT INTO question (submission_time, view_number, vote_number, title, msg) VALUES  (%s, %s, %s, %s, %s)", (time_now(), 0, 0,title,message)
         cursor.execute("INSERT INTO question (submission_time, view_number, vote_number, title, msg) VALUES  (%s, %s, %s, %s, %s)",
         (time_now(), 0, 0,title,message))
         database_common.open_database().commit()
