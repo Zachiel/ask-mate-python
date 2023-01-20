@@ -53,8 +53,8 @@ def delete_question(question_id):
 
 @app.route("/question/<question_id>/<aid>/delete_answer", methods=["POST"])
 def delete_answer(question_id, aid):
-    data_handler.delete_data(mode='answer', 
-                            answer_id =aid)
+    data_handler.delete_data(mode='answer',
+                            aid =aid)
     return redirect("/question/" + question_id)
 
 

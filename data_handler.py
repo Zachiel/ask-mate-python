@@ -79,17 +79,6 @@ def voting_questions(cursor, question_id, mode):
         print('Wrong mode!')
     
 
-
-# def get_data_from_file(filename: str) -> list[Any]:
-#     """Read data from file into list of dictionaries."""
-#     with open(filename, 'r', encoding='UTF-8') as data:
-#         data_list = []
-#         reader = csv.DictReader(data)
-#         for item in reader:
-#             data_list.append(item)
-#         return data_list
-
-
 @database_common.connection_handler
 def delete_data(cursor, mode, aid='', given_question_id=''):
     if mode == 'question':
@@ -103,59 +92,7 @@ def delete_data(cursor, mode, aid='', given_question_id=''):
 
     else:
         print('Wrong mode!')
-        
-# def delete_question_from_file_by_id(filename: str, id):
-#     lines = []
-#     with open(filename, 'r') as readFile:
-#         for row in reader:
-#             lines.append(row)
-#             if row['id'] == id:
-#                 lines.remove(row)
-#     with open(filename, 'w') as writeFile:
-#         writer.writerows(lines)
-                
-
-# def delete_answers_for_question_id(filename: str, question_id):
-#     lines = []
-#     with open(filename, 'r') as readFile:
-#         for row in reader:
-#             lines.append(row)
-#             if row['question_id'] == question_id:
-#                 lines.remove(row)
-#     with open(filename, 'w') as writeFile:
-#         writer.writerows(lines)
-
-
-# def delete_specific_answer(answer_id, filename):
-#     lines = []
-#     with open(filename, 'r') as readFile:
-#         for row in reader:
-#             if row['id'] != answer_id:
-#                 lines.append(row)
-#     with open(filename, 'w') as writeFile:
-#         writer.writerows(lines)
-
-
-
-def write_data_to_file(headers, filename: str, data_dict: dict[str, str]):
-    """Write dictionaries to file."""
-    with open(filename, 'a+', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=headers)
-        writer.writerow(data_dict)
-
-
-def generate_id():
-    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-    alphabet = list(string.ascii_lowercase)
-    data = get_data('question')
-    ids = []
-    for question in data:
-        ids.append(question['id'])
-    id = random.choice(numbers) + random.choice(numbers) +random.choice(alphabet)
-    if id in ids:
-        generate_id()
-    else:
-        return id
+ 
 
 def count_comments() -> dict[str, int]:
     """Get comment count for each question."""
