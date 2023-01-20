@@ -69,25 +69,16 @@ def add_data_to_file(cursor, mode, question_id='', message='', title=''):
     else:
         print('Wrong mode!')
 
-        
-def voting_questions(question_id, mode):
-    questions = get_data('question')
+@database_common.connection_handler
+def voting_questions(cursor, question_id, mode):
+    if mode == 'up':
+        cursor.execute("UPDATE question SET vote_number = vote_number + 1 WHERE id=%(id)s", {'id': question_id})
+    elif mode == 'down':
+        cursor.execute("UPDATE question SET vote_number = vote_number - 1 WHERE id=%(id)s", {'id': question_id})
+    else:
+        print('Wrong mode!')
     
-    for question in questions:
-        if question['id'] == question_id:
-            num = int(question['vote_number'])
-            if mode == 'up':
-                num += 1
-            elif mode == 'down':
-                num -= 1
-            else:
-                print('Wrong mode!')
 
-            question['vote_number'] = str(num)
-            delete_question_from_file_by_id('sample_data/question.csv', question_id)
-            write_data_to_file(HEADERS_QUESTION, QUESTION_PATH, question)
-            break
-        
 
 # def get_data_from_file(filename: str) -> list[Any]:
 #     """Read data from file into list of dictionaries."""
