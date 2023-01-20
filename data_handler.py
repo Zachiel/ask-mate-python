@@ -49,7 +49,7 @@ def get_answers(cursor):
 def get_question_by_id(question_ids):
     questions = get_data('question')
     for question in questions:
-        if question['question_id'] == int(question_ids):
+        if question['id'] == int(question_ids):
             return question
 
 
@@ -100,14 +100,15 @@ def voting_questions(question_id, mode):
 
 
 @database_common.connection_handler
-def delete_data(cursor, mode, id='', given_question_id=''):
-    if  mode == 'question':
-        cursor.execute("DELETE FROM question where question_id = @given_question_id")
-        cursor.execute("DELETE FROM answer where question_id = @given_question_id")
-        database_common.open_database().commit()
-    
+def delete_data(cursor, mode, aid='', given_question_id=''):
+    if mode == 'question':
+        cursor.execute("DELETE FROM question WHERE id = %(question_id)s",
+                        {'question_id': given_question_id})
+        cursor.execute("DELETE FROM answer WHERE question_id = %(question_id)s",
+                        {'question_id': given_question_id})
     elif mode == 'answer':
-        cursor.execute("DELETE FROM answer where answer_id = @id")
+        cursor.execute("DELETE FROM answer WHERE id = %(answer_id)s",
+                        {'answer_id': aid})
 
     else:
         print('Wrong mode!')
