@@ -51,13 +51,13 @@
                 <div class="accordion-item">
                     <h2
                         class="accordion-header"
-                        id="panelsStayOpen-heading{{ item['id'] }}"
+                        id="panelsStayOpen-heading{{ item['question_id'] }}"
                     >
                         <div
                             class="row justify-content-center align-items-center voting"
                         >
                             <div class="col ms-3">
-                                <form action="question/{{item['id']}}/vote-up" method="POST">
+                                <form action="question/{{item['question_id']}}/vote-up" method="POST">
                                     <button type="submit" class="btn btn-upvote" href="#">
                                         <i class="fas fa-arrow-up"></i>
                                     </button>
@@ -65,7 +65,7 @@
                             </div>
                             <div class="col">{{ item['vote_number'] }}</div>
                             <div class="col">
-                                <form action="question/{{item['id']}}/vote-down" method="POST">
+                                <form action="question/{{item['question_id']}}/vote-down" method="POST">
                                     <button type="submit" class="btn btn-downvote" href="#">
                                         <i class="fas fa-arrow-down"></i>
                                     </button>
@@ -76,9 +76,9 @@
                             class="accordion-button"
                             type="button"
                             data-bs-toggle="collapse"
-                            data-bs-target="#panelsStayOpen-collapse{{ item['id'] }}"
+                            data-bs-target="#panelsStayOpen-collapse{{ item['question_id'] }}"
                             aria-expanded="true"
-                            aria-controls="panelsStayOpen-collapse{{ item['id'] }}"
+                            aria-controls="panelsStayOpen-collapse{{ item['question_id'] }}"
                         >
                             <div
                                 class="row-fluid justify-content-between align-items-center g-2"
@@ -97,7 +97,7 @@
                                         ><i
                                             class="fa-regular fa-comment-dots"
                                         ></i>
-                                        {{ comment_count[item['id']] }}</span
+                                        {{ comment_count[item['question_id']] }}</span
                                     >
                                 </div>
                             </div>
@@ -105,16 +105,16 @@
                     </h2>
                     <div>
                         <div
-                            id="panelsStayOpen-collapse{{ item['id'] }}"
+                            id="panelsStayOpen-collapse{{ item['question_id'] }}"
                             class="accordion-collapse collapse"
-                            aria-labelledby="panelsStayOpen-heading{{ item['id'] }}"
+                            aria-labelledby="panelsStayOpen-heading{{ item['question_id'] }}"
                         >
                             <div class="accordion-body">
                                 {{ item['message'].replace('\n', '<br />')|safe
                                 }}
                             </div>
                             <div>
-                                <a href="/question/{{ item['id'] }}">
+                                <a href="/question/{{ item['question_id'] }}">
                                     <button class="btn btn-info ms-3 mb-2">
                                         Open question
                                     </button>
