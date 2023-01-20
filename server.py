@@ -31,12 +31,11 @@ def hello():
 @app.route("/question/<question_id>/")
 def display_question(question_id):
     
-    answers = data_handler.get_data('answer')
-    question_to_send = data_handler.get_question_by_id(
-        question_id)
+    answers = data_handler.get_answers()
+    question_to_send = data_handler.get_question_by_id(question_id)
     answers_send_list = []
     for answer in answers:
-        if answer['question_id'] == int(question_id):
+        if answer['question_id'] == question_id:
             answers_send_list.append(answer)
     return render_template(
         'display_question.html',
@@ -84,18 +83,34 @@ def add_new_question():
         return redirect('/list')
 
 
+# @app.route("/question/<question_id>/edit", methods=['POST','GET'])
+# def edit_question(question_id):
+#     question = data_handler.get_question_by_id(question_id)
+
+#     if request.method == 'POST':
+#         question['title'] = request.form.get("title")
+#         question['message'] = request.form.get("msg")
+#         data_handler.delete_question_from_file_by_id('sample_data/question.csv',
+#                                                      question_id)
+#         data_handler.write_data_to_file(HEADERS_QUESTION,
+#                                         data_handler.QUESTION_PATH,
+#                                         question)
+#         return redirect('/question/'+question_id)
+
+#     return render_template('edit_question.html',
+#                         question=question)
+
 @app.route("/question/<question_id>/edit", methods=['POST','GET'])
 def edit_question(question_id):
     question = data_handler.get_question_by_id(question_id)
 
     if request.method == 'POST':
-        question['title'] = request.form.get("title")
-        question['message'] = request.form.get("msg")
-        data_handler.delete_question_from_file_by_id('sample_data/question.csv',
-                                                     question_id)
-        data_handler.write_data_to_file(HEADERS_QUESTION,
-                                        data_handler.QUESTION_PATH,
-                                        question)
+        title = request.form.get("title")
+        message = request.form.get("msg")
+        data_handler.edit_question(mode='question',
+                               new_title = title,
+                               new_message = message,
+                               given_question_id=question_id)
         return redirect('/question/'+question_id)
 
     return render_template('edit_question.html',
