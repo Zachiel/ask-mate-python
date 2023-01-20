@@ -17,8 +17,9 @@ def hello():
     comment_count = data_handler.count_comments()
     sort_by, order = (request.args.get('order_by'),
                     request.args.get('order_direction'))
+    order = 'DESC' if order == 'descending' else 'ASC'
     if sort_by:
-        questions = data_handler.sorter(questions,
+        questions = data_handler.get_data('question',
                                         sort_by, order)
     return render_template('index.html', headers_question=HEADERS_QUESTION,
                            headers_answer=HEADERS_ANSWER,
