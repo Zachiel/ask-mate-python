@@ -47,9 +47,9 @@ def get_answers(cursor):
 
 
 def get_question_by_id(question_ids):
-    questions = get_questions()
+    questions = get_data('question')
     for question in questions:
-        if question['question_id'] == int(question_ids):
+        if question['id'] == int(question_ids):
             return question
 
 
@@ -71,7 +71,7 @@ def add_data_to_file(cursor, mode, question_id='', message='', title=''):
 
         
 def voting_questions(question_id, mode):
-    questions = get_questions()
+    questions = get_data('question')
     
     for question in questions:
         if question['id'] == question_id:
@@ -143,7 +143,7 @@ def write_data_to_file(headers, filename: str, data_dict: dict[str, str]):
 def generate_id():
     numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     alphabet = list(string.ascii_lowercase)
-    data = get_questions()
+    data = get_data('question')
     ids = []
     for question in data:
         ids.append(question['id'])
@@ -158,14 +158,15 @@ def count_comments() -> dict[str, int]:
     comments_count = {}
     questions = get_data('question')
     answers = get_data('answer')
-    # for question in questions:
-    #     for key, value in question.items():
-    #         if key == 'question_id':
-    #             comments_count.update({value: 0})
-    # for answer in answers:
-    #     for key, value in answer.items():
-    #         if key == 'question_id':
-    #             comments_count[value] += 1
+    for question in questions:
+        for key, value in question.items():
+            if key == 'id':
+                comments_count.update({value: 0})
+    for answer in answers:
+        for key, value in answer.items():
+            if key == 'question_id':
+                
+                comments_count[value] += 1
     return comments_count
 
 @database_common.connection_handler
