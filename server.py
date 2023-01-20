@@ -31,8 +31,7 @@ def hello():
 def display_question(question_id):
     
     answers = data_handler.get_answers()
-    question_to_send = data_handler.get_question_by_id(
-        question_id)
+    question_to_send = data_handler.get_question_by_id(question_id)
     answers_send_list = []
     for answer in answers:
         if answer['question_id'] == question_id:
@@ -46,16 +45,14 @@ def display_question(question_id):
 
 @app.route("/question/<question_id>/delete", methods=["POST"])
 def delete_question(question_id):
-    data_handler.delete_question_from_file_by_id(
-        'sample_data/question.csv', question_id)
-    data_handler.delete_answers_for_question_id(
-        'sample_data/answer.csv', question_id)
+    data_handler.delete_data(mode = 'question', 
+                             given_question_id = question_id)
     return redirect("/list")
-
 
 @app.route("/question/<question_id>/<aid>/delete_answer", methods=["POST"])
 def delete_answer(question_id, aid):
-    data_handler.delete_specific_answer(aid)
+    data_handler.delete_data(mode='answer', 
+                            answer_id =aid)
     return redirect("/question/" + question_id)
 
 
