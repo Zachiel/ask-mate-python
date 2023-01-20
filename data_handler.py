@@ -47,7 +47,7 @@ def get_answers(cursor):
 
 
 def get_question_by_id(question_ids):
-    questions = get_questions()
+    questions = get_data('question')
     for question in questions:
         if question['question_id'] == int(question_ids):
             return question
@@ -99,37 +99,49 @@ def voting_questions(question_id, mode):
 #         return data_list
 
 
+@database_common.connection_handler
+def delete_data(cursor, mode, id='', given_question_id=''):
+    if  mode == 'question':
+        cursor.execute("DELETE FROM question where question_id = @given_question_id")
+        cursor.execute("DELETE FROM answer where question_id = @given_question_id")
+        database_common.open_database().commit()
+    
+    elif mode == 'answer':
+        cursor.execute("DELETE FROM answer where answer_id = @id")
 
-def delete_question_from_file_by_id(filename: str, id):
-    lines = []
-    with open(filename, 'r') as readFile:
-        for row in reader:
-            lines.append(row)
-            if row['id'] == id:
-                lines.remove(row)
-    with open(filename, 'w') as writeFile:
-        writer.writerows(lines)
+    else:
+        print('Wrong mode!')
+        
+# def delete_question_from_file_by_id(filename: str, id):
+#     lines = []
+#     with open(filename, 'r') as readFile:
+#         for row in reader:
+#             lines.append(row)
+#             if row['id'] == id:
+#                 lines.remove(row)
+#     with open(filename, 'w') as writeFile:
+#         writer.writerows(lines)
                 
 
-def delete_answers_for_question_id(filename: str, question_id):
-    lines = []
-    with open(filename, 'r') as readFile:
-        for row in reader:
-            lines.append(row)
-            if row['question_id'] == question_id:
-                lines.remove(row)
-    with open(filename, 'w') as writeFile:
-        writer.writerows(lines)
+# def delete_answers_for_question_id(filename: str, question_id):
+#     lines = []
+#     with open(filename, 'r') as readFile:
+#         for row in reader:
+#             lines.append(row)
+#             if row['question_id'] == question_id:
+#                 lines.remove(row)
+#     with open(filename, 'w') as writeFile:
+#         writer.writerows(lines)
 
 
-def delete_specific_answer(answer_id, filename):
-    lines = []
-    with open(filename, 'r') as readFile:
-        for row in reader:
-            if row['id'] != answer_id:
-                lines.append(row)
-    with open(filename, 'w') as writeFile:
-        writer.writerows(lines)
+# def delete_specific_answer(answer_id, filename):
+#     lines = []
+#     with open(filename, 'r') as readFile:
+#         for row in reader:
+#             if row['id'] != answer_id:
+#                 lines.append(row)
+#     with open(filename, 'w') as writeFile:
+#         writer.writerows(lines)
 
 
 
