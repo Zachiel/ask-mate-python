@@ -91,6 +91,32 @@ def delete_data(cursor, mode, aid='', given_question_id=''):
         print('Wrong mode!')
 
 
+@database_common.connection_handler
+def edit_question(cursor, mode, title, message, given_question_id=''):
+    if mode == 'question':
+        cursor.execute("UPDATE question SET title = %(new_title)s, message = %(new_message)s WHERE id = %(question_id)s",
+                        {'new_title' : title,
+                        'new_message': message,
+                        'question_id': given_question_id})
+
+    else:
+        print('Wrong mode!')
+
+
+def generate_id():
+    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    alphabet = list(string.ascii_lowercase)
+    data = get_data('question')
+    ids = []
+    for question in data:
+        ids.append(question['id'])
+    id = random.choice(numbers) + random.choice(numbers) +random.choice(alphabet)
+    if id in ids:
+        generate_id()
+    else:
+        return id
+
+
 def count_comments() -> dict[str, int]:
     """Get comment count for each question."""
     comments_count = {}
