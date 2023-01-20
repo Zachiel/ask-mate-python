@@ -30,11 +30,11 @@ def hello():
 @app.route("/question/<question_id>/")
 def display_question(question_id):
     
-    answers = data_handler.get_answers()
+    answers = data_handler.get_data('answer')
     question_to_send = data_handler.get_question_by_id(question_id)
     answers_send_list = []
     for answer in answers:
-        if answer['question_id'] == question_id:
+        if answer['question_id'] == int(question_id):
             answers_send_list.append(answer)
     return render_template('display_question.html',
                             question=question_to_send,
