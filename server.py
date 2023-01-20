@@ -12,9 +12,8 @@ HEADERS_ANSWER = data_handler.HEADERS_ANSWER
 @app.route("/list", methods=['GET'])
 def hello():
     """Main page route."""
-    questions = data_handler.get_questions()
-    questions = data_handler.sorter(questions)
-    answers = data_handler.get_answers()
+    questions = data_handler.get_data('question')
+    answers = data_handler.get_data('answer')
     comment_count = data_handler.count_comments()
     sort_by, order = (request.args.get('order_by'),
                     request.args.get('order_direction'))
