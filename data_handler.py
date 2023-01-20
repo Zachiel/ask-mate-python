@@ -103,20 +103,6 @@ def edit_question(cursor, mode, title, message, given_question_id=''):
         print('Wrong mode!')
 
 
-def generate_id():
-    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-    alphabet = list(string.ascii_lowercase)
-    data = get_data('question')
-    ids = []
-    for question in data:
-        ids.append(question['id'])
-    id = random.choice(numbers) + random.choice(numbers) +random.choice(alphabet)
-    if id in ids:
-        generate_id()
-    else:
-        return id
-
-
 def count_comments() -> dict[str, int]:
     """Get comment count for each question."""
     comments_count = {}
