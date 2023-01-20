@@ -5,21 +5,7 @@ from typing import Any
 import string
 import random
 import psycopg2
-
-
-conn = psycopg2.connect("dbname=cc_ask_mate user=cc_ask_mate password=test123")
-cur = conn.cursor()
-cur.execute("SELECT * FROM answer;")
-desc = cur.description
-column_names = [col[0] for col in desc]
-answers_sql = [dict(zip(column_names, row))  
-        for row in cur.fetchall()]
-cur.execute("SELECT * FROM question;")
-desc = cur.description
-column_names = [col[0] for col in desc]
-question_sql = [dict(zip(column_names, row)) for row in cur.fetchall()]
-conn.close()
-
+import database_common
 
 HEADERS_QUESTION: list[str] = ['id', 'submission_time', 'view_number',
                     'vote_number', 'title', 'message', 'image']
@@ -29,8 +15,30 @@ QUESTION_PATH = 'sample_data/question.csv'
 
 ANSWER_PATH = 'sample_data/answer.csv'
 
+@database_common.connection_handler
+def get_questions(cursor):
+    query = """
+        SELECT *
+        FROM question"""
+    cursor.execute(query)
+    desc = cursor.description
+    column_names = [col[0] for col in desc]
+    question_sql = [dict(zip(column_names, row)) for row in cursor.fetchall()]
+    return (question_sql)
+
+@database_common.connection_handler
+def get_answers(cursor):
+    query = """
+        SELECT *
+        FROM answer"""
+    cursor.execute(query)
+    desc = cursor.description
+    column_names = [col[0] for col in desc]
+    answer_sql = [dict(zip(column_names, row)) for row in cursor.fetchall()]
+    return (answer_sql)
+
 def get_question_by_id(question_ids):
-    questions = question_sql
+    questions = get_questions()
     for question in questions:
         if question['question_id'] == int(question_ids):
             return question
