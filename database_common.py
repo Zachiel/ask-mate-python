@@ -33,6 +33,7 @@ def connection_handler(function):
         # we set the cursor_factory parameter to return with a RealDictCursor cursor (cursor which provide dictionaries)
         cur = connection.cursor()
         ret_value = function(cur, *args, **kwargs)
+        connection.commit()
         cur.close()
         connection.close()
         return ret_value
