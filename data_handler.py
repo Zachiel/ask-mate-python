@@ -156,10 +156,10 @@ def write_data_to_file(headers, filename: str, data_dict: dict[str, str]):
 @database_common.connection_handler
 def edit_question(cursor, mode, title, message, given_question_id=''):
     if mode == 'question':
-        cursor.execute("UPDATE question SET title = %(title)s, message = %(message)s WHERE id = %(question_id)s",
-                        {'new_title' : title},
-                        {'new_message': message},
-                        {'question_id': given_question_id})
+        cursor.execute("UPDATE question SET title = %(new_title)s, message = %(new_message)s WHERE id = %(question_id)s",
+                        {'new_title' : title,
+                         'new_message': message,
+                         'question_id': given_question_id})
 
 
     else:

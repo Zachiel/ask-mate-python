@@ -105,11 +105,11 @@ def edit_question(question_id):
     question = data_handler.get_question_by_id(question_id)
 
     if request.method == 'POST':
-        title = request.form.get("title")
-        message = request.form.get("msg")
+        new_title = request.form.get("title")
+        new_message = request.form.get("message")
         data_handler.edit_question(mode='question',
-                               new_title = title,
-                               new_message = message,
+                               title = new_title,
+                               message = new_message,
                                given_question_id=question_id)
         return redirect('/question/'+question_id)
 
