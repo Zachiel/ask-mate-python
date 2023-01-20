@@ -13,7 +13,6 @@ HEADERS_ANSWER = data_handler.HEADERS_ANSWER
 def hello():
     """Main page route."""
     questions = data_handler.get_data('question')
-    answers = data_handler.get_data('answer')
     comment_count = data_handler.count_comments()
     sort_by, order = (request.args.get('order_by'),
                     request.args.get('order_direction'))
@@ -22,10 +21,10 @@ def hello():
         questions = data_handler.get_data('question',
                                         sort_by, order)
     return render_template('index.html', headers_question=HEADERS_QUESTION,
-                           headers_answer=HEADERS_ANSWER,
-                           questions=questions,
-                           time_passed=data_handler.how_much_time_passed,
-                           comment_count=comment_count)
+                            headers_answer=HEADERS_ANSWER,
+                            questions=questions,
+                            time_passed=data_handler.how_much_time_passed,
+                            comment_count=comment_count)
 
 
 @app.route("/question/<question_id>/")
@@ -48,13 +47,13 @@ def display_question(question_id):
 @app.route("/question/<question_id>/delete", methods=["POST"])
 def delete_question(question_id):
     data_handler.delete_data(mode = 'question', 
-                             given_question_id = question_id)
+                                given_question_id = question_id)
     return redirect("/list")
 
 @app.route("/question/<question_id>/<aid>/delete_answer", methods=["POST"])
 def delete_answer(question_id, aid):
     data_handler.delete_data(mode='answer',
-                            aid =aid)
+                                aid =aid)
     return redirect("/question/" + question_id)
 
 
@@ -65,8 +64,8 @@ def new_answer(question_id):
     if request.method == "POST":
         message = request.form.get("message")
         data_handler.add_data_to_file(question_id=question_id,
-                                      mode='answer',
-                                      message=message)
+                                        mode='answer',
+                                        message=message)
         return redirect("/question/"+question_id)
     return render_template('new_answer.html')
 
@@ -79,8 +78,8 @@ def add_new_question():
         message = request.form.get("question")
         title = request.form.get("title")
         data_handler.add_data_to_file(mode='question',
-                                      message=message,
-                                      title=title)
+                                        message=message,
+                                        title=title)
         return redirect('/list')
 
 
@@ -92,7 +91,7 @@ def edit_question(question_id):
         question['title'] = request.form.get("title")
         question['message'] = request.form.get("msg")
         data_handler.delete_question_from_file_by_id('sample_data/question.csv',
-                                                     question_id)
+                                                        question_id)
         data_handler.write_data_to_file(HEADERS_QUESTION,
                                         data_handler.QUESTION_PATH,
                                         question)
