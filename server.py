@@ -12,11 +12,9 @@ HEADERS_ANSWER = data_handler.HEADERS_ANSWER
 @app.route("/list", methods=['GET'])
 def hello():
     """Main page route."""
-    questions = data_handler.get_data_from_file(
-        'sample_data/question.csv')
+    questions = data_handler.get_questions()
     questions = data_handler.sorter(questions)
-    answers = data_handler.get_data_from_file(
-        'sample_data/answer.csv')
+    answers = data_handler.get_answers()
     comment_count = data_handler.count_comments()
     sort_by, order = (request.args.get('order_by'),
                     request.args.get('order_direction'))
@@ -33,8 +31,7 @@ def hello():
 @app.route("/question/<question_id>/")
 def display_question(question_id):
     
-    answers = data_handler.get_data_from_file(
-        'sample_data/answer.csv')
+    answers = data_handler.get_answers()
     question_to_send = data_handler.get_question_by_id(
         question_id)
     answers_send_list = []
@@ -95,7 +92,7 @@ def edit_question(question_id):
 
     if request.method == 'POST':
         question['title'] = request.form.get("title")
-        question['message'] = request.form.get("message")
+        question['message'] = request.form.get("msg")
         data_handler.delete_question_from_file_by_id('sample_data/question.csv',
                                                      question_id)
         data_handler.write_data_to_file(HEADERS_QUESTION,

@@ -5,8 +5,7 @@ from typing import Any
 import string
 import random
 import psycopg2
-
-
+import database_common
 
 HEADERS_QUESTION: list[str] = ['id', 'submission_time', 'view_number',
                     'vote_number', 'title', 'message', 'image']
@@ -16,45 +15,58 @@ QUESTION_PATH = 'sample_data/question.csv'
 
 ANSWER_PATH = 'sample_data/answer.csv'
 
-def get_question_by_id(question_id):
-    questions = get_data_from_file(QUESTION_PATH)
-    question_to_send = ''
+
+@database_common.connection_handler
+def get_questions(cursor):
+    query = """
+        SELECT *
+        FROM question"""
+    cursor.execute(query)
+    desc = cursor.description
+    column_names = [col[0] for col in desc]
+    question_sql = [dict(zip(column_names, row)) for row in cursor.fetchall()]
+    return (question_sql)
+
+@database_common.connection_handler
+def get_answers(cursor):
+    query = """
+        SELECT *
+        FROM answer"""
+    cursor.execute(query)
+    desc = cursor.description
+    column_names = [col[0] for col in desc]
+    answer_sql = [dict(zip(column_names, row)) for row in cursor.fetchall()]
+    return (answer_sql)
+
+
+
+
+def get_question_by_id(question_ids):
+    questions = get_questions()
     for question in questions:
-        if question['id'] == question_id:
-            question_to_send = question
-            return question_to_send
+        if question['question_id'] == int(question_ids):
+            return question
 
 
-def add_data_to_file(mode, question_id='', message='', title=''):
+
+@database_common.connection_handler
+def add_data_to_file(cursor, mode, question_id='', message='', title=''):
     if mode == 'answer':
-        new_answer = {}
-        new_answer['id'] = generate_id()
-        new_answer['submission_time'] = time_now()
-        new_answer['vote_number'] = '0'
-        new_answer['question_id'] = question_id
-        new_answer['message'] = message
-        
-        write_data_to_file(HEADERS_ANSWER,
-                            ANSWER_PATH,
-                            new_answer)
-        
+        cursor.execute('INSERT INTO answer (submission_time, vote_number, question_id, msg) VALUES  (%s, %s, %s, %s)',
+        (time_now(), 0, question_id, message))
+        database_common.open_database().commit()
+       
     elif mode == 'question':
-        new_question = {}
-        new_question['id'] = generate_id()
-        new_question['submission_time'] = time_now()
-        new_question['view_number'] = '0'
-        new_question['vote_number'] = '0'
-        new_question['title'] = title
-        new_question['message'] = message
-        write_data_to_file(HEADERS_QUESTION,
-                                        QUESTION_PATH,
-                                        new_question)
+        cursor.execute("INSERT INTO question (submission_time, view_number, vote_number, title, msg) VALUES  (%s, %s, %s, %s, %s)",
+        (time_now(), 0, 0,title,message))
+        database_common.open_database().commit()
+
     else:
         print('Wrong mode!')
 
         
 def voting_questions(question_id, mode):
-    questions = get_data_from_file(QUESTION_PATH)
+    questions = get_questions()
     
     for question in questions:
         if question['id'] == question_id:
@@ -72,14 +84,14 @@ def voting_questions(question_id, mode):
             break
         
 
-def get_data_from_file(filename: str) -> list[Any]:
-    """Read data from file into list of dictionaries."""
-    with open(filename, 'r', encoding='UTF-8') as data:
-        data_list = []
-        reader = csv.DictReader(data)
-        for item in reader:
-            data_list.append(item)
-        return data_list
+# def get_data_from_file(filename: str) -> list[Any]:
+#     """Read data from file into list of dictionaries."""
+#     with open(filename, 'r', encoding='UTF-8') as data:
+#         data_list = []
+#         reader = csv.DictReader(data)
+#         for item in reader:
+#             data_list.append(item)
+#         return data_list
 
 
 
@@ -132,7 +144,7 @@ def write_data_to_file(headers, filename: str, data_dict: dict[str, str]):
 def generate_id():
     numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     alphabet = list(string.ascii_lowercase)
-    data = get_data_from_file(QUESTION_PATH)
+    data = get_questions()
     ids = []
     for question in data:
         ids.append(question['id'])
@@ -145,11 +157,11 @@ def generate_id():
 def count_comments() -> dict[str, int]:
     """Get comment count for each question."""
     comments_count = {}
-    questions = get_data_from_file(QUESTION_PATH)
-    answers = get_data_from_file('sample_data/answer.csv')
+    questions = get_questions()
+    answers = get_answers()
     for question in questions:
         for key, value in question.items():
-            if key == 'id':
+            if key == 'question_id':
                 comments_count.update({value: 0})
     for answer in answers:
         for key, value in answer.items():
@@ -162,7 +174,7 @@ def sorter(data_dict: list[dict[str, str]], sort_by='date',
            direction='descending') -> list[dict[str, str]]:
     """Sort given data by specific header."""
     order_translate: dict[str, str] = {'date': 'submission_time',
-                    'title': 'title', 'message': 'message',
+                    'title': 'title', 'message': 'msg',
                     'views': 'view_number', 'votes': 'vote_number',
                     'comments': 'comments'}
     if sort_by in ['date', 'views', 'votes']:
@@ -214,4 +226,3 @@ def how_much_time_passed(unix_date: int) -> str:
     if (days // 365) > 0:
         return f'{days // 365} years ago'
     return f'{days} days ago'
-
