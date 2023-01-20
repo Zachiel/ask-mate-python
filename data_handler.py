@@ -17,8 +17,7 @@ answers_sql = [dict(zip(column_names, row))
 cur.execute("SELECT * FROM question;")
 desc = cur.description
 column_names = [col[0] for col in desc]
-question_sql = [dict(zip(column_names, row))  
-        for row in cur.fetchall()]
+question_sql = [dict(zip(column_names, row)) for row in cur.fetchall()]
 conn.close()
 
 
