@@ -17,8 +17,9 @@ def hello():
     comment_count = data_handler.count_comments()
     sort_by, order = (request.args.get('order_by'),
                     request.args.get('order_direction'))
+    order = 'DESC' if order == 'descending' else 'ASC'
     if sort_by:
-        questions = data_handler.sorter(questions,
+        questions = data_handler.get_data('question',
                                         sort_by, order)
     return render_template('index.html', headers_question=HEADERS_QUESTION,
                            headers_answer=HEADERS_ANSWER,
@@ -46,16 +47,14 @@ def display_question(question_id):
 
 @app.route("/question/<question_id>/delete", methods=["POST"])
 def delete_question(question_id):
-    data_handler.delete_question_from_file_by_id(
-        'sample_data/question.csv', question_id)
-    data_handler.delete_answers_for_question_id(
-        'sample_data/answer.csv', question_id)
+    data_handler.delete_data(mode = 'question', 
+                             given_question_id = question_id)
     return redirect("/list")
-
 
 @app.route("/question/<question_id>/<aid>/delete_answer", methods=["POST"])
 def delete_answer(question_id, aid):
-    data_handler.delete_specific_answer(aid)
+    data_handler.delete_data(mode='answer', 
+                            answer_id =aid)
     return redirect("/question/" + question_id)
 
 
