@@ -13,6 +13,7 @@ import psycopg2.extras
 def get_connection_string():
     # setup connection string
     # to do this, please define these environment variables first
+    # /TODO: Hide sensitive data
     return ("dbname=cc_ask_mate user=cc_ask_mate password=test123")
 
 

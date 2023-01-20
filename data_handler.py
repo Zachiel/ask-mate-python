@@ -11,16 +11,21 @@ HEADERS_QUESTION: list[str] = ['id', 'submission_time', 'view_number',
                     'vote_number', 'title', 'message', 'image']
 HEADERS_ANSWER: list[str] = ['id', 'submission_time', 'vote_number',
                             'question_id', 'message', 'image']
-QUESTION_PATH = 'sample_data/question.csv'
 
-ANSWER_PATH = 'sample_data/answer.csv'
 
 
 @database_common.connection_handler
-def get_questions(cursor):
+def get_data(cursor, data_type: str, sort_by='date',
+           order='DESC') -> list[dict[str, str]]:
+    """Sort given data by specific header."""
+    sort_by_translate: dict[str, str] = {'date': 'submission_time',
+                    'title': 'title', 'message': 'message',
+                    'views': 'view_number', 'votes': 'vote_number',
+                    'comments': 'comments'}
     query = """
-        SELECT *
-        FROM question"""
+    SELECT *
+    FROM {}
+    ORDER BY {} {}""".format(data_type, sort_by_translate[sort_by], order)
     cursor.execute(query)
     desc = cursor.description
     column_names = [col[0] for col in desc]
@@ -52,12 +57,12 @@ def get_question_by_id(question_ids):
 @database_common.connection_handler
 def add_data_to_file(cursor, mode, question_id='', message='', title=''):
     if mode == 'answer':
-        cursor.execute('INSERT INTO answer (submission_time, vote_number, question_id, msg) VALUES  (%s, %s, %s, %s)',
+        cursor.execute('INSERT INTO answer (submission_time, vote_number, question_id, message) VALUES  (%s, %s, %s, %s)',
         (time_now(), 0, question_id, message))
         database_common.open_database().commit()
        
     elif mode == 'question':
-        cursor.execute("INSERT INTO question (submission_time, view_number, vote_number, title, msg) VALUES  (%s, %s, %s, %s, %s)",
+        cursor.execute("INSERT INTO question (submission_time, view_number, vote_number, title, message) VALUES  (%s, %s, %s, %s, %s)",
         (time_now(), 0, 0,title,message))
         database_common.open_database().commit()
 
@@ -98,38 +103,32 @@ def voting_questions(question_id, mode):
 def delete_question_from_file_by_id(filename: str, id):
     lines = []
     with open(filename, 'r') as readFile:
-        reader = csv.DictReader(readFile, fieldnames=HEADERS_QUESTION)
         for row in reader:
             lines.append(row)
             if row['id'] == id:
                 lines.remove(row)
     with open(filename, 'w') as writeFile:
-        writer = csv.DictWriter(writeFile, fieldnames=HEADERS_QUESTION)
         writer.writerows(lines)
                 
 
 def delete_answers_for_question_id(filename: str, question_id):
     lines = []
     with open(filename, 'r') as readFile:
-        reader = csv.DictReader(readFile, fieldnames=HEADERS_ANSWER)
         for row in reader:
             lines.append(row)
             if row['question_id'] == question_id:
                 lines.remove(row)
     with open(filename, 'w') as writeFile:
-        writer = csv.DictWriter(writeFile, fieldnames=HEADERS_ANSWER)
         writer.writerows(lines)
 
 
-def delete_specific_answer(answer_id, filename=ANSWER_PATH):
+def delete_specific_answer(answer_id, filename):
     lines = []
     with open(filename, 'r') as readFile:
-        reader = csv.DictReader(readFile, fieldnames=HEADERS_ANSWER)
         for row in reader:
             if row['id'] != answer_id:
                 lines.append(row)
     with open(filename, 'w') as writeFile:
-        writer = csv.DictWriter(writeFile, fieldnames=HEADERS_ANSWER)
         writer.writerows(lines)
 
 
@@ -157,72 +156,46 @@ def generate_id():
 def count_comments() -> dict[str, int]:
     """Get comment count for each question."""
     comments_count = {}
-    questions = get_questions()
-    answers = get_answers()
-    for question in questions:
-        for key, value in question.items():
-            if key == 'question_id':
-                comments_count.update({value: 0})
-    for answer in answers:
-        for key, value in answer.items():
-            if key == 'question_id':
-                comments_count[value] += 1
+    questions = get_data('question')
+    answers = get_data('answer')
+    # for question in questions:
+    #     for key, value in question.items():
+    #         if key == 'question_id':
+    #             comments_count.update({value: 0})
+    # for answer in answers:
+    #     for key, value in answer.items():
+    #         if key == 'question_id':
+    #             comments_count[value] += 1
     return comments_count
 
-#print(count_comments())
-def sorter(data_dict: list[dict[str, str]], sort_by='date',
-           direction='descending') -> list[dict[str, str]]:
+@database_common.connection_handler
+def sorter(cursor, data_type: str, sort_by='date',
+           order='DESC') -> list[dict[str, str]]:
     """Sort given data by specific header."""
-    order_translate: dict[str, str] = {'date': 'submission_time',
-                    'title': 'title', 'message': 'msg',
-                    'views': 'view_number', 'votes': 'vote_number',
-                    'comments': 'comments'}
-    if sort_by in ['date', 'views', 'votes']:
-        ordered = sorted(data_dict,
-                        key=lambda k: int(k[order_translate[sort_by]]),
-                        reverse=direction == 'descending')
-        return ordered
-    if sort_by != 'comments':
-        ordered = sorted(data_dict,
-                        key=lambda k: k[order_translate[sort_by]],
-                        reverse=direction == 'descending')
-        return ordered
-    comments: dict[str, int] = count_comments()
-    comments = sorted(comments.items(), key=lambda k: k[1],
-                    reverse=direction == 'descending')
-    ordered_set: set[dict[str, str]] = set()
-    for key in comments.keys():
-        for item in data_dict:
-            if key == item['id']:
-                ordered_set.add(item)
-    for item in data_dict:
-        if item not in ordered_set:
-            ordered_set.add(item)
-    return list(ordered_set)
+    query = """
+    SELECT *
+    FROM %(data_type)s
+    ORDER BY %(sort_by)s %(order)s"""
+    cursor.execute(query, {'data_type': data_type, 'sort_by': sort_by, 'order': order})
+    return cursor.fetchall()
 
 def time_now():
-    time_now  = datetime.now()
-    time_now = int(round(datetime.timestamp(time_now), 0))
-    return time_now
+    current_time  = datetime.now()
+    current_time_wo_ms = current_time - timedelta(microseconds=current_time.microsecond)
+    return current_time_wo_ms
 
 
-def how_much_time_passed(unix_date: int) -> str:
+def how_much_time_passed(date: datetime) -> str:
     """Calculate how much time has passed since date."""
-    time_now: datetime = datetime.now()
-    time_then: datetime = datetime.fromtimestamp(int(unix_date))
-    delta: timedelta = time_now - time_then
-    delta: timedelta = delta - timedelta(microseconds=delta.microseconds)
-    time_list: list[str] = str(delta).split(',')
-    if len(time_list) == 1:
-        hours, minutes, seconds = [int(time) for time in time_list[0].split(':')]
-        if hours > 0:
-            return f'{hours} hours ago'
-        if minutes > 0:
-            return f'{minutes} minutes ago'
-        if seconds > 0:
-            return f'{seconds} seconds ago'
-    days_1 = time_list[0].split(' ')
-    days = int(days_1[0])
-    if (days // 365) > 0:
-        return f'{days // 365} years ago'
-    return f'{days} days ago'
+    current_time: datetime = time_now()
+    time_then: datetime = date
+    delta: timedelta = current_time - time_then
+    if delta.days >= 365:
+        return f'{delta.days // 365} years ago'
+    if delta.days > 0:
+        return f'{delta.days} days ago'
+    if delta.seconds >= 3600:
+        return f'{delta.seconds // 3600} hours ago'
+    if delta.seconds >= 60:
+        return f'{delta.seconds // 60} minutes ago'
+    return f'{delta.seconds} seconds ago'
