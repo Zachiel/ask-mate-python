@@ -40,12 +40,17 @@ def get_answers(cursor):
     return answer_sql
 
 
-def get_question_by_id(question_ids):
-    questions = get_data('question')
-    for question in questions:
-        if question['id'] == int(question_ids):
-            return question
-
+@database_common.connection_handler
+def get_question_by_id(cursor, question_ids):
+    cursor.execute("""
+        SELECT *
+        FROM question
+        WHERE id=%(id)s""", {'id': question_ids})
+    desc = cursor.description
+    column_names = [col[0] for col in desc]
+    question = [dict(zip(column_names, row)) for row in cursor.fetchall()]
+    return question[0]
+    
 
 @database_common.connection_handler
 def add_data_to_file(cursor, mode, question_id='', message='', title=''):
