@@ -83,6 +83,30 @@ def voting_questions(cursor, question_id, mode):
 
 
 @database_common.connection_handler
+def vote_answer_up(cursor, answer_id):
+    cursor.execute("""UPDATE answer
+                        SET vote_number = vote_number + 1
+                        WHERE id=%(id)s""", {'id': answer_id})
+    
+    
+@database_common.connection_handler
+def vote_answer_down(cursor, answer_id):
+    cursor.execute("""UPDATE answer
+                        SET vote_number = vote_number - 1
+                        WHERE id=%(id)s""", {'id': answer_id})
+
+
+@database_common.connection_handler
+def get_question_id_by_answer_id(cursor, answer_id):
+    cursor.execute("""
+        SELECT question_id
+        FROM answer
+        WHERE id=%(id)s""", {'id': answer_id})
+    question_id = cursor.fetchone()
+    return question_id[0]
+
+
+@database_common.connection_handler
 def delete_data(cursor, mode, aid='', given_question_id=''):
     if mode == 'question':
         cursor.execute("DELETE FROM question WHERE id = %(question_id)s",

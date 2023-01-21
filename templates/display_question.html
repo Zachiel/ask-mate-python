@@ -118,13 +118,17 @@ block content %}
                 <div class="card-body">
                     <div class="row">
                         <div class="col-1 text-nowrap me-5">
-                            <button class="btn btn-upvote" href="#">
-                                <i class="fas fa-arrow-up"></i>
-                            </button>
+                            <a href="http://127.0.0.1:5000/answer/{{answer['id']}}/vote-up">
+                                <button class="btn btn-upvote" href="#">
+                                    <i class="fas fa-arrow-up"></i>
+                                </button>
+                            </a>
                             {{ answer['vote_number'] }}
-                            <button class="btn btn-downvote" href="#">
-                                <i class="fas fa-arrow-down"></i>
-                            </button>
+                            <a href="http://127.0.0.1:5000/answer/{{answer['id']}}/vote-down">
+                                <button class="btn btn-downvote" href="#">
+                                    <i class="fas fa-arrow-down"></i>
+                                </button>
+                            </a>
                         </div>
                         <div class="col">{{ answer['message'] }}</div>
                         <div class="col-1 text-nowrap me-5">

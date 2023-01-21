@@ -106,5 +106,19 @@ def vote_question_down(question_id):
     return redirect("/list")
 
 
+@app.route("/answer/<answer_id>/vote-up")
+def vote_answer_up(answer_id):
+    data_handler.vote_answer_up(answer_id)
+    question_id = data_handler.get_question_id_by_answer_id(answer_id)
+    return redirect(f"/question/{question_id}")
+
+
+@app.route("/answer/<answer_id>/vote-down")
+def vote_answer_down(answer_id):
+    data_handler.vote_answer_down(answer_id)
+    question_id = data_handler.get_question_id_by_answer_id(answer_id)
+    return redirect(f"/question/{question_id}")
+
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
