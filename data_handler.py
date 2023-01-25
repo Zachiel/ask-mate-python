@@ -1,4 +1,5 @@
 """Data read/write and manipulation functions."""
+import sys
 from datetime import datetime, timedelta
 import database_common
 
@@ -22,10 +23,7 @@ def get_data(cursor, data_type: str, sort_by='date',
     FROM {data_type}
     ORDER BY {sort_by_translate[sort_by]} {order}"""
     cursor.execute(query)
-    desc = cursor.description
-    column_names = [col[0] for col in desc]
-    question_sql = [dict(zip(column_names, row)) for row in cursor.fetchall()]
-    return question_sql
+    return cursor.fetchall()
 
 
 @database_common.connection_handler
@@ -34,10 +32,7 @@ def get_answers(cursor):
         SELECT *
         FROM answer"""
     cursor.execute(query)
-    desc = cursor.description
-    column_names = [col[0] for col in desc]
-    answer_sql = [dict(zip(column_names, row)) for row in cursor.fetchall()]
-    return answer_sql
+    return cursor.fetchall()
 
 
 @database_common.connection_handler
@@ -46,24 +41,17 @@ def get_question_by_id(cursor, question_ids):
         SELECT *
         FROM question
         WHERE id=%(id)s""", {'id': question_ids})
-    desc = cursor.description
-    column_names = [col[0] for col in desc]
-    question = [dict(zip(column_names, row)) for row in cursor.fetchall()]
-    return question[0]
+    return cursor.fetchall()
     
 
 @database_common.connection_handler
 def add_data_to_file(cursor, mode, question_id='', message='', title=''):
     if mode == 'answer':
         cursor.execute('INSERT INTO answer (submission_time, vote_number, question_id, message) VALUES  (%s, %s, %s, %s)',
-        (time_now(), 0, question_id, message))
-        database_common.open_database().commit()
-       
+        (time_now(), 0, question_id, message))       
     elif mode == 'question':
         cursor.execute("INSERT INTO question (submission_time, view_number, vote_number, title, message) VALUES  (%s, %s, %s, %s, %s)",
         (time_now(), 0, 0,title,message))
-        database_common.open_database().commit()
-
     else:
         print('Wrong mode!')
 
@@ -81,29 +69,19 @@ def voting_questions(cursor, question_id, mode):
     else:
         print('Wrong mode!')
 
-
+        
 @database_common.connection_handler
-def vote_answer_up(cursor, answer_id):
-    cursor.execute("""UPDATE answer
+def voting_answer(cursor, answer_id, mode):
+    if mode == 'up':
+        cursor.execute("""UPDATE answer
                         SET vote_number = vote_number + 1
-                        WHERE id=%(id)s""", {'id': answer_id})
-    
-    
-@database_common.connection_handler
-def vote_answer_down(cursor, answer_id):
-    cursor.execute("""UPDATE answer
+                        WHERE id=%(answer_id)s""", {'answer_id': answer_id})
+    elif mode == 'down':
+        cursor.execute("""UPDATE answer
                         SET vote_number = vote_number - 1
-                        WHERE id=%(id)s""", {'id': answer_id})
-
-
-@database_common.connection_handler
-def get_question_id_by_answer_id(cursor, answer_id):
-    cursor.execute("""
-        SELECT question_id
-        FROM answer
-        WHERE id=%(id)s""", {'id': answer_id})
-    question_id = cursor.fetchone()
-    return question_id[0]
+                        WHERE id=%(answer_id)s""", {'answer_id': answer_id})
+    else:
+        print('Wrong mode!', file=sys.stderr)
 
 
 @database_common.connection_handler
@@ -161,7 +139,11 @@ def how_much_time_passed(date: datetime) -> str:
     time_then: datetime = date
     delta: timedelta = current_time - time_then
     if delta.days >= 365:
-        return f'{delta.days // 365} years ago'
+        years = delta.days // 365
+        return f'{years} {"year" if years == 1 else "years"} ago'
+    if delta.days >= 30:
+        months = delta.days // 30
+        return f'{months} {"month" if months == 1 else "months"} ago'
     if delta.days > 0:
         return f'{delta.days} days ago'
     if delta.seconds >= 3600:

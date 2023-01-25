@@ -1,3 +1,4 @@
+import sys
 import psycopg2
 import psycopg2.extras
 
@@ -21,11 +22,13 @@ def open_database():
 def connection_handler(function):
     def wrapper(*args, **kwargs):
         connection = open_database()
-        # we set the cursor_factory parameter to return with a RealDictCursor cursor (cursor which provide dictionaries)
-        cur = connection.cursor()
-        ret_value = function(cur, *args, **kwargs)
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        return_value = function(cursor, *args, **kwargs)
+        converted_data = '' if return_value is None else [dict(row) for row in return_value]
         connection.commit()
-        cur.close()
+        cursor.close()
         connection.close()
-        return ret_value
+        # print to vscode console
+        # print('=============================', file=sys.stderr)
+        return converted_data
     return wrapper
