@@ -20,7 +20,7 @@ def hello():
     if sort_by:
         questions = data_handler.get_data('question',
                                             sort_by, order)
-    return render_template('index.html', headers_question=HEADERS_QUESTION,
+    return render_template('pages/index.html', headers_question=HEADERS_QUESTION,
                             headers_answer=HEADERS_ANSWER,
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
@@ -36,7 +36,7 @@ def display_question(question_id):
     for answer in answers:
         if answer['question_id'] == int(question_id):
             answers_send_list.append(answer)
-    return render_template('display_question.html',
+    return render_template('pages/display_question.html',
                             question=question_to_send,
                             answers=answers_send_list,
                             count_answers=len(answers_send_list))
@@ -64,7 +64,7 @@ def new_answer(question_id):
                                         mode='answer',
                                         message=message)
         return redirect("/question/"+question_id)
-    return render_template('new_answer.html')
+    return render_template('pages/new_answer.html')
 
 
 @app.route('/add_question', methods=['GET', 'POST'])
@@ -90,7 +90,7 @@ def edit_question(question_id):
                                     message = new_message,
                                     given_question_id=question_id)
         return redirect('/question/'+question_id)
-    return render_template('edit_question.html',
+    return render_template('pages/edit_question.html',
                         question=question)
 
 
