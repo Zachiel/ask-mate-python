@@ -12,7 +12,11 @@
             "env": {
                 "FLASK_APP": "server.py",
                 "FLASK_DEBUG": "1",
-                "PYDEVD_DISABLE_FILE_VALIDATION": "1"
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+                "PSQL_USER_NAME": "cc_ask_mate",
+                "PSQL_PASSWORD": "test123",
+                "PSQL_HOST": "localhost",
+                "PSQL_DB_NAME": "cc_ask_mate"
             },
             "args": ["run"],
             "jinja": true,
