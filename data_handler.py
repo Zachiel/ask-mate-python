@@ -1,7 +1,5 @@
 """Data read/write and manipulation functions."""
-import sys
 from datetime import datetime, timedelta
-from psycopg2 import sql
 import database_common
 
 
@@ -14,139 +12,168 @@ HEADERS_ANSWER: list[str] = ['id', 'submission_time', 'vote_number',
 @database_common.connection_handler
 def get_latest_questions(cursor) -> list[dict[str, str]]:
     """Show latest questions in home page"""
-    query = """
-    SELECT *
-    FROM question
-    ORDER BY submission_time DESC
-    LIMIT 5"""
+    query: str = """
+        SELECT (id, submission_time, view_number, vote_number, title, message,
+                image)
+        FROM question
+        ORDER BY submission_time DESC
+        LIMIT 5"""
     cursor.execute(query)
     return cursor.fetchall()
 
 
 @database_common.connection_handler
-def get_sorted_questions(cursor, data_type: str, sort_by='date',
-           order='DESC') -> list[dict[str, str]]:
+def get_sorted_questions(cursor, sort_by='date',
+            order='DESC') -> list[dict[str, str]]:
     """Sort given data by specific header."""
     translate: dict[str, str] = {'date': 'submission_time',
                                 'title': 'title',
                                 'message': 'message',
                                 'views': 'view_number',
                                 'votes': 'vote_number',
-                                'comments': 'comments'}
-    query = sql.SQL("""
-    SELECT *
-    FROM question
-    ORDER BY %s %s
-    """)
-    cursor.execute(query, [translate[sort_by], order])
-    return cursor.fetchall()
-
-
-@database_common.connection_handler
-def get_answers(cursor):
-    query = """
-        SELECT *
-        FROM answer"""
+                                'comments': 'comments',
+                                'DESC': 'DESC',
+                                'ASC': 'ASC'}
+    query: str = f"""
+        SELECT (id, submission_time, view_number, vote_number, title, message,
+                image)
+        FROM question
+        ORDER BY {translate[sort_by]} {translate[order]}
+        """
     cursor.execute(query)
     return cursor.fetchall()
 
 
+
 @database_common.connection_handler
-def get_question_by_id(cursor, question_ids):
-    cursor.execute("""
+def get_answers_for_question(cursor, question_id) -> list[dict[str, str]]:
+    """Get all answers for a question."""
+    query: str = """
         SELECT *
-        FROM question
-        WHERE id=%(id)s""", {'id': question_ids})
+        FROM answer
+        WHERE question_id = %(qid)s"""
+    cursor.execute(query, {'qid': question_id})
     return cursor.fetchall()
-    
-
-@database_common.connection_handler
-def add_data_to_file(cursor, mode, question_id='', message='', title=''):
-    if mode == 'answer':
-        cursor.execute('INSERT INTO answer (submission_time, vote_number, question_id, message) VALUES  (%s, %s, %s, %s)',
-        (time_now(), 0, question_id, message))       
-    elif mode == 'question':
-        cursor.execute("INSERT INTO question (submission_time, view_number, vote_number, title, message) VALUES  (%s, %s, %s, %s, %s)",
-        (time_now(), 0, 0,title,message))
-    else:
-        print('Wrong mode!')
 
 
 @database_common.connection_handler
-def voting_questions(cursor, question_id, mode):
-    if mode == 'up':
-        cursor.execute("""UPDATE question
-                        SET vote_number = vote_number + 1
-                        WHERE id=%(id)s""", {'id': question_id})
-    elif mode == 'down':
-        cursor.execute("""UPDATE question
-                        SET vote_number = vote_number - 1
-                        WHERE id=%(id)s""", {'id': question_id})
-    else:
-        print('Wrong mode!')
-
-        
-@database_common.connection_handler
-def voting_answer(cursor, answer_id, mode):
-    if mode == 'up':
-        cursor.execute("""UPDATE answer
-                        SET vote_number = vote_number + 1
-                        WHERE id=%(answer_id)s""", {'answer_id': answer_id})
-    elif mode == 'down':
-        cursor.execute("""UPDATE answer
-                        SET vote_number = vote_number - 1
-                        WHERE id=%(answer_id)s""", {'answer_id': answer_id})
-    else:
-        print('Wrong mode!', file=sys.stderr)
+def get_question_by_id(cursor, question_id) -> list[dict[str, str]]:
+    """Get specific question by its ID."""
+    query: str = """
+        SELECT (id, submission_time, vote_number, question_id, message, image)
+        FROM question
+        WHERE id=%(id)s"""
+    cursor.execute(query, {'id': question_id})
+    return cursor.fetchall()
 
 
 @database_common.connection_handler
-def delete_data(cursor, mode, aid='', given_question_id=''):
-    if mode == 'question':
-        cursor.execute("DELETE FROM question WHERE id = %(question_id)s",
-                        {'question_id': given_question_id})
-        cursor.execute("DELETE FROM answer WHERE question_id = %(question_id)s",
-                        {'question_id': given_question_id})
-    elif mode == 'answer':
-        cursor.execute("DELETE FROM answer WHERE id = %(answer_id)s",
-                        {'answer_id': aid})
-    else:
-        print('Wrong mode!')
+def add_question_to_database(cursor, title, message) -> None:
+    """Save user question into database."""
+    query: str = """
+        INSERT INTO answer (submission_time, vote_number, question_id, message) 
+        VALUES (%s, %s, %s, %s)"""
+    cursor.execute(query, [time_now(), 0, title, message])
 
 
 @database_common.connection_handler
-def edit_question(cursor, mode, title, message, given_question_id=''):
-    if mode == 'question':
-        cursor.execute("UPDATE question SET title = %(new_title)s, message = %(new_message)s WHERE id = %(question_id)s",
-                        {'new_title' : title,
-                        'new_message': message,
-                        'question_id': given_question_id})
-
-    else:
-        print('Wrong mode!')
+def add_answer_to_database(cursor, question_id, message) -> None:
+    """Save user answer into database."""
+    query: str = """
+    INSERT INTO answer (submission_time, vote_number, question_id, message)
+    VALUES (%s, %s, %s, %s)"""
+    cursor.execute(query, [time_now(), 0, question_id, message])
 
 
-def count_comments() -> dict[str, int]:
+@database_common.connection_handler
+def vote_question_up(cursor, question_id) -> None:
+    """Add points to a question."""
+    query: str = """
+        UPDATE question
+        SET vote_number = vote_number + 1
+        WHERE id=%(id)s"""
+    cursor.execute(query, {'id': question_id})
+
+
+@database_common.connection_handler
+def vote_question_down(cursor, question_id) -> None:
+    """Remove points from a question."""
+    query: str = """
+        UPDATE question
+        SET vote_number = vote_number - 1
+        WHERE id=%(id)s"""
+    cursor.execute(query, {'id': question_id})
+
+
+@database_common.connection_handler
+def vote_answer_up(cursor, answer_id) -> None:
+    """Add points to a question."""
+    query: str = """
+        UPDATE question
+        SET vote_number = vote_number + 1
+        WHERE id=%(id)s"""
+    cursor.execute(query, {'id': answer_id})
+
+
+@database_common.connection_handler
+def vote_answer_down(cursor, answer_id) -> None:
+    """Remove points from a question."""
+    query: str = """
+        UPDATE question
+        SET vote_number = vote_number - 1
+        WHERE id=%(id)s"""
+    cursor.execute(query, {'id': answer_id})
+
+
+@database_common.connection_handler
+def delete_question(cursor, question_id) -> None:
+    """Delete question from database."""
+    query_answer: str = """
+        DELETE FROM answer
+        WHERE question_id = %(id)s"""
+    query_question: str = """
+        DELETE FROM question
+        WHERE id = %(id)s"""
+    cursor.execute(query_answer, {'id': question_id})
+    cursor.execute(query_question, {'id': question_id})
+
+
+@database_common.connection_handler
+def delete_data(cursor, answer_id) -> None:
+    """Delete answer from database."""
+    query: str = """
+        DELETE FROM answer
+        WHERE id = %(id)s"""
+    cursor.execute(query, {'id': answer_id})
+
+
+@database_common.connection_handler
+def edit_question(cursor, question_id, title, message) -> None:
+    """Save edits to a question."""
+    query: str = """
+        UPDATE question
+        SET title = %(title)s, message = %(message)s
+        WHERE id = %(question_id)s"""
+    cursor.execute(query, {'title' : title,
+                            'message': message,
+                            'id': question_id})
+
+
+def count_comments(cursor) -> dict[str, int]:
     """Get comment count for each question."""
-    comments_count = {}
-    questions = get_sorted_questions(data_type='question')
-    answers = get_sorted_questions(data_type='answer')
-    for question in questions:
-        for key, value in question.items():
-            if key == 'id':
-                comments_count.update({value: 0})
-    for answer in answers:
-        for key, value in answer.items():
-            if key == 'question_id':
-                comments_count[value] += 1
-    return comments_count
+    query: str = """
+        SELECT q.id AS question_id, COUNT(a.id) AS comments
+        FROM question AS q
+        JOIN answer AS a ON q.id = a.question_id
+        GROUP BY q.id"""
+    cursor.execute(query)
+    return cursor.fetchall()
 
 
-def time_now():
-    current_time  = datetime.now()
-    current_time_wo_ms = current_time - timedelta(
-        microseconds=current_time.microsecond)
-    return current_time_wo_ms
+def time_now() -> datetime:
+    """Get time of question posting."""
+    current_time: datetime  = datetime.now().replace(microsecond=0)
+    return current_time
 
 
 def how_much_time_passed(date: datetime) -> str:

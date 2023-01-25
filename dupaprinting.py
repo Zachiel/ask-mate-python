@@ -31,7 +31,7 @@ def count_comments() -> dict[str, int]:
     """Get comment count for each question."""
     comments_count = {}
     questions = data_handler.get_questions()
-    answers = data_handler.get_answers()
+    answers = data_handler.get_answers_for_question()
     for question in questions:
         for key, value in question.items():
             if key == 'question_id':

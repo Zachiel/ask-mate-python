@@ -1,19 +1,21 @@
 """AskMate server route management."""
-from flask import Flask, render_template, request, redirect
+# pylint: disable=no-value-for-parameter, no-member
+# pyright: reportGeneralTypeIssues=false
+from typing import Union
+from flask import Flask, render_template, request, redirect, Response
 import data_handler
 
-app = Flask(__name__, static_url_path='/static')
+app: Flask = Flask(__name__, static_url_path='/static')
 
-HEADERS_QUESTION = data_handler.HEADERS_QUESTION
-HEADERS_ANSWER = data_handler.HEADERS_ANSWER
+HEADERS_QUESTION: list[str] = data_handler.HEADERS_QUESTION
+HEADERS_ANSWER: list[str] = data_handler.HEADERS_ANSWER
 
 
 @app.route("/")
-def hello():
+def hello() -> str:
     """Main page route."""
-    questions = data_handler.get_latest_questions()
-    comment_count = data_handler.count_comments()
-
+    questions: list[dict[str, str]] = data_handler.get_latest_questions()
+    comment_count: dict[str, str] = data_handler.count_comments()
     return render_template('pages/index.html',
                             headers_question=HEADERS_QUESTION,
                             headers_answer=HEADERS_ANSWER,
@@ -21,17 +23,18 @@ def hello():
                             time_passed=data_handler.how_much_time_passed,
                             comment_count=comment_count)
 
-                            
-@app.route("/list", methods=['GET'])
-def list_questions():
+
+@app.route("/list")
+def list_questions() -> str:
     """Main page route."""
-    questions = data_handler.get_sorted_questions('question')
-    comment_count = data_handler.count_comments()
-    sort_by, order = (request.args.get('order_by'),
-                    request.args.get('order_direction'))
-    order = 'DESC' if order == 'descending' else 'ASC'
+    questions: list[dict[str, str]] = data_handler.get_sorted_questions()
+    comment_count: dict[str, str] = data_handler.count_comments()
+    sort_by: Union[str, None] = request.args.get('order_direction')
+    order: Union[str, None] = ('DESC'
+                                if request.args.get('order_by') == 'descending'
+                                else 'ASC')
     if sort_by:
-        questions = data_handler.get_sorted_questions('question',
+        questions: list[dict[str, str]] = data_handler.get_sorted_questions(
                                             sort_by, order)
     return render_template('pages/index.html',
                             headers_question=HEADERS_QUESTION,
@@ -42,64 +45,66 @@ def list_questions():
 
 
 
-@app.route("/question/<question_id>/")
-def display_question(question_id):
-    
-    answers = data_handler.get_sorted_questions('answer')
-    question_to_send = data_handler.get_question_by_id(question_id)
-    answers_send_list = []
-    for answer in answers:
-        if answer['question_id'] == int(question_id):
-            answers_send_list.append(answer)
+@app.route("/question/<question_id>")
+def display_question(question_id) -> str:
+    """Specific question page route."""
+    question: list[dict[str, str]] = data_handler.get_question_by_id(
+                                                                    question_id)
+    answers: list[dict[str, str]] = data_handler.get_answers_for_question(
+                                                                    question_id)
     return render_template('pages/display_question.html',
-                            question=question_to_send,
-                            answers=answers_send_list,
-                            count_answers=len(answers_send_list))
+                            question=question,
+                            answers=answers,
+                            count_answers=len(answers))
 
 
 @app.route("/question/<question_id>/delete", methods=["POST"])
-def delete_question(question_id):
-    data_handler.delete_data(mode = 'question', 
-                                given_question_id = question_id)
+def delete_question(question_id) -> Response:
+    """Specific question delete route."""
+    data_handler.delete_question(question_id)
     return redirect("/list")
 
 
-@app.route("/question/<question_id>/<aid>/delete_answer", methods=["POST"])
-def delete_answer(question_id, aid):
-    data_handler.delete_data(mode='answer',
-                                aid =aid)
+@app.route("/question/<question_id>/<answer_id>/delete_answer",
+            methods=["POST"])
+def delete_answer(question_id, answer_id) -> Response:
+    """Specific answer delete route."""
+    data_handler.delete_answer(answer_id)
     return redirect("/question/" + question_id)
 
 
-@app.route("/question/<question_id>/new-answer", methods=['POST', 'GET'])
-def new_answer(question_id):
+@app.route("/question/<question_id>/new-answer", methods=['GET', 'POST'])
+def new_answer(question_id) -> Union[Response, str]:
+    """Adding new answer route."""
     if request.method == "POST":
-        message = request.form.get("message")
-        data_handler.add_data_to_file(question_id=question_id,
-                                        mode='answer',
-                                        message=message)
+        message: Union[str, None] = request.form.get("message")
+        data_handler.add_answer_to_database(question_id=question_id,
+                                            message=message)
         return redirect("/question/"+question_id)
     return render_template('pages/new_answer.html')
 
 
 @app.route('/add_question', methods=['GET', 'POST'])
-def add_new_question():
-    if request.method == "GET":
-        return render_template('pages/add_question.html')
-    message = request.form.get("question")
-    title = request.form.get("title")
-    data_handler.add_data_to_file(mode='question',
-                                    message=message,
-                                    title=title)
-    return redirect('/list')
+def new_question() -> Union[Response, str]:
+    """Adding new question route."""
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("question")
+        title: Union[str, None] = request.form.get("title")
+        data_handler.add_data_to_file(mode='question',
+                                        message=message,
+                                        title=title)
+        return redirect('/list')
+    return render_template('pages/add_question.html')
 
 
 @app.route("/question/<question_id>/edit", methods=['POST','GET'])
-def edit_question(question_id):
-    question = data_handler.get_question_by_id(question_id)
+def edit_question(question_id) -> Union[Response, str]:
+    """Editing specific question route."""
+    question: list[dict[str, str]] = data_handler.get_question_by_id(
+                                                            question_id)
     if request.method == 'POST':
-        new_title = request.form.get("title")
-        new_message = request.form.get("message")
+        new_title: Union[str, None] = request.form.get("title")
+        new_message: Union[str, None] = request.form.get("message")
         data_handler.edit_question(mode='question',
                                     title = new_title,
                                     message = new_message,
@@ -110,25 +115,31 @@ def edit_question(question_id):
 
 
 @app.route("/question/<question_id>/vote-up", methods=['POST'])
-def vote_question_up(question_id):
+def vote_question_up(question_id) -> Response:
+    """Question upvoting route."""
     data_handler.voting_questions(question_id, 'up')
     return redirect("/list")
 
 
 @app.route("/question/<question_id>/vote-down", methods=['POST'])
-def vote_question_down(question_id):
+def vote_question_down(question_id) -> Response:
+    """Question downvoting route."""
     data_handler.voting_questions(question_id, 'down')
     return redirect("/list")
 
 
-@app.route("/question/<question_id>/answer/<int:answer_id>/vote-up", methods=['POST'])
-def vote_answer_up(question_id, answer_id):
+@app.route("/question/<question_id>/answer/<int:answer_id>/vote-up",
+            methods=['POST'])
+def vote_answer_up(question_id, answer_id) -> Response:
+    """Answer upvoting route."""
     data_handler.voting_answer(answer_id, mode='up')
     return redirect("/question/" + question_id)
 
 
-@app.route("/question/<question_id>/answer/<int:answer_id>/vote-down", methods=['POST'])
-def vote_answer_down(question_id, answer_id):
+@app.route("/question/<question_id>/answer/<int:answer_id>/vote-down",
+            methods=['POST'])
+def vote_answer_down(question_id, answer_id) -> Response:
+    """Answer downvoting route."""
     data_handler.voting_answer(answer_id, mode='down')
     return redirect("/question/" + question_id)
 
