@@ -9,28 +9,43 @@ HEADERS_ANSWER = data_handler.HEADERS_ANSWER
 
 
 @app.route("/")
-@app.route("/list", methods=['GET'])
 def hello():
     """Main page route."""
-    questions = data_handler.get_data('question')
+    questions = data_handler.get_latest_questions()
+    comment_count = data_handler.count_comments()
+
+    return render_template('pages/index.html',
+                            headers_question=HEADERS_QUESTION,
+                            headers_answer=HEADERS_ANSWER,
+                            questions=questions,
+                            time_passed=data_handler.how_much_time_passed,
+                            comment_count=comment_count)
+
+                            
+@app.route("/list", methods=['GET'])
+def list_questions():
+    """Main page route."""
+    questions = data_handler.get_sorted_questions('question')
     comment_count = data_handler.count_comments()
     sort_by, order = (request.args.get('order_by'),
                     request.args.get('order_direction'))
     order = 'DESC' if order == 'descending' else 'ASC'
     if sort_by:
-        questions = data_handler.get_data('question',
+        questions = data_handler.get_sorted_questions('question',
                                             sort_by, order)
-    return render_template('pages/index.html', headers_question=HEADERS_QUESTION,
+    return render_template('pages/index.html',
+                            headers_question=HEADERS_QUESTION,
                             headers_answer=HEADERS_ANSWER,
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
                             comment_count=comment_count)
 
 
+
 @app.route("/question/<question_id>/")
 def display_question(question_id):
     
-    answers = data_handler.get_data('answer')
+    answers = data_handler.get_sorted_questions('answer')
     question_to_send = data_handler.get_question_by_id(question_id)
     answers_send_list = []
     for answer in answers:

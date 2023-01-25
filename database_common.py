@@ -33,13 +33,12 @@ def open_database():
 def connection_handler(function):
     """Extract specific records requested by function."""
     def wrapper(*args, **kwargs):
-        connection = open_database()
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        return_value = function(cursor, *args, **kwargs)
-        converted_data = '' if return_value is None else [dict(row) for row in return_value]
-        connection.commit()
-        cursor.close()
-        connection.close()
+        with open_database() as connection:
+            with connection.cursor() as cursor:
+                cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+                return_value = function(cursor, *args, **kwargs)
+                converted_data = '' if return_value is None else [dict(row) for row in return_value]
+                # connection.commit()
         # print to vscode console
         # print('=============================', file=sys.stderr)
         return converted_data

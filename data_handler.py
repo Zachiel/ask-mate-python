@@ -1,6 +1,7 @@
 """Data read/write and manipulation functions."""
 import sys
 from datetime import datetime, timedelta
+from psycopg2 import sql
 import database_common
 
 
@@ -11,18 +12,33 @@ HEADERS_ANSWER: list[str] = ['id', 'submission_time', 'vote_number',
 
 
 @database_common.connection_handler
-def get_data(cursor, data_type: str, sort_by='date',
+def get_latest_questions(cursor) -> list[dict[str, str]]:
+    """Show latest questions in home page"""
+    query = """
+    SELECT *
+    FROM question
+    ORDER BY submission_time DESC
+    LIMIT 5"""
+    cursor.execute(query)
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
+def get_sorted_questions(cursor, data_type: str, sort_by='date',
            order='DESC') -> list[dict[str, str]]:
     """Sort given data by specific header."""
-    sort_by_translate: dict[str, str] = {'date': 'submission_time',
-                    'title': 'title', 'message': 'message',
-                    'views': 'view_number', 'votes': 'vote_number',
-                    'comments': 'comments'}
-    query = f"""
+    translate: dict[str, str] = {'date': 'submission_time',
+                                'title': 'title',
+                                'message': 'message',
+                                'views': 'view_number',
+                                'votes': 'vote_number',
+                                'comments': 'comments'}
+    query = sql.SQL("""
     SELECT *
-    FROM {data_type}
-    ORDER BY {sort_by_translate[sort_by]} {order}"""
-    cursor.execute(query)
+    FROM question
+    ORDER BY %s %s
+    """)
+    cursor.execute(query, [translate[sort_by], order])
     return cursor.fetchall()
 
 
@@ -113,8 +129,8 @@ def edit_question(cursor, mode, title, message, given_question_id=''):
 def count_comments() -> dict[str, int]:
     """Get comment count for each question."""
     comments_count = {}
-    questions = get_data('question')
-    answers = get_data('answer')
+    questions = get_sorted_questions(data_type='question')
+    answers = get_sorted_questions(data_type='answer')
     for question in questions:
         for key, value in question.items():
             if key == 'id':
