@@ -70,7 +70,7 @@ def new_answer(question_id):
 @app.route('/add_question', methods=['GET', 'POST'])
 def add_new_question():
     if request.method == "GET":
-        return render_template('/add_question.html')
+        return render_template('pages/add_question.html')
     message = request.form.get("question")
     title = request.form.get("title")
     data_handler.add_data_to_file(mode='question',
@@ -106,18 +106,16 @@ def vote_question_down(question_id):
     return redirect("/list")
 
 
-@app.route("/answer/<answer_id>/vote-up")
-def vote_answer_up(answer_id):
-    data_handler.vote_answer_up(answer_id)
-    question_id = data_handler.get_question_id_by_answer_id(answer_id)
-    return redirect(f"/question/{question_id}")
+@app.route("/question/<question_id>/answer/<int:answer_id>/vote-up", methods=['POST'])
+def vote_answer_up(question_id, answer_id):
+    data_handler.voting_answer(answer_id, mode='up')
+    return redirect("/question/" + question_id)
 
 
-@app.route("/answer/<answer_id>/vote-down")
-def vote_answer_down(answer_id):
-    data_handler.vote_answer_down(answer_id)
-    question_id = data_handler.get_question_id_by_answer_id(answer_id)
-    return redirect(f"/question/{question_id}")
+@app.route("/question/<question_id>/answer/<int:answer_id>/vote-down", methods=['POST'])
+def vote_answer_down(question_id, answer_id):
+    data_handler.voting_answer(answer_id, mode='down')
+    return redirect("/question/" + question_id)
 
 
 if __name__ == "__main__":
