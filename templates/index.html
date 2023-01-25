@@ -1,7 +1,7 @@
-{% extends 'base.html'%} {% block title %}Home{% endblock %} {% block content %}
-<!-- Grid container -->
+{% extends 'template.html'%} {% block title %}Home{% endblock %} {% block content %}
+{# Grid container #}
 <div class="container-fluid my-5 pt-5 w-100">
-    <!-- Grid row 1 -->
+    {# Grid row 1 #}
     <div class="row justify-content-between align-items-center g-2 mb-3">
         <div class="col">
             <h2 class="ms-5">
@@ -10,7 +10,7 @@
                 request.args.get('order_direction')}}{% endif %}
             </h2>
         </div>
-        <!-- Question sorting button -->
+        {# Question sorting button #}
         <div class="col-4 me-3 ps-5">
             <form
                 class="input-group justify-content-end"
@@ -41,11 +41,11 @@
                 </div>
                 <button type="submit" class="btn btn-info shadow">Sort</button>
             </form>
-            <!-- Question sorting button -->
+            {# Question sorting button #}
         </div>
-        <!-- Grid row 2 -->
+        {# Grid row 2 #}
         <div class="row justify-content-center align-items-center g-2">
-            <!-- Listed questions --->
+            {# Listed questions -#}
             <div class="accordion" id="question-accordion">
                 {% for item in questions %}
                 <div class="accordion-item">
@@ -125,7 +125,7 @@
                 </div>
                 {% endfor %}
             </div>
-            <!-- Grid container -->
+            {# Grid container #}
             {% endblock %}
         </div>
     </div>

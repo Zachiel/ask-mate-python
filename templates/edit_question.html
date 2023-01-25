@@ -1,19 +1,36 @@
-{% extends 'base.html' %} {% block title %} Edit question {% endblock %}
-{% block content %}
+{% extends 'template.html' %} {% block title %} Edit question {% endblock %} {%
+block content %}
 <div class="container-fluid my-5 pt-5 w-100">
-    <h1>Question:</h1><hr>
+    <h1>Question:</h1>
+    <hr />
     <form method="POST" name="question" id="question">
         <div class="input-group">
             <span class="input-group-text">Title: </span>
-            <textarea id="title" name="title" class="form-control" aria-label="With textarea">{{question['title']}}</textarea>
+            <textarea
+                id="title"
+                name="title"
+                class="form-control"
+                aria-label="With textarea"
+            >
+{{question['title']}}</textarea
+            >
         </div>
-        <br>
+        <br />
         <div class="input-group">
             <span class="input-group-text">Message: </span>
-            <textarea id="message" name="message" class="form-control" aria-label="With textarea">{{question['message']}}</textarea>
+            <textarea
+                id="message"
+                name="message"
+                class="form-control"
+                aria-label="With textarea"
+            >
+{{question['message']}}</textarea
+            >
         </div>
     </form>
-    <br>
-    <button type="submit" class="btn btn-primary" form="question">Edit the question</button>
+    <br />
+    <button type="submit" class="btn btn-primary" form="question">
+        Edit the question
+    </button>
 </div>
 {% endblock %}

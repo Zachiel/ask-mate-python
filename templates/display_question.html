@@ -1,5 +1,5 @@
-{% extends 'base.html' %} {% block title %} Display a question {% endblock %} {%
-block content %}
+{% extends 'template.html' %} {% block title %} Display a question {% endblock
+%} {% block content %}
 <div class="container-fluid m-5 p-5">
     <div class="row justify-content-center align-items-center g-2">
         <div class="col-8">
@@ -31,7 +31,7 @@ block content %}
                         </div>
                         <div class="col-1 mx-1 me-5">
                             <form action="delete" method="POST">
-                                <!-- Button trigger modal -->
+                                {# Button trigger modal #}
                                 <button
                                     type="button"
                                     class="btn btn-sm btn-danger text-nowrap border-dark shadow"
@@ -40,7 +40,7 @@ block content %}
                                 >
                                     Delete question
                                 </button>
-                                <!-- Modal -->
+                                {# Modal #}
                                 <div
                                     class="modal fade"
                                     id="exampleModal"
@@ -118,13 +118,17 @@ block content %}
                 <div class="card-body">
                     <div class="row">
                         <div class="col-1 text-nowrap me-5">
-                            <a href="http://127.0.0.1:5000/answer/{{answer['id']}}/vote-up">
+                            <a
+                                href="http://127.0.0.1:5000/answer/{{answer['id']}}/vote-up"
+                            >
                                 <button class="btn btn-upvote" href="#">
                                     <i class="fas fa-arrow-up"></i>
                                 </button>
                             </a>
                             {{ answer['vote_number'] }}
-                            <a href="http://127.0.0.1:5000/answer/{{answer['id']}}/vote-down">
+                            <a
+                                href="http://127.0.0.1:5000/answer/{{answer['id']}}/vote-down"
+                            >
                                 <button class="btn btn-downvote" href="#">
                                     <i class="fas fa-arrow-down"></i>
                                 </button>
