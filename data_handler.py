@@ -1,5 +1,6 @@
 """Data read/write and manipulation functions."""
 from datetime import datetime, timedelta
+import sys
 import database_common
 
 
@@ -13,8 +14,7 @@ HEADERS_ANSWER: list[str] = ['id', 'submission_time', 'vote_number',
 def get_latest_questions(cursor) -> list[dict[str, str]]:
     """Show latest questions in home page"""
     query: str = """
-        SELECT (id, submission_time, view_number, vote_number, title, message,
-                image)
+        SELECT *
         FROM question
         ORDER BY submission_time DESC
         LIMIT 5"""
@@ -35,8 +35,7 @@ def get_sorted_questions(cursor, sort_by='date',
                                 'DESC': 'DESC',
                                 'ASC': 'ASC'}
     query: str = f"""
-        SELECT (id, submission_time, view_number, vote_number, title, message,
-                image)
+        SELECT *
         FROM question
         ORDER BY {translate[sort_by]} {translate[order]}
         """
@@ -60,7 +59,7 @@ def get_answers_for_question(cursor, question_id) -> list[dict[str, str]]:
 def get_question_by_id(cursor, question_id) -> list[dict[str, str]]:
     """Get specific question by its ID."""
     query: str = """
-        SELECT (id, submission_time, vote_number, question_id, message, image)
+        SELECT *
         FROM question
         WHERE id=%(id)s"""
     cursor.execute(query, {'id': question_id})
@@ -71,9 +70,9 @@ def get_question_by_id(cursor, question_id) -> list[dict[str, str]]:
 def add_question_to_database(cursor, title, message) -> None:
     """Save user question into database."""
     query: str = """
-        INSERT INTO answer (submission_time, vote_number, question_id, message) 
-        VALUES (%s, %s, %s, %s)"""
-    cursor.execute(query, [time_now(), 0, title, message])
+        INSERT INTO question (submission_time, view_number, vote_number, title, message) 
+        VALUES (%s, %s, %s, %s, %s)"""
+    cursor.execute(query, [time_now(), 0, 0, title, message])
 
 
 @database_common.connection_handler
@@ -159,15 +158,28 @@ def edit_question(cursor, question_id, title, message) -> None:
                             'id': question_id})
 
 
-def count_comments(cursor) -> dict[str, int]:
+@database_common.connection_handler
+def extract_sql_comment_count(cursor) -> dict[str, int]:
     """Get comment count for each question."""
     query: str = """
         SELECT q.id AS question_id, COUNT(a.id) AS comments
         FROM question AS q
-        JOIN answer AS a ON q.id = a.question_id
+        LEFT JOIN answer AS a ON q.id = a.question_id
         GROUP BY q.id"""
     cursor.execute(query)
     return cursor.fetchall()
+
+
+def get_comment_count() -> dict[str, str]:
+    """Extract SQL data into key: value pairs.
+    With ID as key and comment count as value."""
+    sql_count_data = extract_sql_comment_count()
+    comment_count_dict: dict[str, str] = {}
+    for row in sql_count_data:
+        comment_count_dict.update({str(row['question_id']):
+                                    str(row['comments'])})
+    print(comment_count_dict, file=sys.stderr)
+    return comment_count_dict
 
 
 def time_now() -> datetime:
@@ -182,10 +194,10 @@ def how_much_time_passed(date: datetime) -> str:
     time_then: datetime = date
     delta: timedelta = current_time - time_then
     if delta.days >= 365:
-        years = delta.days // 365
+        years: int = delta.days // 365
         return f'{years} {"year" if years == 1 else "years"} ago'
     if delta.days >= 30:
-        months = delta.days // 30
+        months: int = delta.days // 30
         return f'{months} {"month" if months == 1 else "months"} ago'
     if delta.days > 0:
         return f'{delta.days} days ago'

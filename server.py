@@ -1,6 +1,7 @@
 """AskMate server route management."""
 # pylint: disable=no-value-for-parameter, no-member
 # pyright: reportGeneralTypeIssues=false
+import sys
 from typing import Union
 from flask import Flask, render_template, request, redirect, Response
 import data_handler
@@ -15,13 +16,14 @@ HEADERS_ANSWER: list[str] = data_handler.HEADERS_ANSWER
 def hello() -> str:
     """Main page route."""
     questions: list[dict[str, str]] = data_handler.get_latest_questions()
-    comment_count: dict[str, str] = data_handler.count_comments()
+    comment_count: dict[str, str] = data_handler.get_comment_count()
+    print(questions, file=sys.stderr)
     return render_template('pages/index.html',
                             headers_question=HEADERS_QUESTION,
-                            headers_answer=HEADERS_ANSWER,
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
-                            comment_count=comment_count)
+                            comment_count=comment_count,
+                            to_string=str)
 
 
 @app.route("/list")
@@ -38,7 +40,6 @@ def list_questions() -> str:
                                             sort_by, order)
     return render_template('pages/index.html',
                             headers_question=HEADERS_QUESTION,
-                            headers_answer=HEADERS_ANSWER,
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
                             comment_count=comment_count)
@@ -90,9 +91,8 @@ def new_question() -> Union[Response, str]:
     if request.method == "POST":
         message: Union[str, None] = request.form.get("question")
         title: Union[str, None] = request.form.get("title")
-        data_handler.add_data_to_file(mode='question',
-                                        message=message,
-                                        title=title)
+        data_handler.add_question_to_database(message=message,
+                                            title=title)
         return redirect('/list')
     return render_template('pages/add_question.html')
 
@@ -117,14 +117,14 @@ def edit_question(question_id) -> Union[Response, str]:
 @app.route("/question/<question_id>/vote-up", methods=['POST'])
 def vote_question_up(question_id) -> Response:
     """Question upvoting route."""
-    data_handler.voting_questions(question_id, 'up')
+    data_handler.vote_question_up(question_id)
     return redirect("/list")
 
 
 @app.route("/question/<question_id>/vote-down", methods=['POST'])
 def vote_question_down(question_id) -> Response:
     """Question downvoting route."""
-    data_handler.voting_questions(question_id, 'down')
+    data_handler.vote_question_down(question_id)
     return redirect("/list")
 
 
@@ -132,7 +132,7 @@ def vote_question_down(question_id) -> Response:
             methods=['POST'])
 def vote_answer_up(question_id, answer_id) -> Response:
     """Answer upvoting route."""
-    data_handler.voting_answer(answer_id, mode='up')
+    data_handler.vote_answer_up(answer_id)
     return redirect("/question/" + question_id)
 
 
@@ -140,7 +140,7 @@ def vote_answer_up(question_id, answer_id) -> Response:
             methods=['POST'])
 def vote_answer_down(question_id, answer_id) -> Response:
     """Answer downvoting route."""
-    data_handler.voting_answer(answer_id, mode='down')
+    data_handler.vote_answer_down(answer_id)
     return redirect("/question/" + question_id)
 
 
