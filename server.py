@@ -40,7 +40,7 @@ def list_questions() -> str:
 
 
 
-@app.route("/question/<question_id>")
+@app.route("/question/<question_id>/")
 def display_question(question_id) -> str:
     """Specific question page route."""
     data_handler.increase_view_count(question_id)
@@ -98,15 +98,12 @@ def edit_question(question_id) -> Union[Response, str]:
     question: list[dict[str, str]] = data_handler.get_question_by_id(
                                                             question_id)
     if request.method == 'POST':
-        new_title: Union[str, None] = request.form.get("title")
-        new_message: Union[str, None] = request.form.get("message")
-        data_handler.edit_question(mode='question',
-                                    title = new_title,
-                                    message = new_message,
-                                    given_question_id=question_id)
+        title: Union[str, None] = request.form.get("title")
+        message: Union[str, None] = request.form.get("message")
+        data_handler.edit_question(question_id, title, message)
         return redirect('/question/'+question_id)
     return render_template('pages/edit_question.html',
-                        question=question)
+                        question=question[0])
 
 
 @app.route("/question/<question_id>/vote-up", methods=['POST'])

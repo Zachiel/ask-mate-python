@@ -57,7 +57,7 @@ def get_question_by_id(cursor, question_id) -> list[dict[str, str]]:
         SELECT *
         FROM question
         WHERE id=%(id)s"""
-    cursor.execute(query, {'id': question_id})
+    cursor.execute(query, {'id': int(question_id)})
     return cursor.fetchall()
 
 
@@ -103,7 +103,7 @@ def vote_question_down(cursor, question_id) -> None:
 def vote_answer_up(cursor, answer_id) -> None:
     """Add points to a question."""
     query: str = """
-        UPDATE question
+        UPDATE answer
         SET vote_number = vote_number + 1
         WHERE id=%(id)s"""
     cursor.execute(query, {'id': answer_id})
@@ -113,7 +113,7 @@ def vote_answer_up(cursor, answer_id) -> None:
 def vote_answer_down(cursor, answer_id) -> None:
     """Remove points from a question."""
     query: str = """
-        UPDATE question
+        UPDATE answer
         SET vote_number = vote_number - 1
         WHERE id=%(id)s"""
     cursor.execute(query, {'id': answer_id})
@@ -147,7 +147,7 @@ def edit_question(cursor, question_id, title, message) -> None:
     query: str = """
         UPDATE question
         SET title = %(title)s, message = %(message)s
-        WHERE id = %(question_id)s"""
+        WHERE id = %(id)s"""
     cursor.execute(query, {'title' : title,
                             'message': message,
                             'id': question_id})
