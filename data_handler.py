@@ -57,7 +57,7 @@ def get_question_by_id(cursor, question_id) -> list[dict[str, str]]:
         SELECT *
         FROM question
         WHERE id=%(id)s"""
-    cursor.execute(query, {'id': int(question_id)})
+    cursor.execute(query, {'id': question_id})
     return cursor.fetchall()
 
 

@@ -1,6 +1,5 @@
 """Database connection functions."""
 import os
-import sys
 from typing import Union, Callable, Any
 import psycopg2.extras as extras
 import psycopg2
@@ -37,6 +36,5 @@ def connection_handler(function) -> Callable:
             with connection.cursor() as cursor:
                 cursor = connection.cursor(cursor_factory=extras.RealDictCursor)
                 return_value: Any = function(cursor, *args, **kwargs)
-        print(return_value, file=sys.stderr)
         return return_value
     return wrapper
