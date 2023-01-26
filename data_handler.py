@@ -1,13 +1,8 @@
 """Data read/write and manipulation functions."""
 from datetime import datetime, timedelta
+from typing import Any
 import sys
 import database_common
-
-
-HEADERS_QUESTION: list[str] = ['id', 'submission_time', 'view_number',
-                    'vote_number', 'title', 'message', 'image']
-HEADERS_ANSWER: list[str] = ['id', 'submission_time', 'vote_number',
-                            'question_id', 'message', 'image']
 
 
 @database_common.connection_handler
@@ -24,7 +19,7 @@ def get_latest_questions(cursor) -> list[dict[str, str]]:
 
 @database_common.connection_handler
 def get_sorted_questions(cursor, sort_by='date',
-            order='DESC') -> list[dict[str, str]]:
+            order='descending') -> list[dict[str, str]]:
     """Sort given data by specific header."""
     translate: dict[str, str] = {'date': 'submission_time',
                                 'title': 'title',
@@ -32,8 +27,8 @@ def get_sorted_questions(cursor, sort_by='date',
                                 'views': 'view_number',
                                 'votes': 'vote_number',
                                 'comments': 'comments',
-                                'DESC': 'DESC',
-                                'ASC': 'ASC'}
+                                'descending': 'DESC',
+                                'ascending': 'ASC'}
     query: str = f"""
         SELECT *
         FROM question
@@ -138,7 +133,7 @@ def delete_question(cursor, question_id) -> None:
 
 
 @database_common.connection_handler
-def delete_data(cursor, answer_id) -> None:
+def delete_answer(cursor, answer_id) -> None:
     """Delete answer from database."""
     query: str = """
         DELETE FROM answer
@@ -159,6 +154,16 @@ def edit_question(cursor, question_id, title, message) -> None:
 
 
 @database_common.connection_handler
+def increase_view_count(cursor, question_id) -> None:
+    """Increase question view counter."""
+    query: str = """
+        UPDATE question
+        SET view_number = view_number + 1
+        WHERE id = %(id)s"""
+    cursor.execute(query, {'id': question_id})
+
+
+@database_common.connection_handler
 def extract_sql_comment_count(cursor) -> dict[str, int]:
     """Get comment count for each question."""
     query: str = """
@@ -173,7 +178,7 @@ def extract_sql_comment_count(cursor) -> dict[str, int]:
 def get_comment_count() -> dict[str, str]:
     """Extract SQL data into key: value pairs.
     With ID as key and comment count as value."""
-    sql_count_data = extract_sql_comment_count()
+    sql_count_data: Any = extract_sql_comment_count()
     comment_count_dict: dict[str, str] = {}
     for row in sql_count_data:
         comment_count_dict.update({str(row['question_id']):

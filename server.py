@@ -8,9 +8,6 @@ import data_handler
 
 app: Flask = Flask(__name__, static_url_path='/static')
 
-HEADERS_QUESTION: list[str] = data_handler.HEADERS_QUESTION
-HEADERS_ANSWER: list[str] = data_handler.HEADERS_ANSWER
-
 
 @app.route("/")
 def hello() -> str:
@@ -19,7 +16,6 @@ def hello() -> str:
     comment_count: dict[str, str] = data_handler.get_comment_count()
     print(questions, file=sys.stderr)
     return render_template('pages/index.html',
-                            headers_question=HEADERS_QUESTION,
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
                             comment_count=comment_count,
@@ -30,31 +26,30 @@ def hello() -> str:
 def list_questions() -> str:
     """Main page route."""
     questions: list[dict[str, str]] = data_handler.get_sorted_questions()
-    comment_count: dict[str, str] = data_handler.count_comments()
-    sort_by: Union[str, None] = request.args.get('order_direction')
-    order: Union[str, None] = ('DESC'
-                                if request.args.get('order_by') == 'descending'
-                                else 'ASC')
+    comment_count: dict[str, str] = data_handler.get_comment_count()
+    sort_by: Union[str, None] = request.args.get('order_by')
+    order: Union[str, None] = request.args.get('order_direction')
     if sort_by:
         questions: list[dict[str, str]] = data_handler.get_sorted_questions(
                                             sort_by, order)
     return render_template('pages/index.html',
-                            headers_question=HEADERS_QUESTION,
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
-                            comment_count=comment_count)
+                            comment_count=comment_count,
+                            to_string=str)
 
 
 
 @app.route("/question/<question_id>")
 def display_question(question_id) -> str:
     """Specific question page route."""
+    data_handler.increase_view_count(question_id)
     question: list[dict[str, str]] = data_handler.get_question_by_id(
                                                                     question_id)
     answers: list[dict[str, str]] = data_handler.get_answers_for_question(
                                                                     question_id)
     return render_template('pages/display_question.html',
-                            question=question,
+                            question=question[0],
                             answers=answers,
                             count_answers=len(answers))
 

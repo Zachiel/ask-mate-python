@@ -5,16 +5,17 @@
     <div class="row justify-content-between align-items-center g-2 mb-3">
         <div class="col">
             <h2 class="ms-5">
-                {% if request.args.get('order_by') == None %}Latest questions{%
+                {% if request.args.get('order_by') == None or request.path == '/' %}Latest questions{%
                 else %}{{ request.args.get('order_by') }} {{
                 request.args.get('order_direction')}}{% endif %}
             </h2>
         </div>
         {# Question sorting button #}
         <div class="col-4 me-3 ps-5">
+            {% if request.path != '/' %}
             <form
                 class="input-group justify-content-end"
-                action="/"
+                action="/list"
                 method="get"
             >
                 <div class="col">
@@ -41,7 +42,13 @@
                 </div>
                 <button type="submit" class="btn btn-info shadow">Sort</button>
             </form>
-            {# Question sorting button #}
+            {% else %}
+            <div class="col text-end">
+                <a href="/list">
+                    <button class="btn btn-info shadow">Show all questions</button>
+                </a>
+            </div>
+            {% endif %}
         </div>
         {# Grid row 2 #}
         <div class="row justify-content-center align-items-center g-2">

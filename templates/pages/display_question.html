@@ -30,7 +30,10 @@
                             </form>
                         </div>
                         <div class="col-1 mx-1 me-5">
-                            <form action="delete" method="POST">
+                            <form
+                                action="{{question['id']}}/delete"
+                                method="POST"
+                            >
                                 {# Button trigger modal #}
                                 <button
                                     type="button"
@@ -93,18 +96,15 @@
                         </div>
                     </div>
                     <div class="row">
-                        <h2 class="card-title">{{question[0]['title']}}</h2>
+                        <h2 class="card-title">{{question['title']}}</h2>
                         <hr class="border border-warning border-2 opacity-50" />
-                        <p class="card-text">{{question[0]['message']}}</p>
+                        <p class="card-text">{{question['message']}}</p>
                         <div class="text-end">
-                            <form action="new-answer" method="GET">
-                                <button
-                                    type="submit"
-                                    class="btn btn-sm btn-info"
-                                >
+                            <a href="/question/{{question['id']}}/new-answer">
+                                <button class="btn btn-sm btn-info">
                                     Post new answer
                                 </button>
-                            </form>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -157,7 +157,7 @@
                         <div class="col">{{ answer['message'] }}</div>
                         <div class="col-1 text-nowrap me-5">
                             <form
-                                action="{{answer['id']}}/delete_answer"
+                                action="/question/{{question['id']}}/{{answer['id']}}/delete_answer"
                                 method="POST"
                             >
                                 <button
