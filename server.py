@@ -72,32 +72,8 @@ def display_question(question_id) -> str:
                             count_answers=len(answers))
 
 
-@app.route("/question/<question_id>/delete", methods=["POST"])
-def delete_question(question_id) -> Response:
-    """Specific question delete route."""
-    data_handler.delete_question(question_id)
-    return redirect("/list")
-
-
-@app.route("/question/<question_id>/<answer_id>/delete_answer",
-            methods=["POST"])
-def delete_answer(question_id, answer_id) -> Response:
-    """Specific answer delete route."""
-    data_handler.delete_answer(answer_id)
-    return redirect("/question/" + question_id)
-
-
-@app.route("/question/<question_id>/new-answer", methods=['GET', 'POST'])
-def new_answer(question_id) -> Union[Response, str]:
-    """Adding new answer route."""
-    if request.method == "POST":
-        message: Union[str, None] = request.form.get("message")
-        data_handler.add_answer_to_database(question_id, message)
-        return redirect("/question/"+question_id)
-    return render_template('pages/new_answer.html')
-
-
-@app.route('/add_question', methods=['GET', 'POST'])
+@app.route('/add_question',
+            methods=['GET', 'POST'])
 def new_question() -> Union[Response, str]:
     """Adding new question route."""
     if request.method == "POST":
@@ -110,7 +86,8 @@ def new_question() -> Union[Response, str]:
     return render_template('pages/add_question.html')
 
 
-@app.route("/question/<question_id>/edit", methods=['POST','GET'])
+@app.route("/question/<question_id>/edit",
+            methods=['POST','GET'])
 def edit_question(question_id) -> Union[Response, str]:
     """Editing specific question route."""
     question: list[dict[str, str]] = data_handler.get_question_by_id(
@@ -126,18 +103,58 @@ def edit_question(question_id) -> Union[Response, str]:
                         question=question[0])
 
 
-@app.route("/question/<question_id>/vote-up", methods=['POST'])
+@app.route("/question/<question_id>/delete",
+            methods=["POST"])
+def delete_question(question_id) -> Response:
+    """Specific question delete route."""
+    data_handler.delete_question(question_id)
+    return redirect("/list")
+
+
+@app.route("/question/<question_id>/vote-up",
+            methods=['POST'])
 def vote_question_up(question_id) -> Response:
     """Question upvoting route."""
     data_handler.vote_question_up(question_id)
     return redirect("/list")
 
 
-@app.route("/question/<question_id>/vote-down", methods=['POST'])
+@app.route("/question/<question_id>/vote-down",
+            methods=['POST'])
 def vote_question_down(question_id) -> Response:
     """Question downvoting route."""
     data_handler.vote_question_down(question_id)
     return redirect("/list")
+
+
+@app.route("/question/<question_id>/new-answer",
+            methods=['GET', 'POST'])
+def new_answer(question_id) -> Union[Response, str]:
+    """Adding new answer route."""
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.add_answer_to_database(question_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/new_answer.html')
+
+
+@app.route("/question/<question_id>/<answer_id>/edit_answer",
+            methods=['GET', 'POST'])
+def edit_answer(question_id) -> Union[Response, str]:
+    """Adding new answer route."""
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.edit_answer(question_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/edit_answer.html')
+
+
+@app.route("/question/<question_id>/<answer_id>/delete_answer",
+            methods=["POST"])
+def delete_answer(question_id, answer_id) -> Response:
+    """Specific answer delete route."""
+    data_handler.delete_answer(answer_id)
+    return redirect("/question/" + question_id)
 
 
 @app.route("/question/<question_id>/answer/<int:answer_id>/vote-up",
