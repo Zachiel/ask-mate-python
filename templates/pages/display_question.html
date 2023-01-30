@@ -187,7 +187,7 @@
                             <div class="col">{{ answer['message'] }}</div>
                             <div class="col-auto text-nowrap me-5 text-end">
                                 <a
-                                    href="/question/{{question['id']}}/{{answer['id']}}/edit_answer"
+                                    href="/question/{{question['id']}}/answer/{{answer['id']}}/edit_answer"
                                     class="btn btn-sm btn-primary border-dark shadow p-1 px-3 rounded"
                                 >
                                     <span
@@ -197,7 +197,7 @@
                                     ></span>
                                 </a>
                                 <form
-                                    action="/question/{{question['id']}}/{{answer['id']}}/delete_answer"
+                                    action="/question/{{question['id']}}/answer/{{answer['id']}}/delete_answer"
                                     method="POST"
                                     class="form-button"
                                 >

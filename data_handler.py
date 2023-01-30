@@ -73,6 +73,17 @@ def get_answer_by_id(cursor, answer_id) -> list[dict[str, str]]:
 
 
 @database_common.connection_handler
+def get_comment_by_id(cursor, comment_id) -> list[dict[str, str]]:
+    """Get specific question by its ID."""
+    query: str = """
+        SELECT *
+        FROM comment
+        WHERE id=%(id)s"""
+    cursor.execute(query, {'id': comment_id})
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
 def add_question_to_database(cursor, title, message, image_path) -> None:
     """Save user question into database."""
     query: str = """
@@ -86,18 +97,47 @@ def add_question_to_database(cursor, title, message, image_path) -> None:
 def add_answer_to_database(cursor, question_id, message) -> None:
     """Save user answer into database."""
     query: str = """
-    INSERT INTO answer (submission_time, vote_number, question_id, message)
-    VALUES (%s, %s, %s, %s)"""
+        INSERT INTO answer (submission_time, vote_number, question_id, message)
+        VALUES (%s, %s, %s, %s)"""
     cursor.execute(query, [time_now(), 0, question_id, message])
+
+
+@database_common.connection_handler
+def add_comment_to_question(cursor, question_id, message) -> None:
+    """Save user answer into database."""
+    query: str = """
+        INSERT INTO comment (submission_time, question_id, message, edited_count)
+        VALUES (%s, %s, %s)"""
+    cursor.execute(query, [time_now(), 0, question_id, message, 0])
+
+
+@database_common.connection_handler
+def add_comment_to_answer(cursor, answer_id, message) -> None:
+    """Save user answer into database."""
+    query: str = """
+        INSERT INTO comment (submission_time, answer_id, message, edited_count)
+        VALUES (%s, %s, %s)"""
+    cursor.execute(query, [time_now(), 0, answer_id, message, 0])
+
+
+@database_common.connection_handler
+def edit_comment(cursor, comment_id, message) -> None:
+    """Save user answer into database."""
+    query: str = """
+        UPDATE comment
+        SET message = %(message)s
+        SET edited_count = edited_count + 1
+        WHERE id = %(id)s"""
+    cursor.execute(query, {'message': message, 'id': comment_id})
 
 
 @database_common.connection_handler
 def edit_answer(cursor, question_id, message) -> None:
     """Save user answer into database."""
     query: str = """
-    UPDATE answer
-    SET message = %(message)s
-    WHERE id = %(id)s"""
+        UPDATE answer
+        SET message = %(message)s
+        WHERE id = %(id)s"""
     cursor.execute(query, {'message': message, 'id': question_id})
 
 
@@ -177,7 +217,7 @@ def edit_question(cursor, question_id, title, message, image_path) -> None:
 
 
 @database_common.connection_handler
-def increase_view_count(cursor, question_id) -> None:
+def increase_question_view_count(cursor, question_id) -> None:
     """Increase question view counter."""
     query: str = """
         UPDATE question
@@ -187,7 +227,7 @@ def increase_view_count(cursor, question_id) -> None:
 
 
 @database_common.connection_handler
-def extract_sql_comment_count(cursor) -> dict[str, int]:
+def extract_sql_answer_count(cursor) -> dict[str, int]:
     """Get comment count for each question."""
     query: str = """
         SELECT q.id AS question_id, COUNT(a.id) AS comments
@@ -198,11 +238,11 @@ def extract_sql_comment_count(cursor) -> dict[str, int]:
     return cursor.fetchall()
 
 
-def get_comment_count() -> dict[str, str]:
+def get_answer_count() -> dict[str, str]:
     """Extract SQL data into key: value pairs.
     With ID as key and comment count as value."""
     # pylint: disable=no-value-for-parameter
-    sql_count_data: Any = extract_sql_comment_count()
+    sql_count_data: Any = extract_sql_answer_count()
     comment_count_dict: dict[str, str] = {}
     for row in sql_count_data:
         comment_count_dict.update({str(row['question_id']):

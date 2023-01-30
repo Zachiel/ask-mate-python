@@ -32,7 +32,7 @@ def save_image(file) -> Union[str, None]:
 def hello() -> str:
     """Main page route."""
     questions: list[dict[str, str]] = data_handler.get_latest_questions()
-    comment_count: dict[str, str] = data_handler.get_comment_count()
+    comment_count: dict[str, str] = data_handler.get_answer_count()
     print(questions, file=sys.stderr)
     return render_template('pages/index.html',
                             questions=questions,
@@ -45,7 +45,7 @@ def hello() -> str:
 def list_questions() -> str:
     """Main page route."""
     questions: list[dict[str, str]] = data_handler.get_sorted_questions()
-    comment_count: dict[str, str] = data_handler.get_comment_count()
+    comment_count: dict[str, str] = data_handler.get_answer_count()
     sort_by: Union[str, None] = request.args.get('order_by')
     order: Union[str, None] = request.args.get('order_direction')
     if sort_by:
@@ -61,7 +61,7 @@ def list_questions() -> str:
 @app.route("/question/<question_id>/")
 def display_question(question_id) -> str:
     """Specific question page route."""
-    data_handler.increase_view_count(question_id)
+    data_handler.increase_question_view_count(question_id)
     question: list[dict[str, str]] = data_handler.get_question_by_id(
                                                                     question_id)
     answers: list[dict[str, str]] = data_handler.get_answers_for_question(
@@ -138,11 +138,11 @@ def new_answer(question_id) -> Union[Response, str]:
     return render_template('pages/answer.html')
 
 
-@app.route("/question/<question_id>/<answer_id>/edit_answer",
+@app.route("/question/<question_id>/answer/<answer_id>/edit_answer",
             methods=['GET', 'POST'])
 def edit_answer(question_id, answer_id) -> Union[Response, str]:
     """Edit existing answer route."""
-    answer = data_handler.get_answer_by_id(answer_id)
+    answer: list[dict[str, str]] = data_handler.get_answer_by_id(answer_id)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         data_handler.edit_answer(question_id, message)
@@ -150,7 +150,7 @@ def edit_answer(question_id, answer_id) -> Union[Response, str]:
     return render_template('pages/answer.html', answer=answer[0])
 
 
-@app.route("/question/<question_id>/<answer_id>/delete_answer",
+@app.route("/question/<question_id>/answer/<answer_id>/delete_answer",
             methods=["POST"])
 def delete_answer(question_id, answer_id) -> Response:
     """Specific answer delete route."""
@@ -181,6 +181,40 @@ def new_question_comment(question_id) -> None:
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         data_handler.add_comment_to_question(question_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/comment.html')
+
+
+@app.route("/question/<question_id>/answer/<answer_id>/new-comment",
+            methods=["GET", "POST"])
+def new_answer_comment(question_id, answer_id) -> None:
+    """Add comment to a question route."""
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.add_comment_to_answer(answer_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/comment.html')
+
+
+@app.route("/question/<question_id>/comment/<comment_id>/edit-comment",
+            methods=["GET", "POST"])
+def edit_question_comment(question_id, comment_id) -> None:
+    """Add comment to a question route."""
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.edit_question_comment(comment_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/comment.html')
+
+
+@app.route("/question/<question_id>/answer/<answer_id>/comment/ \
+    <comment_id>/new-comment",
+            methods=["GET", "POST"])
+def edit_answer_comment(question_id, comment_id) -> None:
+    """Add comment to a question route."""
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.edit_answer_comment(comment_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html')
 
