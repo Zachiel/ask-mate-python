@@ -1,5 +1,5 @@
-{% extends 'template.html' %} {% block title %} New answer {% endblock %} {%
-block content %}
+{% extends 'template.html' %} {% block title %} {% if answer %}Edit answer{%
+else %}New answer{% endif %} {% endblock %} {% block content %}
 <div class="container-fluid my-5 pt-5 w-75">
     <h1>Your Answer:</h1>
     <hr />
@@ -11,12 +11,15 @@ block content %}
                 name="message"
                 class="form-control"
                 aria-label="With textarea"
-            ></textarea>
+            >
+{% if answer %}
+{{ answer['message'] }}{% endif %}</textarea
+            >
         </div>
     </form>
     <br />
     <button type="submit" class="btn btn-primary" form="message">
-        Post new answer
+        {% if answer %}Save edits{% else %}Post new answer{% endif %}
     </button>
 </div>
 {% endblock %}

@@ -135,7 +135,7 @@ def new_answer(question_id) -> Union[Response, str]:
         message: Union[str, None] = request.form.get("message")
         data_handler.add_answer_to_database(question_id, message)
         return redirect("/question/"+question_id)
-    return render_template('pages/new_answer.html')
+    return render_template('pages/answer.html')
 
 
 @app.route("/question/<question_id>/<answer_id>/edit_answer",
@@ -147,7 +147,7 @@ def edit_answer(question_id, answer_id) -> Union[Response, str]:
         message: Union[str, None] = request.form.get("message")
         data_handler.edit_answer(question_id, message)
         return redirect("/question/"+question_id)
-    return render_template('pages/edit_answer.html', answer=answer[0])
+    return render_template('pages/answer.html', answer=answer[0])
 
 
 @app.route("/question/<question_id>/<answer_id>/delete_answer",
@@ -172,6 +172,17 @@ def vote_answer_down(question_id, answer_id) -> Response:
     """Answer downvoting route."""
     data_handler.vote_answer_down(answer_id)
     return redirect("/question/" + question_id)
+
+
+@app.route("/question/<question_id>/new-comment",
+            methods=["GET", "POST"])
+def new_question_comment(question_id) -> None:
+    """Add comment to a question route."""
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.add_comment_to_question(question_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/comment.html')
 
 
 if __name__ == "__main__":
