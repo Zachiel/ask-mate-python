@@ -1,5 +1,6 @@
 """Data read/write and manipulation functions."""
 from datetime import datetime, timedelta
+import sys
 from typing import Any
 import database_common
 
@@ -38,7 +39,6 @@ def get_sorted_questions(cursor, sort_by='date',
     return cursor.fetchall()
 
 
-
 @database_common.connection_handler
 def get_answers_for_question(cursor, question_id) -> list[dict[str, str]]:
     """Get all answers for a question."""
@@ -47,6 +47,28 @@ def get_answers_for_question(cursor, question_id) -> list[dict[str, str]]:
         FROM answer
         WHERE question_id = %(qid)s"""
     cursor.execute(query, {'qid': question_id})
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
+def get_comments_for_question(cursor, question_id) -> list[dict[str, str]]:
+    """Get all comments for a question."""
+    query: str = """
+        SELECT *
+        FROM comment
+        WHERE question_id = %(qid)s"""
+    cursor.execute(query, {'qid': question_id})
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
+def get_comments_for_answer(cursor, answer_id) -> list[dict[str, str]]:
+    """Get all comments for a answer."""
+    query: str = """
+        SELECT *
+        FROM comment
+        WHERE answer_id = %(aid)s"""
+    cursor.execute(query, {'aid': answer_id})
     return cursor.fetchall()
 
 
@@ -107,8 +129,8 @@ def add_comment_to_question(cursor, question_id, message) -> None:
     """Save user answer into database."""
     query: str = """
         INSERT INTO comment (submission_time, question_id, message, edited_count)
-        VALUES (%s, %s, %s)"""
-    cursor.execute(query, [time_now(), 0, question_id, message, 0])
+        VALUES (%s, %s, %s, %s)"""
+    cursor.execute(query, [time_now(), question_id, message, 0])
 
 
 @database_common.connection_handler
@@ -116,8 +138,8 @@ def add_comment_to_answer(cursor, answer_id, message) -> None:
     """Save user answer into database."""
     query: str = """
         INSERT INTO comment (submission_time, answer_id, message, edited_count)
-        VALUES (%s, %s, %s)"""
-    cursor.execute(query, [time_now(), 0, answer_id, message, 0])
+        VALUES (%s, %s, %s, %s)"""
+    cursor.execute(query, [time_now(), answer_id, message, 0])
 
 
 @database_common.connection_handler
@@ -248,6 +270,16 @@ def get_answer_count() -> dict[str, str]:
         comment_count_dict.update({str(row['question_id']):
                                     str(row['comments'])})
     return comment_count_dict
+
+
+def get_answer_comments(answer_ids: list[int]) -> list[dict[str, str]]:
+    """Get all comments for answers in a question."""
+    comments: list[dict[str, str]] = []
+    for aid in answer_ids:
+        # pylint: disable=no-value-for-parameter
+        comments.append(get_comments_for_answer(answer_id = aid))
+    print(comments, file=sys.stderr)
+    return comments
 
 
 def time_now() -> datetime:

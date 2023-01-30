@@ -174,3 +174,10 @@ footer {
 .form-button {
     display: inline;
 }
+
+a:hover,
+a:visited,
+a:link,
+a:active {
+    text-decoration: none;
+}

@@ -66,9 +66,16 @@ def display_question(question_id) -> str:
                                                                     question_id)
     answers: list[dict[str, str]] = data_handler.get_answers_for_question(
                                                                     question_id)
+    answer_ids: list[int] = [row['id'] for row in answers]
+    question_comments: list[dict[str, str]] = \
+                            data_handler.get_comments_for_question(question_id)
+    answer_comments: list[dict[str, str]] = \
+                                    data_handler.get_answer_comments(answer_ids)
     return render_template('pages/display_question.html',
                             question=question[0],
                             answers=answers,
+                            question_comments=question_comments,
+                            answer_comments=answer_comments,
                             count_answers=len(answers))
 
 
@@ -202,19 +209,19 @@ def edit_question_comment(question_id, comment_id) -> None:
     """Add comment to a question route."""
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
-        data_handler.edit_question_comment(comment_id, message)
+        data_handler.edit_comment(comment_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html')
 
 
 @app.route("/question/<question_id>/answer/<answer_id>/comment/ \
-    <comment_id>/new-comment",
+                                                    <comment_id>/new-comment",
             methods=["GET", "POST"])
 def edit_answer_comment(question_id, comment_id) -> None:
     """Add comment to a question route."""
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
-        data_handler.edit_answer_comment(comment_id, message)
+        data_handler.edit_comment(comment_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html')
 
