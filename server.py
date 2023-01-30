@@ -1,12 +1,31 @@
 """AskMate server route management."""
 # pylint: disable=no-value-for-parameter, no-member
 # pyright: reportGeneralTypeIssues=false
+import os
 import sys
-from typing import Union
+from typing import Union, Any
+import uuid
 from flask import Flask, render_template, request, redirect, Response
 import data_handler
 
+UPLOAD_FOLDER: str = 'static/uploads'
+
 app: Flask = Flask(__name__, static_url_path='/static')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 1 * 1000 * 1000
+
+
+def save_image(file) -> Union[str, None]:
+    """Save image to server and return file path."""
+    if file and data_handler.allowed_file(file.filename):
+        filename: str = uuid.uuid4().hex + '.' +\
+            file.filename.rsplit('.', 1)[1].lower()
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    else:
+        filename = None
+    file_path: Union[str, None] = os.path.join(app.config['UPLOAD_FOLDER'],
+                                                filename) if filename else None
+    return file_path
 
 
 @app.route("/")
@@ -37,7 +56,6 @@ def list_questions() -> str:
                             time_passed=data_handler.how_much_time_passed,
                             comment_count=comment_count,
                             to_string=str)
-
 
 
 @app.route("/question/<question_id>/")
@@ -74,8 +92,7 @@ def new_answer(question_id) -> Union[Response, str]:
     """Adding new answer route."""
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
-        data_handler.add_answer_to_database(question_id=question_id,
-                                            message=message)
+        data_handler.add_answer_to_database(question_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/new_answer.html')
 
@@ -86,8 +103,9 @@ def new_question() -> Union[Response, str]:
     if request.method == "POST":
         message: Union[str, None] = request.form.get("question")
         title: Union[str, None] = request.form.get("title")
-        data_handler.add_question_to_database(message=message,
-                                            title=title)
+        file: Any = request.files['file']
+        file_path: Union[str, None] = save_image(file)
+        data_handler.add_question_to_database(title, message, file_path)
         return redirect('/list')
     return render_template('pages/add_question.html')
 
@@ -100,7 +118,9 @@ def edit_question(question_id) -> Union[Response, str]:
     if request.method == 'POST':
         title: Union[str, None] = request.form.get("title")
         message: Union[str, None] = request.form.get("message")
-        data_handler.edit_question(question_id, title, message)
+        file: Any = request.files['file']
+        file_path: Union[str, None] = save_image(file)
+        data_handler.edit_question(question_id, title, message, file_path)
         return redirect('/question/'+question_id)
     return render_template('pages/edit_question.html',
                         question=question[0])

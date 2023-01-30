@@ -1,9 +1,9 @@
 """Data read/write and manipulation functions."""
 from datetime import datetime, timedelta
 from typing import Any
-import sys
 import database_common
 
+ALLOWED_EXTENSIONS: set[str] = {'png', 'jpg', 'jpeg'}
 
 @database_common.connection_handler
 def get_latest_questions(cursor) -> list[dict[str, str]]:
@@ -62,12 +62,13 @@ def get_question_by_id(cursor, question_id) -> list[dict[str, str]]:
 
 
 @database_common.connection_handler
-def add_question_to_database(cursor, title, message) -> None:
+def add_question_to_database(cursor, title, message, image_path) -> None:
     """Save user question into database."""
     query: str = """
-        INSERT INTO question (submission_time, view_number, vote_number, title, message) 
-        VALUES (%s, %s, %s, %s, %s)"""
-    cursor.execute(query, [time_now(), 0, 0, title, message])
+        INSERT INTO question (submission_time, view_number, vote_number, title,
+                                message, image) 
+        VALUES (%s, %s, %s, %s, %s, %s)"""
+    cursor.execute(query, [time_now(), 0, 0, title, message, image_path])
 
 
 @database_common.connection_handler
@@ -142,15 +143,16 @@ def delete_answer(cursor, answer_id) -> None:
 
 
 @database_common.connection_handler
-def edit_question(cursor, question_id, title, message) -> None:
+def edit_question(cursor, question_id, title, message, image_path) -> None:
     """Save edits to a question."""
     query: str = """
         UPDATE question
-        SET title = %(title)s, message = %(message)s
+        SET title = %(title)s, message = %(message)s, image = %(image_path)s
         WHERE id = %(id)s"""
     cursor.execute(query, {'title' : title,
                             'message': message,
-                            'id': question_id})
+                            'id': question_id,
+                            'image_path': image_path})
 
 
 @database_common.connection_handler
@@ -178,12 +180,12 @@ def extract_sql_comment_count(cursor) -> dict[str, int]:
 def get_comment_count() -> dict[str, str]:
     """Extract SQL data into key: value pairs.
     With ID as key and comment count as value."""
+    # pylint: disable=no-value-for-parameter
     sql_count_data: Any = extract_sql_comment_count()
     comment_count_dict: dict[str, str] = {}
     for row in sql_count_data:
         comment_count_dict.update({str(row['question_id']):
                                     str(row['comments'])})
-    print(comment_count_dict, file=sys.stderr)
     return comment_count_dict
 
 
@@ -211,3 +213,9 @@ def how_much_time_passed(date: datetime) -> str:
     if delta.seconds >= 60:
         return f'{delta.seconds // 60} minutes ago'
     return f'{delta.seconds} seconds ago'
+
+
+def allowed_file(filename) -> bool:
+    """Check if uploaded file has allowed extension"""
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

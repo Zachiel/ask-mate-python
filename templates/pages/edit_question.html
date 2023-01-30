@@ -1,36 +1,86 @@
 {% extends 'template.html' %} {% block title %} Edit question {% endblock %} {%
 block content %}
-<div class="container-fluid my-5 pt-5 w-100">
-    <h1>Question:</h1>
-    <hr />
-    <form method="POST" name="question" id="question">
-        <div class="input-group">
-            <span class="input-group-text">Title: </span>
-            <textarea
-                id="title"
-                name="title"
-                class="form-control"
-                aria-label="With textarea"
-            >
-{{question['title']}}</textarea
-            >
+<div class="container-fluid my-5 pt-5 w-75">
+    <form
+        method="POST"
+        name="question"
+        id="question"
+        enctype="multipart/form-data"
+    >
+        <div class="row justify-content-start align-items-start g-2">
+            <h1>Question:</h1>
+        </div>
+        <hr />
+        <div class="row justify-content-start align-items-start g-2">
+            <div class="col">
+                <div class="input-group">
+                    <span class="input-group-text">Title: </span>
+                    <input
+                        id="title"
+                        type="text"
+                        name="title"
+                        class="form-control"
+                        aria-label="With textarea"
+                        value="{{ question['title'] }}"
+                    />
+                </div>
+                <br />
+                <div class="input-group">
+                    <span class="input-group-text">Message: </span>
+                    <textarea
+                        id="message"
+                        name="message"
+                        class="form-control"
+                        aria-label="With textarea"
+                        rows="10"
+                    >
+{{ question['message'] }}</textarea
+                    >
+                </div>
+            </div>
+            <div class="col-auto">
+                <div
+                    class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm"
+                >
+                    <input
+                        id="upload"
+                        type="file"
+                        name="file"
+                        onchange="readURL(this);"
+                        class="form-control border-0"
+                        accept="image/png, image/jpeg, image/jpg"
+                    />
+                    <label id="upload-label" for="upload" class="detail"
+                        >PNG/JPG up to 1 MB</label
+                    >
+                    <div class="input-group-append">
+                        <label
+                            for="upload"
+                            class="btn btn-light m-0 rounded-pill px-4"
+                        >
+                            <i class="fa fa-cloud-upload mr-2 text-muted"></i
+                            ><small
+                                class="text-uppercase detail font-weight-bold text-muted"
+                                >Choose file</small
+                            ></label
+                        >
+                    </div>
+                </div>
+                {# Uploaded image area #}
+                <div id="image-preview" class="image-area mt-4 rounded">
+                    <img
+                        id="imageResult"
+                        src="/{{ question['image'] }}"
+                        alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block"
+                    />
+                </div>
+            </div>
         </div>
         <br />
-        <div class="input-group">
-            <span class="input-group-text">Message: </span>
-            <textarea
-                id="message"
-                name="message"
-                class="form-control"
-                aria-label="With textarea"
-            >
-{{question['message']}}</textarea
-            >
-        </div>
+        <button type="submit" class="btn btn-primary" form="question">
+            Edit the question
+        </button>
     </form>
-    <br />
-    <button type="submit" class="btn btn-primary" form="question">
-        Edit the question
-    </button>
 </div>
 {% endblock %}
