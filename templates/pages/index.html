@@ -116,9 +116,13 @@
                             class="accordion-collapse collapse"
                             aria-labelledby="panelsStayOpen-heading{{ item['id'] }}"
                         >
-                            <div class="accordion-body">
-                                {{ item['message'].replace('\n', '<br />')|safe
-                                }}
+                            <div class="row accordion-body">
+                                <div class="col-9">
+                                    {{ item['message'].replace('\n', '<br />')|safe }}
+                                </div>
+                                <div class="col-3 text-end">
+                                    <img src="{{ item['image'] }}" class="img-fluid rounded" alt="">
+                                </div>
                             </div>
                             <div>
                                 <a href="/question/{{ item['id'] }}">
@@ -132,8 +136,7 @@
                 </div>
                 {% endfor %}
             </div>
-            {# Grid container #}
-            {% endblock %}
         </div>
     </div>
 </div>
+{% endblock %}
