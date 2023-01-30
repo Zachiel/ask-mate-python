@@ -170,3 +170,7 @@ footer {
 .accordion-body {
     word-wrap: break-word;
 }
+
+.form-button {
+    display: inline;
+}
