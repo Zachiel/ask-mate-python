@@ -11,12 +11,14 @@ block content %}
                 name="message"
                 class="form-control"
                 aria-label="With textarea"
-            ></textarea>
+            >
+{{ answer['message'] }}</textarea
+            >
         </div>
     </form>
     <br />
     <button type="submit" class="btn btn-primary" form="message">
-        Post new answer
+        Edit answer
     </button>
 </div>
 {% endblock %}

@@ -62,6 +62,17 @@ def get_question_by_id(cursor, question_id) -> list[dict[str, str]]:
 
 
 @database_common.connection_handler
+def get_answer_by_id(cursor, answer_id) -> list[dict[str, str]]:
+    """Get specific question by its ID."""
+    query: str = """
+        SELECT *
+        FROM answer
+        WHERE id=%(id)s"""
+    cursor.execute(query, {'id': answer_id})
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
 def add_question_to_database(cursor, title, message, image_path) -> None:
     """Save user question into database."""
     query: str = """
@@ -78,6 +89,16 @@ def add_answer_to_database(cursor, question_id, message) -> None:
     INSERT INTO answer (submission_time, vote_number, question_id, message)
     VALUES (%s, %s, %s, %s)"""
     cursor.execute(query, [time_now(), 0, question_id, message])
+
+
+@database_common.connection_handler
+def edit_answer(cursor, question_id, message) -> None:
+    """Save user answer into database."""
+    query: str = """
+    UPDATE answer
+    SET message = %(message)s
+    WHERE id = %(id)s"""
+    cursor.execute(query, {'message': message, 'id': question_id})
 
 
 @database_common.connection_handler

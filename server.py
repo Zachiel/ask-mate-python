@@ -140,13 +140,14 @@ def new_answer(question_id) -> Union[Response, str]:
 
 @app.route("/question/<question_id>/<answer_id>/edit_answer",
             methods=['GET', 'POST'])
-def edit_answer(question_id) -> Union[Response, str]:
-    """Adding new answer route."""
+def edit_answer(question_id, answer_id) -> Union[Response, str]:
+    """Edit existing answer route."""
+    answer = data_handler.get_answer_by_id(answer_id)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         data_handler.edit_answer(question_id, message)
         return redirect("/question/"+question_id)
-    return render_template('pages/edit_answer.html')
+    return render_template('pages/edit_answer.html', answer=answer[0])
 
 
 @app.route("/question/<question_id>/<answer_id>/delete_answer",
