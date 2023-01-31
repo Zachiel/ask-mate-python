@@ -125,6 +125,16 @@
                                     {% endif %}
                                 </div>
                             </div>
+                            {% if question_comments %}
+                            <hr
+                                class="border border-dark border-1 opacity-50 mt-2"
+                            />
+                            {% endif %} {% for comment in question_comments %}
+                            {% if comment['question_id'] == question['id'] %}
+                            <span class="opacity-50"
+                                >{{comment['message']}}</span
+                            >
+                            {% endif %} {% endfor %}
                             <div class="text-end mt-5">
                                 <a
                                     href="/question/{{question['id']}}/new-answer"
