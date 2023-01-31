@@ -177,6 +177,26 @@ def extract_sql_comment_count(cursor) -> dict[str, int]:
     return cursor.fetchall()
 
 
+@database_common.connection_handler
+def check_exisiting_username(cursor, username) -> None:
+    query: str = """
+        SELECT * FROM accounts WHERE username = %(username)s"""
+    cursor.execute(query, {'username': username})
+    account = cursor.fetchone()
+    if account:
+        return True
+    else:
+        return False
+    
+    
+@database_common.connection_handler
+def register_new_user(cursor, username, password):
+    query: str = """
+    INSERT INTO accounts (username, password)
+    VALUES (%s, %s)"""
+    cursor.execute(query, (username, password, ))
+        
+
 def get_comment_count() -> dict[str, str]:
     """Extract SQL data into key: value pairs.
     With ID as key and comment count as value."""

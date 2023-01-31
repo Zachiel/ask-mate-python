@@ -7,6 +7,7 @@ from typing import Union, Any
 import uuid
 from flask import Flask, render_template, request, redirect, Response
 import data_handler
+import re
 
 UPLOAD_FOLDER: str = 'static/uploads'
 
@@ -33,7 +34,7 @@ def hello() -> str:
     """Main page route."""
     questions: list[dict[str, str]] = data_handler.get_latest_questions()
     comment_count: dict[str, str] = data_handler.get_comment_count()
-    print(questions, file=sys.stderr)
+    #print(questions, file=sys.stderr)
     return render_template('pages/index.html',
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
@@ -154,6 +155,34 @@ def vote_answer_down(question_id, answer_id) -> Response:
     """Answer downvoting route."""
     data_handler.vote_answer_down(answer_id)
     return redirect("/question/" + question_id)
+
+#TODO change prints for messages on site f.e alerts or just plain text
+#TODO password hashing
+@app.route("/registration",
+           methods=['POST', 'GET'])
+def registration_form():
+    if (request.method == 'POST' 
+        and 'username' in request.form 
+        and 'password' in request.form):
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if data_handler.check_exisiting_username(username) == True:
+            print('Account already exists!')
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            print('Username must contain only characters and numbers!')
+            
+        #TODO checking if username and password is empty is not working
+        elif not username or not password:
+            print('Please fill out the form!')
+        else:
+            data_handler.register_new_user(username, password)
+            print('You have succesfully registered!')
+            return redirect('/list')
+    elif request.method == 'POST':
+        print('Please fill out the form!')
+        
+    return render_template('pages/registration.html')
+        
 
 
 if __name__ == "__main__":
