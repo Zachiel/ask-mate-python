@@ -238,6 +238,13 @@
                                         </button>
                                     </form>
                                 </div>
+                                {% for comments in answer_comments %} {% for
+                                comment in comments %} {% if
+                                comment['answer_id'] == answer['id'] %}
+                                <span class="opacity-50"
+                                    >{{comment['message']}}</span
+                                >
+                                {% endif %} {% endfor %} {% endfor %}
                             </div>
                         </div>
                     </div>

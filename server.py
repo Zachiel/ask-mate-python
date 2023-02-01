@@ -33,7 +33,6 @@ def hello() -> str:
     """Main page route."""
     questions: list[dict[str, str]] = data_handler.get_latest_questions()
     comment_count: dict[str, str] = data_handler.get_answer_count()
-    print(questions, file=sys.stderr)
     return render_template('pages/index.html',
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
@@ -76,7 +75,8 @@ def display_question(question_id) -> str:
                             answers=answers,
                             question_comments=question_comments,
                             answer_comments=answer_comments,
-                            count_answers=len(answers))
+                            count_answers=len(answers)
+                            )
 
 
 @app.route('/add_question',
