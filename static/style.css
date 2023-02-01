@@ -170,3 +170,16 @@ footer {
 .accordion-body {
     word-wrap: break-word;
 }
+
+.modal-backdrop {
+    z-index: 1040;
+}
+
+.modal {
+    z-index: 9999;
+    background-color: transparent !important;
+}
+
+.button-gradient {
+    background: var(--powder-gradient);
+}
