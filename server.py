@@ -8,6 +8,7 @@ import uuid
 from flask import Flask, render_template, request, redirect, Response
 import data_handler
 import re
+import hashing
 
 UPLOAD_FOLDER: str = 'static/uploads'
 
@@ -157,7 +158,6 @@ def vote_answer_down(question_id, answer_id) -> Response:
     return redirect("/question/" + question_id)
 
 #TODO change prints for messages on site f.e alerts or just plain text
-#TODO password hashing
 @app.route("/registration",
            methods=['POST', 'GET'])
 def registration_form():
@@ -175,7 +175,8 @@ def registration_form():
         elif not username or not password:
             print('Please fill out the form!')
         else:
-            data_handler.register_new_user(username, password)
+            hashed_password = hashing.hash_password(password)
+            data_handler.register_new_user(username, hashed_password)
             print('You have succesfully registered!')
             return redirect('/list')
     elif request.method == 'POST':
