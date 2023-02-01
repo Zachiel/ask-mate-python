@@ -170,3 +170,31 @@ footer {
 .accordion-body {
     word-wrap: break-word;
 }
+
+.form-button {
+    display: inline;
+}
+
+a:hover,
+a:visited,
+a:link,
+a:active {
+    text-decoration: none;
+}
+
+.btn-comment {
+    transform: scale(0.8);
+}
+
+.modal-backdrop {
+    z-index: 1040;
+}
+
+.modal {
+    z-index: 9999;
+    background-color: transparent !important;
+}
+
+.button-gradient {
+    background: var(--powder-gradient);
+}

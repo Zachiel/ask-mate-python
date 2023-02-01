@@ -1,5 +1,5 @@
 """AskMate server route management."""
-# pylint: disable=no-value-for-parameter, no-member
+# pylint: disable=no-value-for-parameter, no-member, line-too-long, unused-import, unused-argument
 # pyright: reportGeneralTypeIssues=false
 import os
 import sys
@@ -34,8 +34,7 @@ def save_image(file) -> Union[str, None]:
 def hello() -> str:
     """Main page route."""
     questions: list[dict[str, str]] = data_handler.get_latest_questions()
-    comment_count: dict[str, str] = data_handler.get_comment_count()
-    #print(questions, file=sys.stderr)
+    comment_count: dict[str, str] = data_handler.get_answer_count()
     return render_template('pages/index.html',
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
@@ -47,7 +46,7 @@ def hello() -> str:
 def list_questions() -> str:
     """Main page route."""
     questions: list[dict[str, str]] = data_handler.get_sorted_questions()
-    comment_count: dict[str, str] = data_handler.get_comment_count()
+    comment_count: dict[str, str] = data_handler.get_answer_count()
     sort_by: Union[str, None] = request.args.get('order_by')
     order: Union[str, None] = request.args.get('order_direction')
     if sort_by:
@@ -63,43 +62,27 @@ def list_questions() -> str:
 @app.route("/question/<question_id>/")
 def display_question(question_id) -> str:
     """Specific question page route."""
-    data_handler.increase_view_count(question_id)
+    data_handler.increase_question_view_count(question_id)
     question: list[dict[str, str]] = data_handler.get_question_by_id(
                                                                     question_id)
     answers: list[dict[str, str]] = data_handler.get_answers_for_question(
                                                                     question_id)
+    answer_ids: list[int] = [row['id'] for row in answers]
+    question_comments: list[dict[str, str]] = \
+                            data_handler.get_comments_for_question(question_id)
+    answer_comments: list[dict[str, str]] = \
+                                    data_handler.get_answer_comments(answer_ids)
     return render_template('pages/display_question.html',
                             question=question[0],
                             answers=answers,
-                            count_answers=len(answers))
+                            question_comments=question_comments,
+                            answer_comments=answer_comments,
+                            count_answers=len(answers)
+                            )
 
 
-@app.route("/question/<question_id>/delete", methods=["POST"])
-def delete_question(question_id) -> Response:
-    """Specific question delete route."""
-    data_handler.delete_question(question_id)
-    return redirect("/list")
-
-
-@app.route("/question/<question_id>/<answer_id>/delete_answer",
-            methods=["POST"])
-def delete_answer(question_id, answer_id) -> Response:
-    """Specific answer delete route."""
-    data_handler.delete_answer(answer_id)
-    return redirect("/question/" + question_id)
-
-
-@app.route("/question/<question_id>/new-answer", methods=['GET', 'POST'])
-def new_answer(question_id) -> Union[Response, str]:
-    """Adding new answer route."""
-    if request.method == "POST":
-        message: Union[str, None] = request.form.get("message")
-        data_handler.add_answer_to_database(question_id, message)
-        return redirect("/question/"+question_id)
-    return render_template('pages/new_answer.html')
-
-
-@app.route('/add_question', methods=['GET', 'POST'])
+@app.route('/add_question',
+            methods=['GET', 'POST'])
 def new_question() -> Union[Response, str]:
     """Adding new question route."""
     if request.method == "POST":
@@ -112,7 +95,8 @@ def new_question() -> Union[Response, str]:
     return render_template('pages/add_question.html')
 
 
-@app.route("/question/<question_id>/edit", methods=['POST','GET'])
+@app.route("/question/<question_id>/edit",
+            methods=['POST','GET'])
 def edit_question(question_id) -> Union[Response, str]:
     """Editing specific question route."""
     question: list[dict[str, str]] = data_handler.get_question_by_id(
@@ -128,18 +112,59 @@ def edit_question(question_id) -> Union[Response, str]:
                         question=question[0])
 
 
-@app.route("/question/<question_id>/vote-up", methods=['POST'])
+@app.route("/question/<question_id>/delete",
+            methods=["POST"])
+def delete_question(question_id) -> Response:
+    """Specific question delete route."""
+    data_handler.delete_question(question_id)
+    return redirect("/list")
+
+
+@app.route("/question/<question_id>/vote-up",
+            methods=['POST'])
 def vote_question_up(question_id) -> Response:
     """Question upvoting route."""
     data_handler.vote_question_up(question_id)
     return redirect("/list")
 
 
-@app.route("/question/<question_id>/vote-down", methods=['POST'])
+@app.route("/question/<question_id>/vote-down",
+            methods=['POST'])
 def vote_question_down(question_id) -> Response:
     """Question downvoting route."""
     data_handler.vote_question_down(question_id)
     return redirect("/list")
+
+
+@app.route("/question/<question_id>/new-answer",
+            methods=['GET', 'POST'])
+def new_answer(question_id) -> Union[Response, str]:
+    """Adding new answer route."""
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.add_answer_to_database(question_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/answer.html')
+
+
+@app.route("/question/<question_id>/answer/<answer_id>/edit_answer",
+            methods=['GET', 'POST'])
+def edit_answer(question_id, answer_id) -> Union[Response, str]:
+    """Edit existing answer route."""
+    answer: list[dict[str, str]] = data_handler.get_answer_by_id(answer_id)
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.edit_answer(question_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/answer.html', answer=answer[0])
+
+
+@app.route("/question/<question_id>/answer/<answer_id>/delete_answer",
+            methods=["POST"])
+def delete_answer(question_id, answer_id) -> Response:
+    """Specific answer delete route."""
+    data_handler.delete_answer(answer_id)
+    return redirect("/question/" + question_id)
 
 
 @app.route("/question/<question_id>/answer/<int:answer_id>/vote-up",
@@ -181,6 +206,61 @@ def registration_form():
         print('Please fill out the form!')
         
     return render_template('pages/registration.html')
+
+
+@app.route("/question/<question_id>/new-comment",
+            methods=["GET", "POST"])
+def new_question_comment(question_id) -> None:
+    """Add comment to a question route."""
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.add_comment_to_question(question_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/comment.html')
+
+
+@app.route("/question/<question_id>/answer/<answer_id>/new-comment",
+            methods=["GET", "POST"])
+def new_answer_comment(question_id, answer_id) -> None:
+    """Add comment to an answer route."""
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.add_comment_to_answer(answer_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/comment.html')
+
+
+@app.route("/question/<question_id>/comment/<comment_id>/edit-comment",
+            methods=["GET", "POST"])
+def edit_question_comment(question_id, comment_id) -> None:
+    """Edit comment to a question route."""
+    comment: list[dict[str, str]] = data_handler.get_comment_by_id(comment_id)
+    print(comment, file=sys.stderr)
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.edit_comment(comment_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/comment.html', comment=comment[0])
+
+
+@app.route("/question/<question_id>/answer/<answer_id>/comment/<comment_id>/edit-comment",
+            methods=["GET", "POST"])
+def edit_answer_comment(question_id, answer_id, comment_id) -> None:
+    """Edit comment to an answer route."""
+    comment: list[dict[str, str]] = data_handler.get_comment_by_id(comment_id)
+    if request.method == "POST":
+        message: Union[str, None] = request.form.get("message")
+        data_handler.edit_comment(comment_id, message)
+        return redirect("/question/"+question_id)
+    return render_template('pages/comment.html', comment=comment[0])
+
+
+@app.route("/question/<question_id>/comment/<comment_id>/delete-comment",
+            methods=["POST"])
+def delete_comment(question_id, comment_id) -> None:
+    """Delete specific comment route."""
+    data_handler.delete_comment(comment_id)
+    return redirect("/question/" + question_id)
 
 
 if __name__ == "__main__":
