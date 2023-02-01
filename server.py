@@ -168,12 +168,10 @@ def registration_form():
         password = request.form.get('password')
         if data_handler.check_exisiting_username(username) == True:
             print('Account already exists!')
-        elif not re.match(r'[A-Za-z0-9]+', username):
-            print('Username must contain only characters and numbers!')
-            
-        #TODO checking if username and password is empty is not working
         elif not username or not password:
             print('Please fill out the form!')
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            print('Username must contain only characters and numbers!')
         else:
             hashed_password = hashing.hash_password(password)
             data_handler.register_new_user(username, hashed_password)
@@ -183,7 +181,6 @@ def registration_form():
         print('Please fill out the form!')
         
     return render_template('pages/registration.html')
-        
 
 
 if __name__ == "__main__":
