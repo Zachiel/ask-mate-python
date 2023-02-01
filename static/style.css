@@ -185,3 +185,16 @@ a:active {
 .btn-comment {
     transform: scale(0.8);
 }
+
+.modal-backdrop {
+    z-index: 1040;
+}
+
+.modal {
+    z-index: 9999;
+    background-color: transparent !important;
+}
+
+.button-gradient {
+    background: var(--powder-gradient);
+}
