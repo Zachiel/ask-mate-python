@@ -1,6 +1,5 @@
 """Data read/write and manipulation functions."""
 from datetime import datetime, timedelta
-import sys
 from typing import Any
 import database_common
 
@@ -16,6 +15,35 @@ def get_latest_questions(cursor) -> list[dict[str, str]]:
         LIMIT 5"""
     cursor.execute(query)
     return cursor.fetchall()
+
+@database_common.connection_handler
+def get_tag_for_question(cursor, question_id):
+    query: str = """
+        SELECT *
+        FROM question_tag
+        WHERE question_id = %(qid)s"""
+    cursor.execute(query, {'qid': question_id})
+
+    data = cursor.fetchall()
+    if data == []:
+        return 'None'
+    else:
+        id = str(data[0]['tag_id'])
+        query: str = """
+            SELECT *
+            FROM tag
+            WHERE id = %(id)s"""
+        cursor.execute(query, {'id': id})
+        tag = cursor.fetchall()[0]['name']
+        return tag
+
+@database_common.connection_handler
+def add_tag_to_database(cursor, tag_name):
+    """Save new tag into database."""
+    query: str = """
+    INSERT INTO tag (name)
+    VALUES (%s)"""
+    cursor.execute(query, [tag_name])
 
 
 @database_common.connection_handler
@@ -39,6 +67,8 @@ def get_sorted_questions(cursor, sort_by='date',
     return cursor.fetchall()
 
 
+
+
 @database_common.connection_handler
 def get_answers_for_question(cursor, question_id) -> list[dict[str, str]]:
     """Get all answers for a question."""
@@ -47,28 +77,6 @@ def get_answers_for_question(cursor, question_id) -> list[dict[str, str]]:
         FROM answer
         WHERE question_id = %(qid)s"""
     cursor.execute(query, {'qid': question_id})
-    return cursor.fetchall()
-
-
-@database_common.connection_handler
-def get_comments_for_question(cursor, question_id) -> list[dict[str, str]]:
-    """Get all comments for a question."""
-    query: str = """
-        SELECT *
-        FROM comment
-        WHERE question_id = %(qid)s"""
-    cursor.execute(query, {'qid': question_id})
-    return cursor.fetchall()
-
-
-@database_common.connection_handler
-def get_comments_for_answer(cursor, answer_id) -> list[dict[str, str]]:
-    """Get all comments for a answer."""
-    query: str = """
-        SELECT *
-        FROM comment
-        WHERE answer_id = %(aid)s"""
-    cursor.execute(query, {'aid': answer_id})
     return cursor.fetchall()
 
 
@@ -82,27 +90,26 @@ def get_question_by_id(cursor, question_id) -> list[dict[str, str]]:
     cursor.execute(query, {'id': question_id})
     return cursor.fetchall()
 
+@database_common.connection_handler
+def get_question_id_from_title(cursor, title) -> list[dict[str, str]]:
+    """Get specific question ID by its title."""
+    query: str = """
+        SELECT id
+        FROM question
+        WHERE title=%(title)s"""
+    cursor.execute(query, {'title': title})
+    id = cursor.fetchall()[0]['id']
+    return id
 
 @database_common.connection_handler
-def get_answer_by_id(cursor, answer_id) -> list[dict[str, str]]:
-    """Get specific question by its ID."""
+def get_tags(cursor):
+    """get all tags from base"""
     query: str = """
-        SELECT *
-        FROM answer
-        WHERE id=%(id)s"""
-    cursor.execute(query, {'id': answer_id})
+    SELECT *
+    FROM tag"""
+    cursor.execute(query)
     return cursor.fetchall()
 
-
-@database_common.connection_handler
-def get_comment_by_id(cursor, comment_id) -> list[dict[str, str]]:
-    """Get specific question by its ID."""
-    query: str = """
-        SELECT *
-        FROM comment
-        WHERE id=%(id)s"""
-    cursor.execute(query, {'id': comment_id})
-    return cursor.fetchall()
 
 
 @database_common.connection_handler
@@ -116,51 +123,60 @@ def add_question_to_database(cursor, title, message, image_path) -> None:
 
 
 @database_common.connection_handler
+def get_tag_id(cursor, name):
+    """taking tag id basing on its name"""
+    query: str = """
+    SELECT id
+    FROM tag
+    WHERE name = %(name)s"""
+    cursor.execute(query, {'name': name})
+    id = cursor.fetchall()[0]['id']
+    return id
+
+
+@database_common.connection_handler
+def get_tagged_questions(cursor, given_tag) -> list[dict[str, str]]:
+    """Show questions with specific tag in home page"""
+
+    query: str = """
+        SELECT question_id
+        FROM question_tag
+        WHERE tag_id = %(given_tag)s """
+    cursor.execute(query, {'given_tag': given_tag})
+    data = cursor.fetchall()
+    questions_with_given_tag = []
+    for info in data:
+        questions_with_given_tag.append(str(info['question_id']))
+
+    query_2: str = """
+        SELECT *
+        FROM question
+        WHERE id IN %(questions_with_given_tag)s
+        """
+    cursor.execute(query_2, {'questions_with_given_tag': questions_with_given_tag})
+    return cursor.fetchall()
+
+
+
+#print(get_tagged_questions(1))
+
+@database_common.connection_handler
+def add_tag(cursor, question_id, tag):  
+    """add question tag to database"""
+    tag_id = get_tag_id(tag)
+    query: str ="""
+        INSERT INTO question_tag (question_id, tag_id)
+        VALUES (%s, %s)"""
+    cursor.execute(query, [question_id, tag_id])
+
+
+@database_common.connection_handler
 def add_answer_to_database(cursor, question_id, message) -> None:
     """Save user answer into database."""
     query: str = """
-        INSERT INTO answer (submission_time, vote_number, question_id, message)
-        VALUES (%s, %s, %s, %s)"""
+    INSERT INTO answer (submission_time, vote_number, question_id, message)
+    VALUES (%s, %s, %s, %s)"""
     cursor.execute(query, [time_now(), 0, question_id, message])
-
-
-@database_common.connection_handler
-def add_comment_to_question(cursor, question_id, message) -> None:
-    """Save user answer into database."""
-    query: str = """
-        INSERT INTO comment (submission_time, question_id, message, edited_count)
-        VALUES (%s, %s, %s, %s)"""
-    cursor.execute(query, [time_now(), question_id, message, 0])
-
-
-@database_common.connection_handler
-def add_comment_to_answer(cursor, answer_id, message) -> None:
-    """Save user answer into database."""
-    query: str = """
-        INSERT INTO comment (submission_time, answer_id, message, edited_count)
-        VALUES (%s, %s, %s, %s)"""
-    cursor.execute(query, [time_now(), answer_id, message, 0])
-
-
-@database_common.connection_handler
-def edit_comment(cursor, comment_id, message) -> None:
-    """Save user answer into database."""
-    query: str = """
-        UPDATE comment
-        SET message = %(message)s
-        SET edited_count = edited_count + 1
-        WHERE id = %(id)s"""
-    cursor.execute(query, {'message': message, 'id': comment_id})
-
-
-@database_common.connection_handler
-def edit_answer(cursor, question_id, message) -> None:
-    """Save user answer into database."""
-    query: str = """
-        UPDATE answer
-        SET message = %(message)s
-        WHERE id = %(id)s"""
-    cursor.execute(query, {'message': message, 'id': question_id})
 
 
 @database_common.connection_handler
@@ -209,11 +225,16 @@ def delete_question(cursor, question_id) -> None:
     query_answer: str = """
         DELETE FROM answer
         WHERE question_id = %(id)s"""
+    query_tag: str = """
+        DELETE FROM question_tag
+        WHERE question_id = %(id)s"""
     query_question: str = """
         DELETE FROM question
         WHERE id = %(id)s"""
     cursor.execute(query_answer, {'id': question_id})
+    cursor.execute(query_tag, {'id': question_id})
     cursor.execute(query_question, {'id': question_id})
+    
 
 
 @database_common.connection_handler
@@ -226,29 +247,27 @@ def delete_answer(cursor, answer_id) -> None:
 
 
 @database_common.connection_handler
-def delete_comment(cursor, comment_id) -> None:
-    """Delete comment from database."""
-    query: str = """
-        DELETE FROM comment
-        WHERE id = %(id)s"""
-    cursor.execute(query, {'id': comment_id})
-
-
-@database_common.connection_handler
-def edit_question(cursor, question_id, title, message, image_path) -> None:
+def edit_question(cursor, question_id, title, message, image_path, tag) -> None:
     """Save edits to a question."""
+    tag_id = get_tag_id(tag)
     query: str = """
         UPDATE question
         SET title = %(title)s, message = %(message)s, image = %(image_path)s
         WHERE id = %(id)s"""
+    query_tag: str = """
+        UPDATE question_tag
+        SET tag_id = %(tag_id)s
+        WHERE question_id = %(question_id)s"""
     cursor.execute(query, {'title' : title,
                             'message': message,
                             'id': question_id,
                             'image_path': image_path})
+    cursor.execute(query_tag, {'question_id': question_id,
+                                'tag_id': tag_id})
 
 
 @database_common.connection_handler
-def increase_question_view_count(cursor, question_id) -> None:
+def increase_view_count(cursor, question_id) -> None:
     """Increase question view counter."""
     query: str = """
         UPDATE question
@@ -258,7 +277,7 @@ def increase_question_view_count(cursor, question_id) -> None:
 
 
 @database_common.connection_handler
-def extract_sql_answer_count(cursor) -> dict[str, int]:
+def extract_sql_comment_count(cursor) -> dict[str, int]:
     """Get comment count for each question."""
     query: str = """
         SELECT q.id AS question_id, COUNT(a.id) AS comments
@@ -269,26 +288,16 @@ def extract_sql_answer_count(cursor) -> dict[str, int]:
     return cursor.fetchall()
 
 
-def get_answer_count() -> dict[str, str]:
+def get_comment_count() -> dict[str, str]:
     """Extract SQL data into key: value pairs.
     With ID as key and comment count as value."""
     # pylint: disable=no-value-for-parameter
-    sql_count_data: Any = extract_sql_answer_count()
+    sql_count_data: Any = extract_sql_comment_count()
     comment_count_dict: dict[str, str] = {}
     for row in sql_count_data:
         comment_count_dict.update({str(row['question_id']):
                                     str(row['comments'])})
     return comment_count_dict
-
-
-def get_answer_comments(answer_ids: list[int]) -> list[dict[str, str]]:
-    """Get all comments for answers in a question."""
-    comments: list[dict[str, str]] = []
-    for aid in answer_ids:
-        # pylint: disable=no-value-for-parameter
-        comments.append(get_comments_for_answer(answer_id = aid))
-    print(comments, file=sys.stderr)
-    return comments
 
 
 def time_now() -> datetime:
