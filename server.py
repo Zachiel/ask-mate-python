@@ -207,7 +207,7 @@ def new_answer_comment(question_id, answer_id) -> None:
             methods=["GET", "POST"])
 def edit_question_comment(question_id, comment_id) -> None:
     """Edit comment to a question route."""
-    comment = data_handler.get_comment_by_id(comment_id)
+    comment: list[dict[str, str]] = data_handler.get_comment_by_id(comment_id)
     print(comment, file=sys.stderr)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
@@ -220,7 +220,7 @@ def edit_question_comment(question_id, comment_id) -> None:
             methods=["GET", "POST"])
 def edit_answer_comment(question_id, answer_id, comment_id) -> None:
     """Edit comment to an answer route."""
-    comment = data_handler.get_comment_by_id(comment_id)
+    comment: list[dict[str, str]] = data_handler.get_comment_by_id(comment_id)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         data_handler.edit_comment(comment_id, message)
