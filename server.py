@@ -1,5 +1,5 @@
 """AskMate server route management."""
-# pylint: disable=no-value-for-parameter, no-member
+# pylint: disable=no-value-for-parameter, no-member, line-too-long, unused-import, unused-argument
 # pyright: reportGeneralTypeIssues=false
 import os
 import sys
@@ -195,7 +195,7 @@ def new_question_comment(question_id) -> None:
 @app.route("/question/<question_id>/answer/<answer_id>/new-comment",
             methods=["GET", "POST"])
 def new_answer_comment(question_id, answer_id) -> None:
-    """Add comment to a question route."""
+    """Add comment to an answer route."""
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         data_handler.add_comment_to_answer(answer_id, message)
@@ -206,24 +206,34 @@ def new_answer_comment(question_id, answer_id) -> None:
 @app.route("/question/<question_id>/comment/<comment_id>/edit-comment",
             methods=["GET", "POST"])
 def edit_question_comment(question_id, comment_id) -> None:
-    """Add comment to a question route."""
+    """Edit comment to a question route."""
+    comment = data_handler.get_comment_by_id(comment_id)
+    print(comment, file=sys.stderr)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         data_handler.edit_comment(comment_id, message)
         return redirect("/question/"+question_id)
-    return render_template('pages/comment.html')
+    return render_template('pages/comment.html', comment=comment[0])
 
 
-@app.route("/question/<question_id>/answer/<answer_id>/comment/ \
-                                                    <comment_id>/new-comment",
+@app.route("/question/<question_id>/answer/<answer_id>/comment/<comment_id>/edit-comment",
             methods=["GET", "POST"])
-def edit_answer_comment(question_id, comment_id) -> None:
-    """Add comment to a question route."""
+def edit_answer_comment(question_id, answer_id, comment_id) -> None:
+    """Edit comment to an answer route."""
+    comment = data_handler.get_comment_by_id(comment_id)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         data_handler.edit_comment(comment_id, message)
         return redirect("/question/"+question_id)
-    return render_template('pages/comment.html')
+    return render_template('pages/comment.html', comment=comment[0])
+
+
+@app.route("/question/<question_id>/comment/<comment_id>/delete-comment",
+            methods=["POST"])
+def delete_comment(question_id, comment_id) -> None:
+    """Delete specific comment route."""
+    data_handler.delete_comment(comment_id)
+    return redirect("/question/" + question_id)
 
 
 if __name__ == "__main__":

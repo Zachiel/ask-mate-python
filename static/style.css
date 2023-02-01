@@ -181,3 +181,7 @@ a:link,
 a:active {
     text-decoration: none;
 }
+
+.btn-comment {
+    transform: scale(0.8);
+}

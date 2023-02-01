@@ -226,6 +226,15 @@ def delete_answer(cursor, answer_id) -> None:
 
 
 @database_common.connection_handler
+def delete_comment(cursor, comment_id) -> None:
+    """Delete comment from database."""
+    query: str = """
+        DELETE FROM comment
+        WHERE id = %(id)s"""
+    cursor.execute(query, {'id': comment_id})
+
+
+@database_common.connection_handler
 def edit_question(cursor, question_id, title, message, image_path) -> None:
     """Save edits to a question."""
     query: str = """

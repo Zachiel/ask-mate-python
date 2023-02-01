@@ -131,9 +131,41 @@
                             />
                             {% endif %} {% for comment in question_comments %}
                             {% if comment['question_id'] == question['id'] %}
-                            <span class="opacity-50"
-                                >{{comment['message']}}</span
-                            >
+                            <div class="row">
+                                <div class="col">
+                                    <p class="opacity-50">
+                                        {{comment['message']}}
+                                    </p>
+                                </div>
+                                <div class="col-auto text-nowrap text-end">
+                                    <a
+                                        href="/question/{{question['id']}}/comment/{{comment['id']}}/edit-comment"
+                                        class="btn btn-sm btn-primary btn-comment border-dark shadow p-1 px-3 rounded"
+                                    >
+                                        <span
+                                            ><i
+                                                class="fa-solid fa-pen-to-square"
+                                            ></i
+                                        ></span>
+                                    </a>
+                                    <form
+                                        action="/question/{{question['id']}}/comment/{{comment['id']}}/delete-comment"
+                                        method="POST"
+                                        class="form-button"
+                                    >
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-danger btn-comment border-dark shadow p-1 px-3 rounded"
+                                        >
+                                            <span
+                                                ><i
+                                                    class="fa-solid fa-trash"
+                                                ></i
+                                            ></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                             {% endif %} {% endfor %}
                             <div class="text-end mt-5">
                                 <a
@@ -238,12 +270,45 @@
                                         </button>
                                     </form>
                                 </div>
+
                                 {% for comments in answer_comments %} {% for
                                 comment in comments %} {% if
                                 comment['answer_id'] == answer['id'] %}
-                                <span class="opacity-50"
-                                    >{{comment['message']}}</span
-                                >
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="opacity-50">
+                                            {{comment['message']}}
+                                        </p>
+                                    </div>
+                                    <div class="col-auto text-nowrap text-end">
+                                        <a
+                                            href="/question/{{question['id']}}/answer/{{answer['id']}}/comment/{{comment['id']}}/edit-comment"
+                                            class="btn btn-sm btn-primary btn-comment border-dark shadow p-1 px-3 rounded"
+                                        >
+                                            <span
+                                                ><i
+                                                    class="fa-solid fa-pen-to-square"
+                                                ></i
+                                            ></span>
+                                        </a>
+                                        <form
+                                            action="/question/{{question['id']}}/comment/{{comment['id']}}/delete-comment"
+                                            method="POST"
+                                            class="form-button"
+                                        >
+                                            <button
+                                                type="submit"
+                                                class="btn btn-sm btn-danger btn-comment border-dark shadow p-1 px-3 rounded"
+                                            >
+                                                <span
+                                                    ><i
+                                                        class="fa-solid fa-trash"
+                                                    ></i
+                                                ></span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
                                 {% endif %} {% endfor %} {% endfor %}
                             </div>
                         </div>

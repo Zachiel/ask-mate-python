@@ -12,8 +12,7 @@ else %}New comment{% endif %} {% endblock %} {% block content %}
                 class="form-control"
                 aria-label="With textarea"
             >
-{% if comment %}
-{{ comment['message'] }}{% endif %}</textarea
+{% if comment %}{{ comment['message'] }}{% endif %}</textarea
             >
         </div>
     </form>
