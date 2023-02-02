@@ -93,20 +93,17 @@ content%}
             </div>
         </div>
         <div>
-            
             <label for="tag">Choose a tag:</label>
-            
+
             <select name="tag" id="tag">
                 {% for tag in tags %}
-                <option 
-                    name="tag"
-                    id="tag"
-                    value="{{tag['name']}}">{{tag['name']}}
+                <option name="tag" id="tag" value="{{tag['name']}}">
+                    {{tag['name']}}
                 </option>
                 {%endfor%}
             </select>
-              <p>Do you need another tag? Post it and then use!</p>
-              <a href="/new_tag">Add tag</a>
+            <p>Do you need another tag? Post it and then use!</p>
+            <a href="/new_tag">Add tag</a>
         </div>
         <div class="row justify-content-center align-items-center g-2">
             <div class="col-1">

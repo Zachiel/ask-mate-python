@@ -32,7 +32,7 @@ def save_image(file) -> Union[str, None]:
 def hello() -> str:
     """Main page route."""
     questions: list[dict[str, str]] = data_handler.get_latest_questions()
-    comment_count: dict[str, str] = data_handler.get_comment_count()
+    comment_count: dict[str, str] = data_handler.get_answer_count()
     return render_template('pages/index.html',
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
@@ -44,7 +44,7 @@ def hello() -> str:
 def list_questions() -> str:
     """Main page route."""
     questions: list[dict[str, str]] = data_handler.get_sorted_questions()
-    comment_count: dict[str, str] = data_handler.get_comment_count()
+    comment_count: dict[str, str] = data_handler.get_answer_count()
     sort_by: Union[str, None] = request.args.get('order_by')
     order: Union[str, None] = request.args.get('order_direction')
     if sort_by:
@@ -81,15 +81,13 @@ def display_question(question_id) -> str:
                             tag = tag)
 
 
-
-
 @app.route('/add_question', methods=['GET', 'POST'])
 def new_question() -> Union[Response, str]:
     """Adding new question route."""
     tags = data_handler.get_tags()
     if request.method == "POST":
         title: Union[str, None] = request.form.get("title")
-        message: Union[str, None] = repr(request.form.get("message"))
+        message: Union[str, None] = request.form.get("message")
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
         data_handler.add_question_to_database(title, message, file_path)
@@ -98,7 +96,7 @@ def new_question() -> Union[Response, str]:
         adding_question = data_handler.get_question_id_from_title(title)
         data_handler.add_tag(adding_question, tag)
         return redirect('/list')
-    return render_template('pages/add_question.html', tags=tags)
+    return render_template('pages/question.html', tags=tags)
 
 
 @app.route("/question/<question_id>/edit", methods=['POST','GET'])
@@ -110,7 +108,7 @@ def edit_question(question_id) -> Union[Response, str]:
     tags = data_handler.get_tags()
     if request.method == 'POST':
         title: Union[str, None] = request.form.get("title")
-        message: Union[str, None] = repr(request.form.get("message"))
+        message: Union[str, None] = request.form.get("message")
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
         tag = request.form.get("tag")
@@ -172,8 +170,6 @@ def edit_answer(question_id, answer_id) -> Union[Response, str]:
     return render_template('pages/answer.html', answer=answer[0])
 
 
-
-
 @app.route("/question/<question_id>/answer/<answer_id>/delete_answer",
             methods=["POST"])
 def delete_answer(question_id, answer_id) -> Response:
@@ -198,7 +194,6 @@ def vote_answer_down(question_id, answer_id) -> Response:
     return redirect("/question/" + question_id)
 
 
-
 @app.route("/all_tags")
 def search_through_tags():
     """showing all tags to search through them"""
@@ -207,6 +202,7 @@ def search_through_tags():
     for info in tags:
         tags_names.append(info['name'])
     return render_template("/pages/tags_page.html/", tags_names=tags_names)
+
 
 @app.route("/question/<question_id>/new-comment",
             methods=["GET", "POST"])
@@ -217,6 +213,7 @@ def new_question_comment(question_id) -> None:
         data_handler.add_comment_to_question(question_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html')
+
 
 @app.route("/question/<question_id>/answer/<answer_id>/new-comment",
             methods=["GET", "POST"])
@@ -239,6 +236,7 @@ def edit_question_comment(question_id, comment_id) -> None:
         data_handler.edit_comment(comment_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html', comment=comment[0])
+
 
 @app.route("/question/<question_id>/answer/<answer_id>/comment/<comment_id>/edit-comment",
             methods=["GET", "POST"])
@@ -273,9 +271,9 @@ def search() -> Response:
 def tag_page(tag):
     """show list of questions with specific tag"""
     questions: list[dict[str, str]] = data_handler.get_tagged_questions(tag)
-    comment_count: dict[str, str] = data_handler.get_comment_count()
-    return render_template("/pages/tag_page.html/", 
-                            tag=tag, 
+    comment_count: dict[str, str] = data_handler.get_answer_count()
+    return render_template("/pages/tag_page.html/",
+                            tag=tag,
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
                             comment_count=comment_count,
@@ -287,7 +285,6 @@ def new_tag() -> Union[Response, str]:
     """Adding new tag route."""
     if request.method == "POST":
         tag: Union[str, None] = request.form.get("tag")
-        print('yes')
         data_handler.add_tag_to_database(tag)
         return redirect("/")
     return render_template('pages/new_tag.html')

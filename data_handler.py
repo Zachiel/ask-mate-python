@@ -47,8 +47,8 @@ def get_tag_id(cursor, name):
     FROM tag
     WHERE name = %(name)s"""
     cursor.execute(query, {'name': name})
-    id = cursor.fetchall()[0]['id']
-    return id
+    tag_id = cursor.fetchall()[0]['id']
+    return tag_id
 
 
 @database_common.connection_handler
@@ -123,8 +123,8 @@ def get_question_id_from_title(cursor, title) -> list[dict[str, str]]:
         FROM question
         WHERE title=%(title)s"""
     cursor.execute(query, {'title': title})
-    id = cursor.fetchall()[0]['id']
-    return id
+    question_id = cursor.fetchall()[0]['id']
+    return question_id
 
 
 @database_common.connection_handler
@@ -240,7 +240,7 @@ def delete_question(cursor, question_id) -> None:
     cursor.execute(query_answer, {'id': question_id})
     cursor.execute(query_tag, {'id': question_id})
     cursor.execute(query_question, {'id': question_id})
-    
+
 
 @database_common.connection_handler
 def delete_answer(cursor, answer_id) -> None:
@@ -323,7 +323,7 @@ def get_answer_count() -> dict[str, str]:
     """Extract SQL data into key: value pairs.
     With ID as key and comment count as value."""
     # pylint: disable=no-value-for-parameter
-    sql_count_data: Any = extract_sql_answer_count()
+    sql_count_data: Any = extract_sql_comment_count()
     comment_count_dict: dict[str, str] = {}
     for row in sql_count_data:
         comment_count_dict.update({str(row['question_id']):
@@ -337,7 +337,6 @@ def get_answer_comments(answer_ids: list[int]) -> list[dict[str, str]]:
     for aid in answer_ids:
         # pylint: disable=no-value-for-parameter
         comments.append(get_comments_for_answer(answer_id = aid))
-    print(comments, file=sys.stderr)
     return comments
 
 def time_now() -> datetime:
@@ -384,12 +383,12 @@ def get_tag_for_question(cursor, question_id):
     if data == []:
         return 'None'
     else:
-        id = str(data[0]['tag_id'])
+        tag_id = str(data[0]['tag_id'])
         query: str = """
             SELECT *
             FROM tag
             WHERE id = %(id)s"""
-        cursor.execute(query, {'id': id})
+        cursor.execute(query, {'id': tag_id})
         tag = cursor.fetchall()[0]['name']
         return tag
 
@@ -429,10 +428,11 @@ def get_tagged_questions(cursor, given_tag) -> list[dict[str, str]]:
 
 
 @database_common.connection_handler
-def add_tag(cursor, question_id, tag):  
+def add_tag(cursor, question_id, tag):
     """add question tag to database"""
-    tag_id = get_tag_id(tag)
-    query: str ="""
-        INSERT INTO question_tag (question_id, tag_id)
-        VALUES (%s, %s)"""
-    cursor.execute(query, [question_id, tag_id])
+    if tag:
+        tag_id = get_tag_id(tag)
+        query: str ="""
+            INSERT INTO question_tag (question_id, tag_id)
+            VALUES (%s, %s)"""
+        cursor.execute(query, [question_id, tag_id])

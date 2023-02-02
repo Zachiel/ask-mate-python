@@ -35,7 +35,7 @@ block content %}
                         rows="10"
                         style="white-space: pre-line"
                     >
-{% if question %}{{ question['message'].replace('\\r\\n', '&#13;&#10')|safe }}{% endif %}</textarea
+{% if question %}{{ question['message'].replace('\r\n', "&#13;&#10;")|safe }}{% endif %}</textarea
                     >
                 </div>
             </div>
@@ -78,8 +78,22 @@ block content %}
                 </div>
             </div>
         </div>
+        <div class="col">
+            <label for="tag">Choose a tag:</label>
+
+            <select name="tag" id="tag">
+                <option value="" name="tag" selected>Select tag</option>
+                {% for tag in tags %}
+                <option name="tag" id="tag" value="{{tag['name']}}">
+                    {{tag['name']}}
+                </option>
+                {%endfor%}
+            </select>
+            <p>Do you need another tag? Post it and then use!</p>
+            <a href="/new_tag">Add tag</a>
+        </div>
         <br />
-        <button type="submit" class="btn btn-primary" form="question">
+        <button type="submit" class="btn btn-info" form="question">
             {% if question %}Edit the question{% else %}Post new question{%
             endif %}
         </button>
