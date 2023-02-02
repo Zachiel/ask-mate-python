@@ -80,9 +80,6 @@ $(function () {
                         </div>
                     </a>
                     `);
-                    if (!question["image"]) {
-                        $(".result-image");
-                    }
                 });
             },
         });

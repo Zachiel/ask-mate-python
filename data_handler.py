@@ -228,6 +228,14 @@ def vote_answer_down(cursor, answer_id) -> None:
 @database_common.connection_handler
 def delete_question(cursor, question_id) -> None:
     """Delete question from database."""
+    answers = get_answers_for_question(question_id)
+    answer_ids = [answer['id'] for answer in answers]
+    query_answer_comment: str = """
+        DELETE FROM comment
+        WHERE answer_id = %(id)s"""
+    query_comment: str = """
+        DELETE FROM comment
+        WHERE question_id = %(id)s"""
     query_answer: str = """
         DELETE FROM answer
         WHERE question_id = %(id)s"""
@@ -237,6 +245,9 @@ def delete_question(cursor, question_id) -> None:
     query_question: str = """
         DELETE FROM question
         WHERE id = %(id)s"""
+    for aid in answer_ids:
+        cursor.execute(query_answer_comment, {'id': aid})
+    cursor.execute(query_comment, {'id': question_id})
     cursor.execute(query_answer, {'id': question_id})
     cursor.execute(query_tag, {'id': question_id})
     cursor.execute(query_question, {'id': question_id})
@@ -311,9 +322,9 @@ def search_for_question(cursor, phrase) -> list[dict[str, str]]:
         FROM question AS q
         LEFT JOIN question_tag AS qt ON q.id = qt.question_id
         LEFT JOIN tag as t ON qt.tag_id = t.id
-        WHERE q.title ILIKE %(phrase)s OR t.name LIKE %(phrase)s
+        WHERE q.title ILIKE %(phrase)s OR t.name ILIKE %(phrase)s
         ORDER BY q.submission_time DESC
-        LIMIT 10"""
+        LIMIT 5"""
     like_pattern = '%{}%'.format(phrase)
     cursor.execute(query, {'phrase': like_pattern})
     return cursor.fetchall()

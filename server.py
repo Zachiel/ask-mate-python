@@ -78,7 +78,7 @@ def display_question(question_id) -> str:
                             answer_comments=answer_comments,
                             count_answers=len(answers),
                             to_string=str,
-                            tag = tag)
+                            tag = None if tag is None else tag)
 
 
 @app.route('/add_question', methods=['GET', 'POST'])
@@ -148,7 +148,7 @@ def vote_question_down(question_id) -> Response:
 def new_answer(question_id) -> Union[Response, str]:
     """Adding new answer route."""
     if request.method == "POST":
-        message: Union[str, None] = repr(request.form.get("message"))
+        message: Union[str, None] = request.form.get("message")
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
         data_handler.add_answer_to_database(question_id, message, file_path)
@@ -162,7 +162,7 @@ def edit_answer(question_id, answer_id) -> Union[Response, str]:
     """Edit existing answer route."""
     answer: list[dict[str, str]] = data_handler.get_answer_by_id(answer_id)
     if request.method == "POST":
-        message: Union[str, None] = repr(request.form.get("message"))
+        message: Union[str, None] = request.form.get("message")
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
         data_handler.edit_answer(question_id, message, file_path)
@@ -209,7 +209,7 @@ def search_through_tags():
 def new_question_comment(question_id) -> None:
     """Add comment to a question route."""
     if request.method == "POST":
-        message: Union[str, None] = repr(request.form.get("message"))
+        message: Union[str, None] = request.form.get("message")
         data_handler.add_comment_to_question(question_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html')
@@ -220,7 +220,7 @@ def new_question_comment(question_id) -> None:
 def new_answer_comment(question_id, answer_id) -> None:
     """Add comment to an answer route."""
     if request.method == "POST":
-        message: Union[str, None] = repr(request.form.get("message"))
+        message: Union[str, None] = request.form.get("message")
         data_handler.add_comment_to_answer(answer_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html')
@@ -232,7 +232,7 @@ def edit_question_comment(question_id, comment_id) -> None:
     """Edit comment to a question route."""
     comment: list[dict[str, str]] = data_handler.get_comment_by_id(comment_id)
     if request.method == "POST":
-        message: Union[str, None] = repr(request.form.get("message"))
+        message: Union[str, None] = request.form.get("message")
         data_handler.edit_comment(comment_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html', comment=comment[0])
@@ -244,7 +244,7 @@ def edit_answer_comment(question_id, answer_id, comment_id) -> None:
     """Edit comment to an answer route."""
     comment: list[dict[str, str]] = data_handler.get_comment_by_id(comment_id)
     if request.method == "POST":
-        message: Union[str, None] = repr(request.form.get("message"))
+        message: Union[str, None] = request.form.get("message")
         data_handler.edit_comment(comment_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html', comment=comment[0])

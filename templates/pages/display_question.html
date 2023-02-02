@@ -95,9 +95,11 @@
                                 </div>
                             </form>
                         </div>
+                        {% if tag == None %}
                         <div>
                             <h5><strong>Tag:</strong> {{tag}}</h5>
                         </div>
+                        {% endif %}
                         <div class="row w-100 m-0 p-0">
                             <h2 class="card-title">{{question['title']}}</h2>
                             <hr
