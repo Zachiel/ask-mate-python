@@ -1,11 +1,30 @@
-{% extends 'template.html' %} {% block title %} {% if answer %}Edit answer{%
-else %}New answer{% endif %} {% endblock %} {% block content %}
+{% extends 'template.html' %} {% block title %} Edit question {% endblock %} {%
+block content %}
 <div class="container-fluid my-5 pt-5 w-75">
-    <h1>Your Answer:</h1>
-    <hr />
-    <form method="POST" name="message" id="message">
-        <div class="row">
-            <div class="col-8">
+    <form
+        method="POST"
+        name="question"
+        id="question"
+        enctype="multipart/form-data"
+    >
+        <div class="row justify-content-start align-items-start g-2">
+            <h1>Question:</h1>
+        </div>
+        <hr />
+        <div class="row justify-content-start align-items-start g-2">
+            <div class="col">
+                <div class="input-group">
+                    <span class="input-group-text">Title: </span>
+                    <input
+                        id="title"
+                        type="text"
+                        name="title"
+                        class="form-control"
+                        aria-label="With textarea"
+                        value="{% if question %}{{ question['title'] }}{% endif %}"
+                    />
+                </div>
+                <br />
                 <div class="input-group">
                     <span class="input-group-text">Message: </span>
                     <textarea
@@ -13,14 +32,13 @@ else %}New answer{% endif %} {% endblock %} {% block content %}
                         name="message"
                         class="form-control"
                         aria-label="With textarea"
-                        rows="5"
+                        rows="10"
                     >
-{% if answer %}
-{{ answer['message'] }}{% endif %}</textarea
+{% if question %}{{ question['message'] }}{% endif %}</textarea
                     >
                 </div>
             </div>
-            <div class="col-4 text-end">
+            <div class="col-auto">
                 <div
                     class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm"
                 >
@@ -52,17 +70,17 @@ else %}New answer{% endif %} {% endblock %} {% block content %}
                 <div id="image-preview" class="image-area mt-4 rounded">
                     <img
                         id="imageResult"
-                        src="/{% if answer %}{{ answer['image'] }}{% endif %}"
+                        src="/{% if question %}{{ question['image'] }}{% endif %}"
                         alt=""
                         class="img-fluid rounded shadow-sm mx-auto d-block"
                     />
                 </div>
             </div>
         </div>
+        <br />
+        <button type="submit" class="btn btn-primary" form="question">
+            Edit the question
+        </button>
     </form>
-    <br />
-    <button type="submit" class="btn btn-primary" form="message">
-        {% if answer %}Save edits{% else %}Post new answer{% endif %}
-    </button>
 </div>
 {% endblock %}

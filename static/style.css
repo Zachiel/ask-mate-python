@@ -167,6 +167,29 @@ footer {
     position: relative;
 }
 
+.answer-image-area {
+    border: 2px dashed var(--text-caption);
+    padding: 1rem;
+    position: relative;
+}
+
+.answer-image-area::before {
+    color: var(--text-caption);
+    font-weight: bold;
+    text-transform: uppercase;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8rem;
+    z-index: 1;
+}
+
+.answer-image-area img {
+    z-index: 2;
+    position: relative;
+}
+
 .accordion-body {
     word-wrap: break-word;
 }
