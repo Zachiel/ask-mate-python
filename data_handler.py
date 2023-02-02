@@ -1,5 +1,6 @@
 """Data read/write and manipulation functions."""
 from datetime import datetime, timedelta
+import sys
 from typing import Any
 import database_common
 
@@ -15,35 +16,6 @@ def get_latest_questions(cursor) -> list[dict[str, str]]:
         LIMIT 5"""
     cursor.execute(query)
     return cursor.fetchall()
-
-@database_common.connection_handler
-def get_tag_for_question(cursor, question_id):
-    query: str = """
-        SELECT *
-        FROM question_tag
-        WHERE question_id = %(qid)s"""
-    cursor.execute(query, {'qid': question_id})
-
-    data = cursor.fetchall()
-    if data == []:
-        return 'None'
-    else:
-        id = str(data[0]['tag_id'])
-        query: str = """
-            SELECT *
-            FROM tag
-            WHERE id = %(id)s"""
-        cursor.execute(query, {'id': id})
-        tag = cursor.fetchall()[0]['name']
-        return tag
-
-@database_common.connection_handler
-def add_tag_to_database(cursor, tag_name):
-    """Save new tag into database."""
-    query: str = """
-    INSERT INTO tag (name)
-    VALUES (%s)"""
-    cursor.execute(query, [tag_name])
 
 
 @database_common.connection_handler
@@ -67,6 +39,16 @@ def get_sorted_questions(cursor, sort_by='date',
     return cursor.fetchall()
 
 
+@database_common.connection_handler
+def get_tag_id(cursor, name):
+    """taking tag id basing on its name"""
+    query: str = """
+    SELECT id
+    FROM tag
+    WHERE name = %(name)s"""
+    cursor.execute(query, {'name': name})
+    id = cursor.fetchall()[0]['id']
+    return id
 
 
 @database_common.connection_handler
@@ -90,6 +72,7 @@ def get_question_by_id(cursor, question_id) -> list[dict[str, str]]:
     cursor.execute(query, {'id': question_id})
     return cursor.fetchall()
 
+
 @database_common.connection_handler
 def get_question_id_from_title(cursor, title) -> list[dict[str, str]]:
     """Get specific question ID by its title."""
@@ -101,16 +84,6 @@ def get_question_id_from_title(cursor, title) -> list[dict[str, str]]:
     id = cursor.fetchall()[0]['id']
     return id
 
-@database_common.connection_handler
-def get_tags(cursor):
-    """get all tags from base"""
-    query: str = """
-    SELECT *
-    FROM tag"""
-    cursor.execute(query)
-    return cursor.fetchall()
-
-
 
 @database_common.connection_handler
 def add_question_to_database(cursor, title, message, image_path) -> None:
@@ -120,43 +93,6 @@ def add_question_to_database(cursor, title, message, image_path) -> None:
                                 message, image) 
         VALUES (%s, %s, %s, %s, %s, %s)"""
     cursor.execute(query, [time_now(), 0, 0, title, message, image_path])
-
-
-@database_common.connection_handler
-def get_tag_id(cursor, name):
-    """taking tag id basing on its name"""
-    query: str = """
-    SELECT id
-    FROM tag
-    WHERE name = %(name)s"""
-    cursor.execute(query, {'name': name})
-    id = cursor.fetchall()[0]['id']
-    return id
-
-
-@database_common.connection_handler
-def get_tagged_questions(cursor, given_tag) -> list[dict[str, str]]:
-    """Show questions with specific tag in home page"""
-    tag_id = get_tag_id(given_tag)
-    query_on: str = """
-        SELECT q.submission_time, q.id, q.title, q.message, q.image, qt.question_id AS question_tag, qt.tag_id, t.name
-        FROM question AS q
-        LEFT JOIN question_tag AS qt ON q.id = qt.question_id
-        LEFT JOIN tag as t ON qt.tag_id = t.id
-        WHERE t.id = %(tag_id)s
-        ORDER BY q.submission_time DESC"""
-    cursor.execute(query_on, {'tag_id': tag_id})
-    return cursor.fetchall()
-
-
-@database_common.connection_handler
-def add_tag(cursor, question_id, tag):  
-    """add question tag to database"""
-    tag_id = get_tag_id(tag)
-    query: str ="""
-        INSERT INTO question_tag (question_id, tag_id)
-        VALUES (%s, %s)"""
-    cursor.execute(query, [question_id, tag_id])
 
 
 @database_common.connection_handler
@@ -224,7 +160,6 @@ def delete_question(cursor, question_id) -> None:
     cursor.execute(query_tag, {'id': question_id})
     cursor.execute(query_question, {'id': question_id})
     
-
 
 @database_common.connection_handler
 def delete_answer(cursor, answer_id) -> None:
@@ -319,3 +254,69 @@ def allowed_file(filename) -> bool:
     """Check if uploaded file has allowed extension"""
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@database_common.connection_handler
+def get_tag_for_question(cursor, question_id):
+    query: str = """
+        SELECT *
+        FROM question_tag
+        WHERE question_id = %(qid)s"""
+    cursor.execute(query, {'qid': question_id})
+
+    data = cursor.fetchall()
+    if data == []:
+        return 'None'
+    else:
+        id = str(data[0]['tag_id'])
+        query: str = """
+            SELECT *
+            FROM tag
+            WHERE id = %(id)s"""
+        cursor.execute(query, {'id': id})
+        tag = cursor.fetchall()[0]['name']
+        return tag
+
+
+@database_common.connection_handler
+def add_tag_to_database(cursor, tag_name):
+    """Save new tag into database."""
+    query: str = """
+    INSERT INTO tag (name)
+    VALUES (%s)"""
+    cursor.execute(query, [tag_name])
+
+
+@database_common.connection_handler
+def get_tags(cursor):
+    """get all tags from base"""
+    query: str = """
+    SELECT *
+    FROM tag"""
+    cursor.execute(query)
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
+def get_tagged_questions(cursor, given_tag) -> list[dict[str, str]]:
+    """Show questions with specific tag in home page"""
+    tag_id = get_tag_id(given_tag)
+    query_on: str = """
+        SELECT q.submission_time, q.id, q.title, q.message, q.image, qt.question_id AS question_tag, qt.tag_id, t.name
+        FROM question AS q
+        LEFT JOIN question_tag AS qt ON q.id = qt.question_id
+        LEFT JOIN tag as t ON qt.tag_id = t.id
+        WHERE t.id = %(tag_id)s
+        ORDER BY q.submission_time DESC"""
+    cursor.execute(query_on, {'tag_id': tag_id})
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
+def add_tag(cursor, question_id, tag):  
+    """add question tag to database"""
+    tag_id = get_tag_id(tag)
+    query: str ="""
+        INSERT INTO question_tag (question_id, tag_id)
+        VALUES (%s, %s)"""
+    cursor.execute(query, [question_id, tag_id])
