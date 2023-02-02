@@ -282,11 +282,23 @@ def check_exisiting_username(cursor, username) -> None:
     
     
 @database_common.connection_handler
-def register_new_user(cursor, username, password):
+def check_exisiting_email(cursor, email) -> None:
     query: str = """
-    INSERT INTO accounts (username, password)
-    VALUES (%s, %s)"""
-    cursor.execute(query, (username, password, ))
+        SELECT * FROM accounts WHERE email = %(email)s"""
+    cursor.execute(query, {'email': email})
+    account = cursor.fetchone()
+    if account:
+        return True
+    else:
+        return False
+    
+    
+@database_common.connection_handler
+def register_new_user(cursor, username, password, email, fname, lname):
+    query: str = """
+    INSERT INTO accounts (username, password, email, fname, lname)
+    VALUES (%s, %s, %s, %s, %s)"""
+    cursor.execute(query, (username, password, email, fname, lname, ))
         
 
 def get_answer_count() -> dict[str, str]:
