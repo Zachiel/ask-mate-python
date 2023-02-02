@@ -1,0 +1,123 @@
+{%extends 'template.html' %} {%block title%} New question {%endblock%} {%block
+content%}
+<div class="container-fluid my-5 py-5">
+    <form action="/add_question" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <div
+                class="row justify-content-center align-items-center text-center g-2"
+            >
+                <h1 class="mb-5">Fill the form to ask your question</h1>
+            </div>
+            <div
+                class="row justify-content-center align-items-center g-2 mx-5 pe-5"
+            >
+                <div class="col-2 text-end">
+                    <label for="title" class="form-label"
+                        >Question header</label
+                    >
+                </div>
+                <div class="col me-5 pe-5">
+                    <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        class="form-control"
+                        placeholder=""
+                        minlength="10"
+                    />
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div
+                class="row justify-content-center align-items-center g-2 mx-5 pe-5"
+            >
+                <div class="col-2 text-end">
+                    <label for="question" class="form-label"
+                        >Question body</label
+                    >
+                </div>
+                <div class="col me-5 pe-5">
+                    <textarea
+                        class="form-control"
+                        name="question"
+                        id="question"
+                        rows="10"
+                        minlength="30"
+                    ></textarea>
+                </div>
+                <div class="col-3 me-5 pe-5">
+                    <div
+                        class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm"
+                    >
+                        <input
+                            id="upload"
+                            type="file"
+                            name="file"
+                            onchange="readURL(this);"
+                            class="form-control border-0"
+                            accept="image/png, image/jpeg, image/jpg"
+                        />
+                        <label id="upload-label" for="upload" class="detail"
+                            >PNG/JPG up to 1 MB</label
+                        >
+                        <div class="input-group-append">
+                            <label
+                                for="upload"
+                                class="btn btn-light m-0 rounded-pill px-4"
+                            >
+                                <i
+                                    class="fa fa-cloud-upload mr-2 text-muted"
+                                ></i
+                                ><small
+                                    class="text-uppercase detail font-weight-bold text-muted"
+                                    >Choose file</small
+                                ></label
+                            >
+                        </div>
+                    </div>
+
+                    {# Uploaded image area #}
+                    <div
+                        id="image-preview"
+                        class="image-area mt-4 rounded hidden"
+                    >
+                        <img
+                            id="imageResult"
+                            src="#"
+                            alt=""
+                            class="img-fluid rounded shadow-sm mx-auto d-block"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            
+            <label for="tag">Choose a tag:</label>
+            
+            <select name="tag" id="tag">
+                {% for tag in tags %}
+                <option 
+                    name="tag"
+                    id="tag"
+                    value="{{tag['name']}}">{{tag['name']}}
+                </option>
+                {%endfor%}
+            </select>
+              <p>Do you need another tag? Post it and then use!</p>
+              <a href="/new_tag">Add tag</a>
+        </div>
+        <div class="row justify-content-center align-items-center g-2">
+            <div class="col-1">
+                <input
+                    id="submit-question"
+                    class="btn btn-info"
+                    type="submit"
+                    value="Submit question"
+                />
+            </div>
+        </div>
+    </form>
+</div>
+{%endblock%}

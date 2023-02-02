@@ -1,56 +1,37 @@
 {% extends 'template.html' %} {% block title %} Display a question {% endblock
-%} {% block content %}
-<div class="container-fluid m-5 p-5">
-    <div class="row justify-content-center align-items-center g-2">
-        <div class="col-8">
-            <div class="card border-dark p-3">
-                <div class="card-body">
-                    <div class="row justify-content-end align-items-start mb-2">
-                        <div class="col text-start">
-                            <span class="detail text-nowrap"
-                                >{{ question['submission_time']}}</span
-                            >
-                            <span class="detail text-nowrap px-2">
-                                <i class="far fa-eye"></i> {{
-                                question['view_number'] }}
-                            </span>
-                            <span class="detail text-nowrap">
-                                <i class="fa-regular fa-comment-dots"></i>
-                                {{ count_answers }}
-                            </span>
-                        </div>
-                        <div class="col-auto">
-                            <a
-                                href="edit"
-                                class="btn btn-sm btn-primary border-dark shadow p-1 px-3 rounded"
-                            >
-                                <span
-                                    ><i class="fa-solid fa-pen-to-square"></i
-                                ></span>
-                            </a>
-                            <form
-                                action="delete"
-                                method="POST"
-                                class="form-button"
-                            >
-                                {# Button trigger modal #}
-                                <button
-                                    type="button"
-                                    class="btn btn-sm btn-danger border-dark shadow p-1 px-3 rounded"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal"
+    %} {% block content %}
+    <div class="container-fluid m-5 p-5">
+        <div class="row justify-content-center align-items-center g-2">
+            <div class="col-8">
+                <div class="card border-dark p-3">
+                    <div class="card-body">
+                        <div class="row justify-content-end align-items-start mb-2">
+                            <div class="col text-start">
+                                <span class="detail text-nowrap"
+                                    >{{ question['submission_time']}}</span
+                                >
+                                <span class="detail text-nowrap px-2">
+                                    <i class="far fa-eye"></i> {{
+                                    question['view_number'] }}
+                                </span>
+                                <span class="detail text-nowrap">
+                                    <i class="fa-regular fa-comment-dots"></i>
+                                    {{ count_answers }}
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <a
+                                    href="edit"
+                                    class="btn btn-sm btn-primary border-dark shadow p-1 px-3 rounded"
                                 >
                                     <span
-                                        ><i class="fa-solid fa-trash"></i
+                                        ><i class="fa-solid fa-pen-to-square"></i
                                     ></span>
-                                </button>
-                                {# Modal #}
-                                <div
-                                    class="modal fade"
-                                    id="exampleModal"
-                                    tabindex="-1"
-                                    aria-labelledby="exampleModalLabel"
-                                    aria-hidden="true"
+                                </a>
+                                <form
+                                    action="delete"
+                                    method="POST"
+                                    class="form-button"
                                 >
                                     <div class="modal-dialog">
                                         <div class="modal-content">
@@ -146,112 +127,81 @@
                                         class="btn btn-sm btn-primary btn-comment border-dark shadow p-1 px-3 rounded"
                                     >
                                         <span
-                                            ><i
-                                                class="fa-solid fa-pen-to-square"
-                                            ></i
+                                            ><i class="fa-solid fa-trash"></i
                                         ></span>
-                                    </a>
-                                    <form
-                                        action="/question/{{question['id']}}/comment/{{comment['id']}}/delete-comment"
-                                        method="POST"
-                                        class="form-button"
-                                    >
-                                        <button
-                                            type="submit"
-                                            class="btn btn-sm btn-danger btn-comment border-dark shadow p-1 px-3 rounded"
-                                        >
-                                            <span
-                                                ><i
-                                                    class="fa-solid fa-trash"
-                                                ></i
-                                            ></span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                            {% endif %} {% endfor %}
-                            <div class="text-end mt-5">
-                                <a
-                                    href="/question/{{question['id']}}/new-answer"
-                                >
-                                    <button class="btn btn-sm btn-info">
-                                        Answer
                                     </button>
-                                </a>
-                                <a
-                                    href="/question/{{question['id']}}/new-comment"
-                                >
-                                    <button class="btn btn-sm btn-info">
-                                        Comment
-                                    </button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% for answer in answers %}
-            <div class="row justify-content-center align-items-center">
-                <div class="col">
-                    <div class="card border-dark p-1">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-auto">
+                                    {# Modal #}
                                     <div
-                                        class="row justify-content-center align-items-center"
+                                        class="modal fade"
+                                        id="exampleModal"
+                                        tabindex="-1"
+                                        aria-labelledby="exampleModalLabel"
+                                        aria-hidden="true"
                                     >
-                                        <div class="col mx-0 px-0">
-                                            <form
-                                                action="{{question['id']}}/answer/{{answer['id']}}/vote-up"
-                                                method="POST"
-                                            >
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-upvote"
-                                                    href="#"
-                                                >
-                                                    <i
-                                                        class="fas fa-arrow-up"
-                                                    ></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                        <div class="col mx-0 px-0">
-                                            {{ answer['vote_number'] }}
-                                        </div>
-                                        <div class="col mx-0 px-0">
-                                            <form
-                                                action="{{question['id']}}/answer/{{answer['id']}}/vote-down"
-                                                method="POST"
-                                            >
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-downvote"
-                                                    href="#"
-                                                >
-                                                    <i
-                                                        class="fas fa-arrow-down"
-                                                    ></i>
-                                                </button>
-                                            </form>
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1
+                                                        class="modal-title fs-5"
+                                                        id="exampleModalLabel"
+                                                    >
+                                                        Are you sure you want to
+                                                        delete?
+                                                    </h1>
+                                                    <button
+                                                        type="button"
+                                                        class="btn-close"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close"
+                                                    ></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    This action is irreversible. The
+                                                    question with all its answers
+                                                    will be permanently deleted. Do
+                                                    you want to continue?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-secondary"
+                                                        data-bs-dismiss="modal"
+                                                    >
+                                                        Close
+                                                    </button>
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-danger"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </form>
+                            </div>
+                            <div>
+                                <h5><strong>Tag:</strong> {{tag}}</h5>
+                            </div>
+                            <div class="row w-100 m-0 p-0">
+                                <h2 class="card-title">{{question['title']}}</h2>
+                                <hr
+                                    class="border border-warning border-2 opacity-50"
+                                />
                                 <div class="container-fluid">
                                     <div class="row flex">
-                                        {% if answer['image'] %}
+                                        {% if question['image'] %}
                                         <div class="col-9">
                                             <span class="card-text">
                                                 {{answer['message'].replace('\\r\\n',
                                                 '<br />')|safe}}
                                             </span>
                                         </div>
-                                        <div
-                                            class="col-2 answer-image-area text-center"
-                                        >
-                                            <a href="/{{ answer['image'] }}"
+                                        <div class="col image-area text-center">
+                                            <a href="/{{ question['image'] }}"
                                                 ><img
-                                                    src="/{{ answer['image'] }}"
+                                                    src="/{{ question['image'] }}"
                                                     alt=""
                                                     class="img-fluid"
                                             /></a>
@@ -264,49 +214,14 @@
                                             </p>
                                         </div>
                                         {% endif %}
-                                        <div class="col-1 text-center">
-                                            <a
-                                                href="/question/{{question['id']}}/answer/{{answer['id']}}/new-comment"
-                                            >
-                                                <button
-                                                    class="btn btn-sm btn-info"
-                                                >
-                                                    Comment
-                                                </button>
-                                            </a>
-                                            <a
-                                                href="/question/{{question['id']}}/answer/{{answer['id']}}/edit_answer"
-                                                class="btn btn-sm btn-primary border-dark shadow p-1 px-3 rounded"
-                                            >
-                                                <span
-                                                    ><i
-                                                        class="fa-solid fa-pen-to-square"
-                                                    ></i
-                                                ></span>
-                                            </a>
-                                            <form
-                                                action="/question/{{question['id']}}/answer/{{answer['id']}}/delete_answer"
-                                                method="POST"
-                                                class="form-button"
-                                            >
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-sm btn-danger border-dark shadow p-1 px-3 rounded"
-                                                >
-                                                    <span
-                                                        ><i
-                                                            class="fa-solid fa-trash"
-                                                        ></i
-                                                    ></span>
-                                                </button>
-                                            </form>
-                                        </div>
                                     </div>
                                 </div>
-
-                                {% for comments in answer_comments %} {% for
-                                comment in comments %} {% if
-                                comment['answer_id'] == answer['id'] %}
+                                {% if question_comments %}
+                                <hr
+                                    class="border border-dark border-1 opacity-50 mt-2"
+                                />
+                                {% endif %} {% for comment in question_comments %}
+                                {% if comment['question_id'] == question['id'] %}
                                 <div class="row">
                                     <div class="col">
                                         <p class="opacity-50">
@@ -316,7 +231,7 @@
                                     </div>
                                     <div class="col-auto text-nowrap text-end">
                                         <a
-                                            href="/question/{{question['id']}}/answer/{{answer['id']}}/comment/{{comment['id']}}/edit-comment"
+                                            href="/question/{{question['id']}}/comment/{{comment['id']}}/edit-comment"
                                             class="btn btn-sm btn-primary btn-comment border-dark shadow p-1 px-3 rounded"
                                         >
                                             <span
@@ -343,14 +258,186 @@
                                         </form>
                                     </div>
                                 </div>
-                                {% endif %} {% endfor %} {% endfor %}
+                                {% endif %} {% endfor %}
+                                <div class="text-end mt-5">
+                                    <a
+                                        href="/question/{{question['id']}}/new-answer"
+                                    >
+                                        <button class="btn btn-sm btn-info">
+                                            Answer
+                                        </button>
+                                    </a>
+                                    <a
+                                        href="/question/{{question['id']}}/new-comment"
+                                    >
+                                        <button class="btn btn-sm btn-info">
+                                            Comment
+                                        </button>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% for answer in answers %}
+                <div class="row justify-content-center align-items-center">
+                    <div class="col">
+                        <div class="card border-dark p-1">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <div
+                                            class="row justify-content-center align-items-center"
+                                        >
+                                            <div class="col mx-0 px-0">
+                                                <form
+                                                    action="{{question['id']}}/answer/{{answer['id']}}/vote-up"
+                                                    method="POST"
+                                                >
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-upvote"
+                                                        href="#"
+                                                    >
+                                                        <i
+                                                            class="fas fa-arrow-up"
+                                                        ></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <div class="col mx-0 px-0">
+                                                {{ answer['vote_number'] }}
+                                            </div>
+                                            <div class="col mx-0 px-0">
+                                                <form
+                                                    action="{{question['id']}}/answer/{{answer['id']}}/vote-down"
+                                                    method="POST"
+                                                >
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-downvote"
+                                                        href="#"
+                                                    >
+                                                        <i
+                                                            class="fas fa-arrow-down"
+                                                        ></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="container-fluid">
+                                        <div class="row flex">
+                                            {% if answer['image'] %}
+                                            <div class="col-9">
+                                                <span class="card-text">
+                                                    {{answer['message']}}
+                                                </span>
+                                            </div>
+                                            <div
+                                                class="col-2 answer-image-area text-center"
+                                            >
+                                                <a href="/{{ answer['image'] }}"
+                                                    ><img
+                                                        src="/{{ answer['image'] }}"
+                                                        alt=""
+                                                        class="img-fluid"
+                                                /></a>
+                                            </div>
+                                            {% else %}
+                                            <div class="col">
+                                                <p class="card-text text-wrap">
+                                                    {{answer['message']}}
+                                                </p>
+                                            </div>
+                                            {% endif %}
+                                            <div class="col-1 text-center">
+                                                <a
+                                                    href="/question/{{question['id']}}/answer/{{answer['id']}}/new-comment"
+                                                >
+                                                    <button
+                                                        class="btn btn-sm btn-info"
+                                                    >
+                                                        Comment
+                                                    </button>
+                                                </a>
+                                                <a
+                                                    href="/question/{{question['id']}}/answer/{{answer['id']}}/edit_answer"
+                                                    class="btn btn-sm btn-primary border-dark shadow p-1 px-3 rounded"
+                                                >
+                                                    <span
+                                                        ><i
+                                                            class="fa-solid fa-pen-to-square"
+                                                        ></i
+                                                    ></span>
+                                                </a>
+                                                <form
+                                                    action="/question/{{question['id']}}/answer/{{answer['id']}}/delete_answer"
+                                                    method="POST"
+                                                    class="form-button"
+                                                >
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-sm btn-danger border-dark shadow p-1 px-3 rounded"
+                                                    >
+                                                        <span
+                                                            ><i
+                                                                class="fa-solid fa-trash"
+                                                            ></i
+                                                        ></span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+    
+                                    {% for comments in answer_comments %} {% for
+                                    comment in comments %} {% if
+                                    comment['answer_id'] == answer['id'] %}
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="opacity-50">
+                                                {{comment['message']}}
+                                            </p>
+                                        </div>
+                                        <div class="col-auto text-nowrap text-end">
+                                            <a
+                                                href="/question/{{question['id']}}/answer/{{answer['id']}}/comment/{{comment['id']}}/edit-comment"
+                                                class="btn btn-sm btn-primary btn-comment border-dark shadow p-1 px-3 rounded"
+                                            >
+                                                <span
+                                                    ><i
+                                                        class="fa-solid fa-pen-to-square"
+                                                    ></i
+                                                ></span>
+                                            </a>
+                                            <form
+                                                action="/question/{{question['id']}}/comment/{{comment['id']}}/delete-comment"
+                                                method="POST"
+                                                class="form-button"
+                                            >
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-sm btn-danger btn-comment border-dark shadow p-1 px-3 rounded"
+                                                >
+                                                    <span
+                                                        ><i
+                                                            class="fa-solid fa-trash"
+                                                        ></i
+                                                    ></span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    {% endif %} {% endfor %} {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% endblock %}
         </div>
-        {% endblock %}
     </div>
-</div>
+    
