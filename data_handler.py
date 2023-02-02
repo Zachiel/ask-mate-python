@@ -273,14 +273,15 @@ def extract_sql_answer_count(cursor) -> dict[str, int]:
 def search_for_question(cursor, phrase) -> list[dict[str, str]]:
     """Show latest questions in home page"""
     query: str = """
-        SELECT q.*, qt.question_id AS question_tag, qt.tag_id, t.id AS tag_id, t.name
+        SELECT q.id, q.title, q.message, q.image, t.name AS tag_name
         FROM question AS q
         LEFT JOIN question_tag AS qt ON q.id = qt.question_id
         LEFT JOIN tag as t ON qt.tag_id = t.id
-        WHERE q.title LIKE %%%(phrase)s%% OR t.name LIKE %%%(phrase)s%%
+        WHERE q.title ILIKE %(phrase)s OR t.name LIKE %(phrase)s
         ORDER BY q.submission_time DESC
         LIMIT 10"""
-    cursor.execute(query, {'phrase': phrase})
+    like_pattern = '%{}%'.format(phrase)
+    cursor.execute(query, {'phrase': like_pattern})
     return cursor.fetchall()
 
 

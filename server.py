@@ -240,5 +240,14 @@ def delete_comment(question_id, comment_id) -> None:
     return redirect("/question/" + question_id)
 
 
+@app.route("/search",
+            methods=["POST"])
+def search() -> Response:
+    """Search database records route."""
+    phrase: str = request.form.get("search")
+    records: Union[str, None] = data_handler.search_for_question(phrase)
+    return records
+
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)

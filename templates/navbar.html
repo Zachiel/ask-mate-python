@@ -1,37 +1,46 @@
 <header>
     {# Sticky top navbar #}
-    <nav class="navbar navbar-expand-lg fixed-top">
-        {# Flexbox container #}
-        <div class="container-fluid w-75">
-            {# AskMate logo #}
+    <nav
+        class="navbar navbar-expand-lg fixed-top d-flex justify-content-around align-items-center"
+    >
+        {# AskMate logo #}
+        <div class="flex-column">
             <a class="navbar-brand" href="/">
                 <img
+                    id="logo"
                     class="img-fluid"
                     src="{{ url_for('static', filename='images/logo.png') }}"
                     alt="AskMate"
-                    style="max-height: 10vh"
                 />
             </a>
-            {# Small screen hamburger icon #}
-            <button
-                class="shadow navbar-toggler hidden-lg-up"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#collapsibleNavId"
-                aria-controls="collapsibleNavId"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-            >
-                <img
-                    src="{{ url_for('static', filename='icons/hamburger_icon.svg') }}"
-                    alt="menu"
-                />
-            </button>
-            {# Site navigation #}
-            <div
-                class="collapse navbar-collapse justify-content-end"
-                id="collapsibleNavId"
-            >
+        </div>
+        {# Small screen hamburger icon #}
+        <button
+            class="shadow navbar-toggler hidden-lg-up"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapsibleNavId"
+            aria-controls="collapsibleNavId"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <img
+                src="{{ url_for('static', filename='icons/hamburger_icon.svg') }}"
+                alt="menu"
+            />
+        </button>
+        {# Search bar #}
+        <div class="flex-column">
+            <div id="search-bar">
+                <a href="#search">
+                    <input id="search-input" class="rounded-pill" value="" />
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </a>
+            </div>
+        </div>
+        {# Site navigation #}
+        <div class="flex-column">
+            <div class="collapse navbar-collapse" id="collapsibleNavId">
                 <ul class="nav nav-pills">
                     <li class="shadow nav-item mx-1">
                         <a href="/list" class="nav-link active">Home</a>
@@ -60,4 +69,18 @@
         </div>
     </nav>
     {% include 'signin.html' %}
+    <div id="search">
+        <form method="POST">
+            <input
+                id="search-fullscreen"
+                type="search"
+                name="search"
+                value=""
+                placeholder="Search for question..."
+                autocomplete="off"
+            />
+        </form>
+        <hr class="border border-light border-2" />
+        <div class="container-fluid w-100" id="search-result"></div>
+    </div>
 </header>
