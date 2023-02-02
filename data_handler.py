@@ -131,8 +131,7 @@ def get_question_id_from_title(cursor, title) -> list[dict[str, str]]:
 def add_question_to_database(cursor, title, message, image_path) -> None:
     """Save user question into database."""
     query: str = """
-        INSERT INTO question (submission_time, view_number, vote_number, title,
-                                message, image) 
+        INSERT INTO question (submission_time, view_number, vote_number, title, message, image) 
         VALUES (%s, %s, %s, %s, %s, %s)"""
     cursor.execute(query, [time_now(), 0, 0, title, message, image_path])
 
@@ -141,8 +140,7 @@ def add_question_to_database(cursor, title, message, image_path) -> None:
 def add_answer_to_database(cursor, question_id, message, image) -> None:
     """Save user answer into database."""
     query: str = """
-        INSERT INTO answer (submission_time, vote_number, question_id,
-                            message, image)
+        INSERT INTO answer (submission_time, vote_number, question_id, message, image)
         VALUES (%s, %s, %s, %s, %s)"""
     cursor.execute(query, [time_now(), 0, question_id, message, image])
 
@@ -304,16 +302,22 @@ def extract_sql_comment_count(cursor) -> dict[str, int]:
     return cursor.fetchall()
 
 
-def get_comment_count() -> dict[str, str]:
-    """Extract SQL data into key: value pairs.
-    With ID as key and comment count as value."""
-    # pylint: disable=no-value-for-parameter
-    sql_count_data: Any = extract_sql_comment_count()
-    comment_count_dict: dict[str, str] = {}
-    for row in sql_count_data:
-        comment_count_dict.update({str(row['question_id']):
-                                    str(row['comments'])})
-    return comment_count_dict
+
+@database_common.connection_handler
+def search_for_question(cursor, phrase) -> list[dict[str, str]]:
+    """Show latest questions in home page"""
+    query: str = """
+        SELECT q.id, q.title, q.message, q.image, t.name AS tag_name
+        FROM question AS q
+        LEFT JOIN question_tag AS qt ON q.id = qt.question_id
+        LEFT JOIN tag as t ON qt.tag_id = t.id
+        WHERE q.title ILIKE %(phrase)s OR t.name LIKE %(phrase)s
+        ORDER BY q.submission_time DESC
+        LIMIT 10"""
+    like_pattern = '%{}%'.format(phrase)
+    cursor.execute(query, {'phrase': like_pattern})
+    return cursor.fetchall()
+
 
 def get_answer_count() -> dict[str, str]:
     """Extract SQL data into key: value pairs.

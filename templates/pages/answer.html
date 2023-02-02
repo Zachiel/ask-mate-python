@@ -3,7 +3,7 @@ else %}New answer{% endif %} {% endblock %} {% block content %}
 <div class="container-fluid my-5 pt-5 w-75">
     <h1>Your Answer:</h1>
     <hr />
-    <form method="POST" name="message" id="message">
+    <form method="POST" enctype="multipart/form-data">
         <div class="row">
             <div class="col-8">
                 <div class="input-group">
@@ -16,7 +16,7 @@ else %}New answer{% endif %} {% endblock %} {% block content %}
                         rows="5"
                     >
 {% if answer %}
-{{ answer['message'] }}{% endif %}</textarea
+{{ answer['message'].replace('\\r\\n', '&#13;&#10')|safe }}{% endif %}</textarea
                     >
                 </div>
             </div>
@@ -59,10 +59,10 @@ else %}New answer{% endif %} {% endblock %} {% block content %}
                 </div>
             </div>
         </div>
+        <br />
+        <button type="submit" class="btn btn-primary">
+            {% if answer %}Save edits{% else %}Post new answer{% endif %}
+        </button>
     </form>
-    <br />
-    <button type="submit" class="btn btn-primary" form="message">
-        {% if answer %}Save edits{% else %}Post new answer{% endif %}
-    </button>
 </div>
 {% endblock %}

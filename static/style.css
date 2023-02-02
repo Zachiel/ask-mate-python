@@ -29,6 +29,10 @@ footer {
     color: var(--text-general);
 }
 
+#logo {
+    max-height: 10vh;
+}
+
 .hidden {
     display: none;
 }
@@ -220,4 +224,95 @@ a:active {
 
 .button-gradient {
     background: var(--powder-gradient);
+}
+
+#search-bar {
+    position: relative;
+}
+
+#search-bar i {
+    position: absolute;
+    left: 0;
+    top: 0.7vh;
+    margin-left: 10px;
+    color: gray;
+    opacity: 0.5;
+}
+
+#search-input {
+    padding-left: 30px;
+}
+
+#search {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 10000;
+    transition: all 0.5s ease-in-out;
+    transform: translate(0px, -100%) scale(0, 0);
+    opacity: 0;
+}
+
+#search.open {
+    transform: translate(0px, 0px) scale(1, 1);
+    opacity: 1;
+}
+
+#search input[type="search"] {
+    position: absolute;
+    top: 15%;
+    width: 100%;
+    color: rgb(255, 255, 255);
+    background: rgba(0, 0, 0, 0);
+    font-size: 60px;
+    font-weight: 300;
+    text-align: center;
+    border: 0px;
+    margin: 0px auto;
+    margin-top: -51px;
+    padding-left: 30px;
+    padding-right: 30px;
+    outline: none;
+}
+
+#search .close {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    color: #fff;
+    background-color: #428bca;
+    border-color: #357ebd;
+    opacity: 1;
+    padding: 10px 17px;
+    font-size: 27px;
+}
+
+.border-light {
+    position: absolute;
+    top: 20%;
+    width: 100%;
+}
+
+#search-result {
+    position: absolute;
+    top: 25%;
+    margin-left: 10%;
+    color: white;
+}
+
+#search-result a {
+    color: white;
+}
+
+#search-result a:hover {
+    color: lightskyblue;
+}
+
+.result-image {
+    max-height: 100px;
+    width: 100px;
+    height: 100px;
 }
