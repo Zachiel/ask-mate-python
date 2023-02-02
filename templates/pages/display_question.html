@@ -234,41 +234,69 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col">{{ answer['message'] }}</div>
-                                <div class="col-auto text-nowrap text-end">
-                                    <a
-                                        href="/question/{{question['id']}}/answer/{{answer['id']}}/new-comment"
-                                    >
-                                        <button class="btn btn-sm btn-info">
-                                            Comment
-                                        </button>
-                                    </a>
-                                    <a
-                                        href="/question/{{question['id']}}/answer/{{answer['id']}}/edit_answer"
-                                        class="btn btn-sm btn-primary border-dark shadow p-1 px-3 rounded"
-                                    >
-                                        <span
-                                            ><i
-                                                class="fa-solid fa-pen-to-square"
-                                            ></i
-                                        ></span>
-                                    </a>
-                                    <form
-                                        action="/question/{{question['id']}}/answer/{{answer['id']}}/delete_answer"
-                                        method="POST"
-                                        class="form-button"
-                                    >
-                                        <button
-                                            type="submit"
-                                            class="btn btn-sm btn-danger border-dark shadow p-1 px-3 rounded"
+                                <div class="container-fluid">
+                                    <div class="row flex">
+                                        {% if answer['image'] %}
+                                        <div class="col-9">
+                                            <span class="card-text">
+                                                {{answer['message']}}
+                                            </span>
+                                        </div>
+                                        <div
+                                            class="col-2 answer-image-area text-center"
                                         >
-                                            <span
-                                                ><i
-                                                    class="fa-solid fa-trash"
-                                                ></i
-                                            ></span>
-                                        </button>
-                                    </form>
+                                            <a href="/{{ answer['image'] }}"
+                                                ><img
+                                                    src="/{{ answer['image'] }}"
+                                                    alt=""
+                                                    class="img-fluid"
+                                            /></a>
+                                        </div>
+                                        {% else %}
+                                        <div class="col">
+                                            <p class="card-text text-wrap">
+                                                {{answer['message']}}
+                                            </p>
+                                        </div>
+                                        {% endif %}
+                                        <div class="col-1 text-center">
+                                            <a
+                                                href="/question/{{question['id']}}/answer/{{answer['id']}}/new-comment"
+                                            >
+                                                <button
+                                                    class="btn btn-sm btn-info"
+                                                >
+                                                    Comment
+                                                </button>
+                                            </a>
+                                            <a
+                                                href="/question/{{question['id']}}/answer/{{answer['id']}}/edit_answer"
+                                                class="btn btn-sm btn-primary border-dark shadow p-1 px-3 rounded"
+                                            >
+                                                <span
+                                                    ><i
+                                                        class="fa-solid fa-pen-to-square"
+                                                    ></i
+                                                ></span>
+                                            </a>
+                                            <form
+                                                action="/question/{{question['id']}}/answer/{{answer['id']}}/delete_answer"
+                                                method="POST"
+                                                class="form-button"
+                                            >
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-sm btn-danger border-dark shadow p-1 px-3 rounded"
+                                                >
+                                                    <span
+                                                        ><i
+                                                            class="fa-solid fa-trash"
+                                                        ></i
+                                                    ></span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {% for comments in answer_comments %} {% for

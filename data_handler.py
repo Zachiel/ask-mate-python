@@ -116,19 +116,21 @@ def add_question_to_database(cursor, title, message, image_path) -> None:
 
 
 @database_common.connection_handler
-def add_answer_to_database(cursor, question_id, message) -> None:
+def add_answer_to_database(cursor, question_id, message, image) -> None:
     """Save user answer into database."""
     query: str = """
-        INSERT INTO answer (submission_time, vote_number, question_id, message)
-        VALUES (%s, %s, %s, %s)"""
-    cursor.execute(query, [time_now(), 0, question_id, message])
+        INSERT INTO answer (submission_time, vote_number, question_id,
+                            message, image)
+        VALUES (%s, %s, %s, %s, %s)"""
+    cursor.execute(query, [time_now(), 0, question_id, message, image])
 
 
 @database_common.connection_handler
 def add_comment_to_question(cursor, question_id, message) -> None:
     """Save user answer into database."""
     query: str = """
-        INSERT INTO comment (submission_time, question_id, message, edited_count)
+        INSERT INTO comment (submission_time, question_id, message,
+                            edited_count)
         VALUES (%s, %s, %s, %s)"""
     cursor.execute(query, [time_now(), question_id, message, 0])
 
@@ -154,13 +156,14 @@ def edit_comment(cursor, comment_id, message) -> None:
 
 
 @database_common.connection_handler
-def edit_answer(cursor, question_id, message) -> None:
+def edit_answer(cursor, question_id, message, image) -> None:
     """Save user answer into database."""
     query: str = """
         UPDATE answer
-        SET message = %(message)s
+        SET message = %(message)s, image = %(image)s
         WHERE id = %(id)s"""
-    cursor.execute(query, {'message': message, 'id': question_id})
+    cursor.execute(query, {'message': message, 'id': question_id,
+                            'image': image})
 
 
 @database_common.connection_handler

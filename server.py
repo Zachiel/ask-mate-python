@@ -90,7 +90,7 @@ def new_question() -> Union[Response, str]:
         file_path: Union[str, None] = save_image(file)
         data_handler.add_question_to_database(title, message, file_path)
         return redirect('/list')
-    return render_template('pages/add_question.html')
+    return render_template('pages/question.html')
 
 
 @app.route("/question/<question_id>/edit",
@@ -106,7 +106,7 @@ def edit_question(question_id) -> Union[Response, str]:
         file_path: Union[str, None] = save_image(file)
         data_handler.edit_question(question_id, title, message, file_path)
         return redirect('/question/'+question_id)
-    return render_template('pages/edit_question.html',
+    return render_template('pages/question.html',
                         question=question[0])
 
 
@@ -140,7 +140,9 @@ def new_answer(question_id) -> Union[Response, str]:
     """Adding new answer route."""
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
-        data_handler.add_answer_to_database(question_id, message)
+        file: Any = request.files['file']
+        file_path: Union[str, None] = save_image(file)
+        data_handler.add_answer_to_database(question_id, message, file_path)
         return redirect("/question/"+question_id)
     return render_template('pages/answer.html')
 
@@ -152,7 +154,9 @@ def edit_answer(question_id, answer_id) -> Union[Response, str]:
     answer: list[dict[str, str]] = data_handler.get_answer_by_id(answer_id)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
-        data_handler.edit_answer(question_id, message)
+        file: Any = request.files['file']
+        file_path: Union[str, None] = save_image(file)
+        data_handler.edit_answer(question_id, message, file_path)
         return redirect("/question/"+question_id)
     return render_template('pages/answer.html', answer=answer[0])
 

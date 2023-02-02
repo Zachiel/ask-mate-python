@@ -4,17 +4,60 @@ else %}New answer{% endif %} {% endblock %} {% block content %}
     <h1>Your Answer:</h1>
     <hr />
     <form method="POST" name="message" id="message">
-        <div class="input-group">
-            <span class="input-group-text">Message: </span>
-            <textarea
-                id="message"
-                name="message"
-                class="form-control"
-                aria-label="With textarea"
-            >
+        <div class="row">
+            <div class="col-8">
+                <div class="input-group">
+                    <span class="input-group-text">Message: </span>
+                    <textarea
+                        id="message"
+                        name="message"
+                        class="form-control"
+                        aria-label="With textarea"
+                        rows="5"
+                    >
 {% if answer %}
 {{ answer['message'] }}{% endif %}</textarea
-            >
+                    >
+                </div>
+            </div>
+            <div class="col-4 text-end">
+                <div
+                    class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm"
+                >
+                    <input
+                        id="upload"
+                        type="file"
+                        name="file"
+                        onchange="readURL(this);"
+                        class="form-control border-0"
+                        accept="image/png, image/jpeg, image/jpg"
+                    />
+                    <label id="upload-label" for="upload" class="detail"
+                        >PNG/JPG up to 1 MB</label
+                    >
+                    <div class="input-group-append">
+                        <label
+                            for="upload"
+                            class="btn btn-light m-0 rounded-pill px-4"
+                        >
+                            <i class="fa fa-cloud-upload mr-2 text-muted"></i
+                            ><small
+                                class="text-uppercase detail font-weight-bold text-muted"
+                                >Choose file</small
+                            ></label
+                        >
+                    </div>
+                </div>
+                {# Uploaded image area #}
+                <div id="image-preview" class="image-area mt-4 rounded">
+                    <img
+                        id="imageResult"
+                        src="/{% if answer %}{{ answer['image'] }}{% endif %}"
+                        alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block"
+                    />
+                </div>
+            </div>
         </div>
     </form>
     <br />
