@@ -33,8 +33,9 @@ block content %}
                         class="form-control"
                         aria-label="With textarea"
                         rows="10"
+                        style="white-space: pre-line"
                     >
-{% if question %}{{ question['message'] }}{% endif %}</textarea
+{% if question %}{{ question['message'].replace('\\r\\n', '&#13;&#10')|safe }}{% endif %}</textarea
                     >
                 </div>
             </div>
@@ -79,7 +80,8 @@ block content %}
         </div>
         <br />
         <button type="submit" class="btn btn-primary" form="question">
-            Edit the question
+            {% if question %}Edit the question{% else %}Post new question{%
+            endif %}
         </button>
     </form>
 </div>

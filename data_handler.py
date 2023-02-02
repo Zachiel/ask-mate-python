@@ -109,8 +109,7 @@ def get_comment_by_id(cursor, comment_id) -> list[dict[str, str]]:
 def add_question_to_database(cursor, title, message, image_path) -> None:
     """Save user question into database."""
     query: str = """
-        INSERT INTO question (submission_time, view_number, vote_number, title,
-                                message, image) 
+        INSERT INTO question (submission_time, view_number, vote_number, title, message, image) 
         VALUES (%s, %s, %s, %s, %s, %s)"""
     cursor.execute(query, [time_now(), 0, 0, title, message, image_path])
 
@@ -119,8 +118,7 @@ def add_question_to_database(cursor, title, message, image_path) -> None:
 def add_answer_to_database(cursor, question_id, message, image) -> None:
     """Save user answer into database."""
     query: str = """
-        INSERT INTO answer (submission_time, vote_number, question_id,
-                            message, image)
+        INSERT INTO answer (submission_time, vote_number, question_id, message, image)
         VALUES (%s, %s, %s, %s, %s)"""
     cursor.execute(query, [time_now(), 0, question_id, message, image])
 
@@ -129,8 +127,7 @@ def add_answer_to_database(cursor, question_id, message, image) -> None:
 def add_comment_to_question(cursor, question_id, message) -> None:
     """Save user answer into database."""
     query: str = """
-        INSERT INTO comment (submission_time, question_id, message,
-                            edited_count)
+        INSERT INTO comment (submission_time, question_id, message, edited_count)
         VALUES (%s, %s, %s, %s)"""
     cursor.execute(query, [time_now(), question_id, message, 0])
 
@@ -269,6 +266,21 @@ def extract_sql_answer_count(cursor) -> dict[str, int]:
         LEFT JOIN answer AS a ON q.id = a.question_id
         GROUP BY q.id"""
     cursor.execute(query)
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
+def search_for_question(cursor, phrase) -> list[dict[str, str]]:
+    """Show latest questions in home page"""
+    query: str = """
+        SELECT q.*, qt.question_id AS question_tag, qt.tag_id, t.id AS tag_id, t.name
+        FROM question AS q
+        LEFT JOIN question_tag AS qt ON q.id = qt.question_id
+        LEFT JOIN tag as t ON qt.tag_id = t.id
+        WHERE q.title LIKE %%%(phrase)s%% OR t.name LIKE %%%(phrase)s%%
+        ORDER BY q.submission_time DESC
+        LIMIT 10"""
+    cursor.execute(query, {'phrase': phrase})
     return cursor.fetchall()
 
 

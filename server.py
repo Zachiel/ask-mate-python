@@ -75,8 +75,8 @@ def display_question(question_id) -> str:
                             answers=answers,
                             question_comments=question_comments,
                             answer_comments=answer_comments,
-                            count_answers=len(answers)
-                            )
+                            count_answers=len(answers),
+                            to_string=str)
 
 
 @app.route('/add_question',
@@ -84,8 +84,8 @@ def display_question(question_id) -> str:
 def new_question() -> Union[Response, str]:
     """Adding new question route."""
     if request.method == "POST":
-        message: Union[str, None] = request.form.get("question")
         title: Union[str, None] = request.form.get("title")
+        message: Union[str, None] = repr(request.form.get("message"))
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
         data_handler.add_question_to_database(title, message, file_path)
@@ -101,13 +101,14 @@ def edit_question(question_id) -> Union[Response, str]:
                                                             question_id)
     if request.method == 'POST':
         title: Union[str, None] = request.form.get("title")
-        message: Union[str, None] = request.form.get("message")
+        message: Union[str, None] = repr(request.form.get("message"))
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
         data_handler.edit_question(question_id, title, message, file_path)
         return redirect('/question/'+question_id)
     return render_template('pages/question.html',
-                        question=question[0])
+                        question=question[0],
+                        to_string=str)
 
 
 @app.route("/question/<question_id>/delete",
@@ -139,7 +140,7 @@ def vote_question_down(question_id) -> Response:
 def new_answer(question_id) -> Union[Response, str]:
     """Adding new answer route."""
     if request.method == "POST":
-        message: Union[str, None] = request.form.get("message")
+        message: Union[str, None] = repr(request.form.get("message"))
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
         data_handler.add_answer_to_database(question_id, message, file_path)
@@ -153,7 +154,7 @@ def edit_answer(question_id, answer_id) -> Union[Response, str]:
     """Edit existing answer route."""
     answer: list[dict[str, str]] = data_handler.get_answer_by_id(answer_id)
     if request.method == "POST":
-        message: Union[str, None] = request.form.get("message")
+        message: Union[str, None] = repr(request.form.get("message"))
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
         data_handler.edit_answer(question_id, message, file_path)
@@ -190,7 +191,7 @@ def vote_answer_down(question_id, answer_id) -> Response:
 def new_question_comment(question_id) -> None:
     """Add comment to a question route."""
     if request.method == "POST":
-        message: Union[str, None] = request.form.get("message")
+        message: Union[str, None] = repr(request.form.get("message"))
         data_handler.add_comment_to_question(question_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html')
@@ -201,7 +202,7 @@ def new_question_comment(question_id) -> None:
 def new_answer_comment(question_id, answer_id) -> None:
     """Add comment to an answer route."""
     if request.method == "POST":
-        message: Union[str, None] = request.form.get("message")
+        message: Union[str, None] = repr(request.form.get("message"))
         data_handler.add_comment_to_answer(answer_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html')
@@ -212,9 +213,8 @@ def new_answer_comment(question_id, answer_id) -> None:
 def edit_question_comment(question_id, comment_id) -> None:
     """Edit comment to a question route."""
     comment: list[dict[str, str]] = data_handler.get_comment_by_id(comment_id)
-    print(comment, file=sys.stderr)
     if request.method == "POST":
-        message: Union[str, None] = request.form.get("message")
+        message: Union[str, None] = repr(request.form.get("message"))
         data_handler.edit_comment(comment_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html', comment=comment[0])
@@ -226,7 +226,7 @@ def edit_answer_comment(question_id, answer_id, comment_id) -> None:
     """Edit comment to an answer route."""
     comment: list[dict[str, str]] = data_handler.get_comment_by_id(comment_id)
     if request.method == "POST":
-        message: Union[str, None] = request.form.get("message")
+        message: Union[str, None] = repr(request.form.get("message"))
         data_handler.edit_comment(comment_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html', comment=comment[0])

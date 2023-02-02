@@ -105,7 +105,8 @@
                                     {% if question['image'] %}
                                     <div class="col-9">
                                         <span class="card-text">
-                                            {{question['message']}}
+                                            {{ question['message'].replace('\n',
+                                            '<br />')|safe }}
                                         </span>
                                     </div>
                                     <div class="col image-area text-center">
@@ -118,8 +119,9 @@
                                     </div>
                                     {% else %}
                                     <div class="col">
-                                        <p class="card-text text-wrap">
-                                            {{question['message']}}
+                                        <p class="card-text">
+                                            {{question['message'].replace('\\r\\n',
+                                            '<br />')|safe }}
                                         </p>
                                     </div>
                                     {% endif %}
@@ -134,7 +136,8 @@
                             <div class="row">
                                 <div class="col">
                                     <p class="opacity-50">
-                                        {{comment['message']}}
+                                        {{comment['message'].replace('\\r\\n',
+                                        '<br />')|safe}}
                                     </p>
                                 </div>
                                 <div class="col-auto text-nowrap text-end">
@@ -239,7 +242,8 @@
                                         {% if answer['image'] %}
                                         <div class="col-9">
                                             <span class="card-text">
-                                                {{answer['message']}}
+                                                {{answer['message'].replace('\\r\\n',
+                                                '<br />')|safe}}
                                             </span>
                                         </div>
                                         <div
@@ -255,7 +259,8 @@
                                         {% else %}
                                         <div class="col">
                                             <p class="card-text text-wrap">
-                                                {{answer['message']}}
+                                                {{answer['message'].replace('\\r\\n',
+                                                '<br />')|safe}}
                                             </p>
                                         </div>
                                         {% endif %}
@@ -305,7 +310,8 @@
                                 <div class="row">
                                     <div class="col">
                                         <p class="opacity-50">
-                                            {{comment['message']}}
+                                            {{comment['message'].replace('\\r\\n',
+                                            '<br />')|safe}}
                                         </p>
                                     </div>
                                     <div class="col-auto text-nowrap text-end">
