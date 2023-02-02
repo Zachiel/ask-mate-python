@@ -182,30 +182,32 @@ def vote_answer_down(question_id, answer_id) -> Response:
     data_handler.vote_answer_down(answer_id)
     return redirect("/question/" + question_id)
 
-#TODO change prints for messages on site f.e alerts or just plain text
+#TODO pop up after succesful registration
 @app.route("/registration",
-           methods=['POST', 'GET'])
+           methods=['POST'])
 def registration_form():
-    if (request.method == 'POST' 
-        and 'username' in request.form 
-        and 'password' in request.form):
-        username = request.form.get('username')
-        password = request.form.get('password')
+    if request.method == 'POST':
+        username = request.form.get('usernameValidation')
+        password = request.form.get('validationPassword')
+        email = request.form.get('email-validation')
+        fname = request.form.get('firstNameValidation')
+        lname = request.form.get('lastNameValidation')
         if data_handler.check_exisiting_username(username) == True:
-            print('Account already exists!')
-        elif not username or not password:
-            print('Please fill out the form!')
+            return 'Username already in use!'
+        elif data_handler.check_exisiting_email(email) == True:
+            return 'Email already in use!'
+        elif not username or not password or not email or not fname or not lname:
+            return 'Please fill out the form!'
         elif not re.match(r'[A-Za-z0-9]+', username):
-            print('Username must contain only characters and numbers!')
+            return 'Username must contain only characters and numbers!'
+        elif not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{8,}$', password):
+            return 'Invalid password'
         else:
             hashed_password = hashing.hash_password(password)
-            data_handler.register_new_user(username, hashed_password)
+            data_handler.register_new_user(username, hashed_password, email, fname, lname)
             print('You have succesfully registered!')
-            return redirect('/list')
-    elif request.method == 'POST':
-        print('Please fill out the form!')
-        
-    return render_template('pages/registration.html')
+            return redirect('/')
+    return redirect('/')
 
 
 @app.route("/question/<question_id>/new-comment",
