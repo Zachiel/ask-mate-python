@@ -19,9 +19,9 @@ def get_latest_questions(cursor) -> list[dict[str, str]]:
 @database_common.connection_handler
 def get_tag_for_question(cursor, question_id):
     query: str = """
-        SELECT *
-        FROM question_tag
-        WHERE question_id = %(qid)s"""
+        SELECT tag_id
+        FROM question
+        WHERE id = %(qid)s"""
     cursor.execute(query, {'qid': question_id})
 
     data = cursor.fetchall()
@@ -37,13 +37,21 @@ def get_tag_for_question(cursor, question_id):
         tag = cursor.fetchall()[0]['name']
         return tag
 
+
 @database_common.connection_handler
 def add_tag_to_database(cursor, tag_name):
-    """Save new tag into database."""
-    query: str = """
-    INSERT INTO tag (name)
-    VALUES (%s)"""
-    cursor.execute(query, [tag_name])
+    tag_names = []
+    tags = get_tags()
+    for tag in tags:
+        tag_names.append(tag['name'])
+    if tag_name in tag_names:
+        pass
+    else:
+        """Save new tag into database."""
+        query: str = """
+        INSERT INTO tag (name)
+        VALUES (%s)"""
+        cursor.execute(query, [tag_name])
 
 
 @database_common.connection_handler
@@ -113,17 +121,17 @@ def get_tags(cursor):
 
 
 @database_common.connection_handler
-def add_question_to_database(cursor, title, message, image_path) -> None:
+def add_question_to_database(cursor, title, message, image_path, tag_id) -> None:
     """Save user question into database."""
     query: str = """
         INSERT INTO question (submission_time, view_number, vote_number, title,
-                                message, image) 
-        VALUES (%s, %s, %s, %s, %s, %s)"""
-    cursor.execute(query, [time_now(), 0, 0, title, message, image_path])
+                                message, image, tag_id) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+    cursor.execute(query, [time_now(), 0, 0, title, message, image_path, tag_id])
 
 
 @database_common.connection_handler
-def get_tag_id(cursor, name):
+def get_tag_id(cursor, name): 
     """taking tag id basing on its name"""
     query: str = """
     SELECT id
@@ -133,41 +141,29 @@ def get_tag_id(cursor, name):
     id = cursor.fetchall()[0]['id']
     return id
 
+@database_common.connection_handler
+def get_tag_name(cursor, id): 
+    """taking tag name basing on its id"""
+    query: str = """
+    SELECT name
+    FROM tag
+    WHERE id = %(id)s"""
+    cursor.execute(query, {'id': id})
+    name = cursor.fetchall()[0]['name']
+    return name
 
 @database_common.connection_handler
 def get_tagged_questions(cursor, given_tag) -> list[dict[str, str]]:
     """Show questions with specific tag in home page"""
-
+    tag_id = get_tag_id(given_tag)
     query: str = """
-        SELECT question_id
-        FROM question_tag
-        WHERE tag_id = %(given_tag)s """
-    cursor.execute(query, {'given_tag': given_tag})
-    data = cursor.fetchall()
-    questions_with_given_tag = []
-    for info in data:
-        questions_with_given_tag.append(str(info['question_id']))
-
-    query_2: str = """
         SELECT *
         FROM question
-        WHERE id IN %(questions_with_given_tag)s
+        WHERE tag_id = %(tag_id)s
         """
-    cursor.execute(query_2, {'questions_with_given_tag': questions_with_given_tag})
+    cursor.execute(query, {'tag_id': tag_id})
     return cursor.fetchall()
 
-
-
-#print(get_tagged_questions(1))
-
-@database_common.connection_handler
-def add_tag(cursor, question_id, tag):  
-    """add question tag to database"""
-    tag_id = get_tag_id(tag)
-    query: str ="""
-        INSERT INTO question_tag (question_id, tag_id)
-        VALUES (%s, %s)"""
-    cursor.execute(query, [question_id, tag_id])
 
 
 @database_common.connection_handler
@@ -225,14 +221,10 @@ def delete_question(cursor, question_id) -> None:
     query_answer: str = """
         DELETE FROM answer
         WHERE question_id = %(id)s"""
-    query_tag: str = """
-        DELETE FROM question_tag
-        WHERE question_id = %(id)s"""
     query_question: str = """
         DELETE FROM question
         WHERE id = %(id)s"""
     cursor.execute(query_answer, {'id': question_id})
-    cursor.execute(query_tag, {'id': question_id})
     cursor.execute(query_question, {'id': question_id})
     
 
@@ -252,18 +244,14 @@ def edit_question(cursor, question_id, title, message, image_path, tag) -> None:
     tag_id = get_tag_id(tag)
     query: str = """
         UPDATE question
-        SET title = %(title)s, message = %(message)s, image = %(image_path)s
+        SET title = %(title)s, message = %(message)s, image = %(image_path)s, tag = %(tag_id)s
         WHERE id = %(id)s"""
-    query_tag: str = """
-        UPDATE question_tag
-        SET tag_id = %(tag_id)s
-        WHERE question_id = %(question_id)s"""
+
     cursor.execute(query, {'title' : title,
                             'message': message,
                             'id': question_id,
-                            'image_path': image_path})
-    cursor.execute(query_tag, {'question_id': question_id,
-                                'tag_id': tag_id})
+                            'image_path': image_path,
+                            "tag_id": tag_id})
 
 
 @database_common.connection_handler
