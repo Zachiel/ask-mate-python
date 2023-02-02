@@ -108,9 +108,11 @@ def new_question() -> Union[Response, str]:
         title: Union[str, None] = request.form.get("title")
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
-        tag_name = request.form.get("tag")
-        tag_id = data_handler.get_tag_id(tag_name)
-        data_handler.add_question_to_database(title, message, file_path, tag_id)
+        data_handler.add_question_to_database(title, message, file_path)
+
+        tag = request.form.get("tag")
+        adding_question = data_handler.get_question_id_from_title(title)
+        data_handler.add_tag(adding_question, tag)
         return redirect('/list')
     return render_template('pages/add_question.html', tags=tags)
 
@@ -191,13 +193,12 @@ def tag_page(tag):
 @app.route("/new_tag", methods=['GET', 'POST'])
 def new_tag() -> Union[Response, str]:
     """Adding new tag route."""
-    tags = data_handler.get_tags()
     if request.method == "POST":
         tag: Union[str, None] = request.form.get("tag")
         print('yes')
         data_handler.add_tag_to_database(tag)
         return redirect("/")
-    return render_template('pages/new_tag.html', tags=tags)
+    return render_template('pages/new_tag.html')
 
 
 if __name__ == "__main__":
