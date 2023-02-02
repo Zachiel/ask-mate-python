@@ -1,0 +1,17 @@
+{% extends 'template.html' %} {% block title %} Search by tags {% endblock %} {%
+    block content %}
+
+    <div class="container-fluid my-5 py-5">
+        <h3 class="mb-5">These are existing tags, click on one to search for questions tagged by it</h3>
+    </div>
+    {%for tag in tags_names%}
+    <div class="text-end mt-5">
+        <a href="/tag_page/{{tag}}">
+            <button class="btn btn-sm btn-info">{{tag}}</button>
+        </a>
+    </div>
+    {%endfor%}
+
+
+{% endblock %}
+
