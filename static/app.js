@@ -76,7 +76,11 @@ $(function () {
                             </div>
                             <div class="col mx-5">${question["title"]}</div>
                             <div class="col mx-5">${str}</div>
-                            <div class="col">Tags: ${question["tag_name"]}</div>
+                            <div class="col">Tags: ${
+                                !question["tag_name"]
+                                    ? ""
+                                    : question["tag_name"]
+                            }</div>
                         </div>
                     </a>
                     `);

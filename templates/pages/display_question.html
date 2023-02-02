@@ -95,9 +95,17 @@
                                 </div>
                             </form>
                         </div>
-                        {% if tag == None %}
-                        <div>
-                            <h5><strong>Tag:</strong> {{tag}}</h5>
+                        {% if tag != 'None' %}
+                        <div class="container-fluid">
+                            <div
+                                id="tag-container"
+                                class="d-flex justify-content-start align-items-center g-2 rounded-pill"
+                            >
+                                <div class="col-auto hashtag">#</div>
+                                <div class="col-auto ms-1 tag-name">
+                                    {{tag}}
+                                </div>
+                            </div>
                         </div>
                         {% endif %}
                         <div class="row w-100 m-0 p-0">
