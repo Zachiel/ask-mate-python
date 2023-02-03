@@ -313,7 +313,7 @@ def extract_sql_comment_count(cursor) -> dict[str, int]:
     return cursor.fetchall()
 
 @database_common.connection_handler
-def check_exisiting_username(cursor, username) -> None:
+def check_exisiting_username(cursor, username):
     query: str = """
         SELECT * FROM accounts WHERE username = %(username)s"""
     cursor.execute(query, {'username': username})
@@ -325,7 +325,7 @@ def check_exisiting_username(cursor, username) -> None:
     
     
 @database_common.connection_handler
-def check_exisiting_email(cursor, email) -> None:
+def check_exisiting_email(cursor, email):
     query: str = """
         SELECT * FROM accounts WHERE email = %(email)s"""
     cursor.execute(query, {'email': email})

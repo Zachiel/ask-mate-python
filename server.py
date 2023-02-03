@@ -5,12 +5,12 @@ import os
 import sys
 from typing import Union, Any
 import uuid
+import re
 from flask import Flask, render_template, request, redirect, Response
 import data_handler
-import re
 import hashing
 
-UPLOAD_FOLDER: str = 'static/uploads'
+UPLOAD_FOLDER: str = 'static\\uploads'
 
 app: Flask = Flask(__name__, static_url_path='/static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
