@@ -138,5 +138,6 @@ INSERT INTO question_tag VALUES (0, 1);
 INSERT INTO question_tag VALUES (1, 3);
 INSERT INTO question_tag VALUES (2, 3);
 
-INSERT INTO accounts VALUES (0, 'HeadAdmin', '$2b$12$4.mUGwYVt9yAFNysWPcdR.1IOrLkQzXSFClCADK9/P6mEbg5wFPk.', 'admin@admin.com', 'AskMate', 'Admin', '1666-06-09 16:16:16');
-SELECT pg_catalog.setval('accounts_id_seq', 1, true);
+INSERT INTO accounts VALUES (0, 'HeadAdmin', '$2b$12$4.mUGwYVt9yAFNysWPcdR.1IOrLkQzXSFClCADK9/P6mEbg5wFPk.', 'admin@admin.com', 'AskMate', 'Admin', '1666-06-09');
+INSERT INTO accounts VALUES (1, 'JohnnyP', '$2b$12$aOQ2SzqwfC3DCrWNRaa7xe6fIFPeMvPtf3m3ArHZMl2QUXhD3Mfxu', 'test@test.com', 'Iwan', 'Pavluczenko', '2005-04-02');
+SELECT pg_catalog.setval('accounts_id_seq', 2, true);

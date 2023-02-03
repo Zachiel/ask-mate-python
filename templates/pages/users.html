@@ -5,12 +5,17 @@ content %} {# Grid container #}
     <div class="row justify-content-between align-items-center g-2 mb-3">
         <div class="table-responsive">
             <table
-                class="table table-striped table-hover table-borderless table-primary align-middle"
+                id="users"
+                class="table table-striped table-hover table-borderless table-primary align-middle display"
             >
                 <thead class="table-dark">
                     <tr>
                         <th>User</th>
                         <th>Member since</th>
+                        <th>Questions asked</th>
+                        <th>Answers</th>
+                        <th>Comments</th>
+                        <th>Reputation</th>
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
@@ -22,6 +27,10 @@ content %} {# Grid container #}
                             >
                         </td>
                         <td>{{ user['registrationdate'] }}</td>
+                        <td>5</td>
+                        <td>5</td>
+                        <td>5</td>
+                        <td>5</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -30,4 +39,4 @@ content %} {# Grid container #}
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %} bs5-table
