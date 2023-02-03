@@ -118,7 +118,7 @@
                         >
                             <div class="row accordion-body">
                                 <div class="col-9">
-                                    {{ item['message'].replace('\n', '<br />')|safe }}
+                                    {{ item['message'].replace('\r\n', '<br />')|safe }}
                                 </div>
                                 <div class="col-3 text-end">
                                     <img src="{{ item['image'] }}" class="img-fluid rounded" alt="">
