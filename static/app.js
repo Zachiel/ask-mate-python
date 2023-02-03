@@ -28,6 +28,7 @@ $(function () {
 
 $(document).ready(function () {
     "use strict";
+    $("#users").DataTable();
     var forms = $(".needs-validation");
     var validation = Array.prototype.filter.call(forms, function (form) {
         form.addEventListener(

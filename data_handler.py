@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 import sys
 from typing import Any
+import bcrypt
 import database_common
 
 ALLOWED_EXTENSIONS: set[str] = {'png', 'jpg', 'jpeg'}
@@ -475,3 +476,45 @@ def add_tag(cursor, question_id, tag):
             INSERT INTO question_tag (question_id, tag_id)
             VALUES (%s, %s)"""
         cursor.execute(query, [question_id, tag_id])
+
+
+def hash_password(password):
+    to_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(to_bytes, salt)
+    hashed = hashed.decode('utf-8')
+    return hashed
+
+@database_common.connection_handler
+def check_login_password(cursor, username, password):
+    query = """
+    SELECT password FROM accounts
+    WHERE username = %s"""
+    cursor.execute(query, (username, ))
+    db_hashed_password = cursor.fetchone()
+    return bcrypt.checkpw(password.encode('utf-8'),
+                            db_hashed_password['password'].encode('utf-8'))
+
+
+@database_common.connection_handler
+def get_all_users(cursor):
+    """Get all registered users."""
+    query: str = """
+    SELECT id, username, registrationdate
+    FROM accounts"""
+    cursor.execute(query)
+    return cursor.fetchall()
+
+@database_common.connection_handler
+def get_user_by_id(cursor, user_id):
+    """Get specific user."""
+    query: str = """
+    SELECT a.id, a.username, a.email, a.fname, a.lname, a.registrationdate, COUNT(qu.user_id = %(id)s) AS questions, COUNT(au.user_id = %(id)s) AS answers, COUNT(cu.user_id = %(id)s) AS comments
+    FROM accounts AS a
+    LEFT JOIN question_user AS qu ON a.id = qu.user_id
+    LEFT JOIN answer_user AS au ON a.id = au.user_id
+    LEFT JOIN comment_user AS cu ON a.id = cu.user_id
+    WHERE id = %(id)s
+    GROUP BY a.id"""
+    cursor.execute(query, {'id': user_id})
+    return cursor.fetchone()

@@ -19,8 +19,20 @@
         integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM="
         crossorigin="anonymous"
     ></script>
+    {# Data Tables scripts #}
+    <script
+        type="text/javascript"
+        charset="utf8"
+        src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.js"
+    ></script>
     {# Custom javascript #}
     <script src="{{ url_for('static', filename='app.js') }}"></script>
+    {# Data Tables styles #}
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.css"
+    />
     {# Custom stylesheet #}
     <link
         rel="stylesheet"

@@ -11,11 +11,21 @@ ALTER TABLE IF EXISTS ONLY public.answer DROP CONSTRAINT IF EXISTS fk_question_i
 ALTER TABLE IF EXISTS ONLY public.comment DROP CONSTRAINT IF EXISTS pk_comment_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.comment DROP CONSTRAINT IF EXISTS fk_question_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.comment DROP CONSTRAINT IF EXISTS fk_answer_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.tag DROP CONSTRAINT IF EXISTS pk_tag_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.question_tag DROP CONSTRAINT IF EXISTS pk_question_tag_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.question_tag DROP CONSTRAINT IF EXISTS fk_question_id CASCADE;
-ALTER TABLE IF EXISTS ONLY public.tag DROP CONSTRAINT IF EXISTS pk_tag_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.question_tag DROP CONSTRAINT IF EXISTS fk_tag_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.accounts DROP CONSTRAINT IF EXISTS pk_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.question_user DROP CONSTRAINT IF EXISTS pk_question_user_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.question_user DROP CONSTRAINT IF EXISTS fk_question_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.question_user DROP CONSTRAINT IF EXISTS fk_user_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.answer_user DROP CONSTRAINT IF EXISTS pk_answer_user_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.answer_user DROP CONSTRAINT IF EXISTS fk_answer_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.answer_user DROP CONSTRAINT IF EXISTS fk_user_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.comment_user DROP CONSTRAINT IF EXISTS pk_comment_user_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.comment_user DROP CONSTRAINT IF EXISTS fk_comment_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.comment_user DROP CONSTRAINT IF EXISTS fk_user_id CASCADE;
+
 
 DROP TABLE IF EXISTS public.question;
 CREATE TABLE question (
@@ -35,7 +45,9 @@ CREATE TABLE answer (
     vote_number integer,
     question_id integer,
     message text,
-    image text
+    image text,
+    accepted boolean NOT NULL,
+    edited_count integer
 );
 
 DROP TABLE IF EXISTS public.comment;
@@ -48,17 +60,16 @@ CREATE TABLE comment (
     edited_count integer
 );
 
+DROP TABLE IF EXISTS public.tag;
+CREATE TABLE tag (
+    id serial NOT NULL,
+    name text
+);
 
 DROP TABLE IF EXISTS public.question_tag;
 CREATE TABLE question_tag (
     question_id integer NOT NULL,
     tag_id integer NOT NULL
-);
-
-DROP TABLE IF EXISTS public.tag;
-CREATE TABLE tag (
-    id serial NOT NULL,
-    name text
 );
 
 DROP TABLE IF EXISTS public.accounts;
@@ -72,33 +83,51 @@ CREATE TABLE accounts (
     registrationDate date
 );
 
+DROP TABLE IF EXISTS public.question_user;
+CREATE TABLE question_user (
+    question_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+DROP TABLE IF EXISTS public.answer_user;
+CREATE TABLE answer_user (
+    answer_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+DROP TABLE IF EXISTS public.comment_user;
+CREATE TABLE comment_user (
+    comment_id integer NOT NULL,
+    user_id integer NOT NULL
+);
 
 
-ALTER TABLE ONLY answer
-    ADD CONSTRAINT pk_answer_id PRIMARY KEY (id);
-
-ALTER TABLE ONLY comment
-    ADD CONSTRAINT pk_comment_id PRIMARY KEY (id);
 
 ALTER TABLE ONLY question
     ADD CONSTRAINT pk_question_id PRIMARY KEY (id);
 
-ALTER TABLE ONLY question_tag
-    ADD CONSTRAINT pk_question_tag_id PRIMARY KEY (question_id, tag_id);
-
-ALTER TABLE ONLY tag
-    ADD CONSTRAINT pk_tag_id PRIMARY KEY (id);
-
-ALTER TABLE ONLY comment
-    ADD CONSTRAINT fk_answer_id FOREIGN KEY (answer_id) REFERENCES answer(id);
+ALTER TABLE ONLY answer
+    ADD CONSTRAINT pk_answer_id PRIMARY KEY (id);
 
 ALTER TABLE ONLY answer
     ADD CONSTRAINT fk_question_id FOREIGN KEY (question_id) REFERENCES question(id);
 
-ALTER TABLE ONLY question_tag
-    ADD CONSTRAINT fk_question_id FOREIGN KEY (question_id) REFERENCES question(id);
+ALTER TABLE ONLY comment
+    ADD CONSTRAINT pk_comment_id PRIMARY KEY (id);
 
 ALTER TABLE ONLY comment
+    ADD CONSTRAINT fk_answer_id FOREIGN KEY (answer_id) REFERENCES answer(id);
+
+ALTER TABLE ONLY comment
+    ADD CONSTRAINT fk_question_id FOREIGN KEY (question_id) REFERENCES question(id);
+
+ALTER TABLE ONLY tag
+    ADD CONSTRAINT pk_tag_id PRIMARY KEY (id);
+
+ALTER TABLE ONLY question_tag
+    ADD CONSTRAINT pk_question_tag_id PRIMARY KEY (question_id, tag_id);
+
+ALTER TABLE ONLY question_tag
     ADD CONSTRAINT fk_question_id FOREIGN KEY (question_id) REFERENCES question(id);
 
 ALTER TABLE ONLY question_tag
@@ -106,6 +135,33 @@ ALTER TABLE ONLY question_tag
 
 ALTER TABLE ONLY accounts
     ADD CONSTRAINT pk_id PRIMARY KEY (id);
+
+ALTER TABLE ONLY question_user
+    ADD CONSTRAINT pk_question_user_id PRIMARY KEY (question_id, user_id);
+
+ALTER TABLE ONLY question_user
+    ADD CONSTRAINT fk_question_id FOREIGN KEY (question_id) REFERENCES question(id);
+
+ALTER TABLE ONLY question_user
+    ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES accounts(id);
+
+ALTER TABLE ONLY answer_user
+    ADD CONSTRAINT pk_answer_user_id PRIMARY KEY (answer_id, user_id);
+
+ALTER TABLE ONLY answer_user
+    ADD CONSTRAINT fk_answer_id FOREIGN KEY (answer_id) REFERENCES answer(id);
+
+ALTER TABLE ONLY answer_user
+    ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES accounts(id);
+
+ALTER TABLE ONLY comment_user
+    ADD CONSTRAINT pk_comment_user_id PRIMARY KEY (comment_id, user_id);
+
+ALTER TABLE ONLY comment_user
+    ADD CONSTRAINT fk_comment_id FOREIGN KEY (comment_id) REFERENCES comment(id);
+
+ALTER TABLE ONLY comment_user
+    ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES accounts(id);
 
 INSERT INTO question VALUES (0, '2017-04-28 08:29:00', 29, 7, 'How to make lists in Python?', 'I am totally new to this, any hints?', NULL);
 INSERT INTO question VALUES (1, '2017-04-29 09:19:00', 15, 9, 'Wordpress loading multiple jQuery Versions', 'I developed a plugin that uses the jquery booklet plugin (http://builtbywill.com/booklet/#/) this plugin binds a function to $ so I cann call $(".myBook").booklet();
@@ -121,8 +177,8 @@ INSERT INTO question VALUES (2, '2017-05-01 10:41:00', 1364, 57, 'Drawing canvas
 ', NULL);
 SELECT pg_catalog.setval('question_id_seq', 2, true);
 
-INSERT INTO answer VALUES (1, '2017-04-28 16:49:00', 4, 1, 'You need to use brackets: my_list = []', NULL);
-INSERT INTO answer VALUES (2, '2017-04-25 14:42:00', 35, 1, 'Look it up in the Python docs', 'static\uploads\8b3c75974759436d9e90d2a73cf018fa.png');
+INSERT INTO answer VALUES (1, '2017-04-28 16:49:00', 4, 1, 'You need to use brackets: my_list = []', NULL, false, 0);
+INSERT INTO answer VALUES (2, '2017-04-25 14:42:00', 35, 1, 'Look it up in the Python docs', 'static\uploads\8b3c75974759436d9e90d2a73cf018fa.png', false, 0);
 SELECT pg_catalog.setval('answer_id_seq', 2, true);
 
 INSERT INTO comment VALUES (1, 0, NULL, 'Please clarify the question as it is too vague!', '2017-05-01 05:49:00');
@@ -138,5 +194,15 @@ INSERT INTO question_tag VALUES (0, 1);
 INSERT INTO question_tag VALUES (1, 3);
 INSERT INTO question_tag VALUES (2, 3);
 
-INSERT INTO accounts VALUES (0, 'HeadAdmin', '$2b$12$4.mUGwYVt9yAFNysWPcdR.1IOrLkQzXSFClCADK9/P6mEbg5wFPk.', 'admin@admin.com', 'AskMate', 'Admin', '1666-06-09 16:16:16');
-SELECT pg_catalog.setval('accounts_id_seq', 1, true);
+INSERT INTO accounts VALUES (0, 'HeadAdmin', '$2b$12$4.mUGwYVt9yAFNysWPcdR.1IOrLkQzXSFClCADK9/P6mEbg5wFPk.', 'admin@admin.com', 'AskMate', 'Admin', '1666-06-09');
+INSERT INTO accounts VALUES (1, 'JohnnyP', '$2b$12$aOQ2SzqwfC3DCrWNRaa7xe6fIFPeMvPtf3m3ArHZMl2QUXhD3Mfxu', 'test@test.com', 'Iwan', 'Pavluczenko', '2005-04-02');
+SELECT pg_catalog.setval('accounts_id_seq', 2, true);
+
+INSERT INTO question_user VALUES (0, 0);
+INSERT INTO question_user VALUES (2, 1);
+
+INSERT INTO answer_user VALUES (1, 0);
+INSERT INTO answer_user VALUES (2, 1);
+
+INSERT INTO comment_user VALUES (1, 0);
+INSERT INTO comment_user VALUES (2, 1);
