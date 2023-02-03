@@ -195,7 +195,7 @@ def vote_answer_down(question_id, answer_id) -> Response:
     data_handler.vote_answer_down(answer_id)
     return redirect("/question/" + question_id)
 
-#TODO pop up after succesful registration
+
 @app.route("/registration",
            methods=['POST'])
 def registration_form():
@@ -219,8 +219,7 @@ def registration_form():
             hashed_password = hashing.hash_password(password)
             registrationDate = data_handler.time_now()
             data_handler.register_new_user(username, hashed_password, email, fname, lname, registrationDate)
-            print('You have succesfully registered!')
-            return redirect('/')
+            return render_template('pages/success.html')
     return redirect('/')
 
 
