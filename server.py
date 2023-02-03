@@ -321,17 +321,23 @@ def new_tag() -> Union[Response, str]:
 @app.route("/users")
 def display_users():
     """Display existing users route."""
-    users = data_handler.get_all_users()
+    users = data_handler.get_all_user_stats()
+    reputations = []
+    for user in users:
+        reputations.append(data_handler.get_user_reputation(user['id']))
     return render_template('pages/users.html',
-                            users=users)
+                            users=users,
+                            reps=reputations)
 
 
 @app.route("/user/<user_id>")
 def profile_page(user_id):
     """Display user profile route."""
     user = data_handler.get_user_by_id(user_id)
+    reputation = data_handler.get_user_reputation(user_id)
     return render_template("pages/user_profile.html",
-                            user=user)
+                            user=user,
+                            rep=reputation)
 
 
 if __name__ == "__main__":
