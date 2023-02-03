@@ -509,8 +509,12 @@ def get_all_users(cursor):
 def get_user_by_id(cursor, user_id):
     """Get specific user."""
     query: str = """
-    SELECT username, email, fname, lname, registrationdate
-    FROM accounts
-    WHERE id = %(id)s"""
+    SELECT a.id, a.username, a.email, a.fname, a.lname, a.registrationdate, COUNT(qu.user_id = %(id)s) AS questions, COUNT(au.user_id = %(id)s) AS answers, COUNT(cu.user_id = %(id)s) AS comments
+    FROM accounts AS a
+    LEFT JOIN question_user AS qu ON a.id = qu.user_id
+    LEFT JOIN answer_user AS au ON a.id = au.user_id
+    LEFT JOIN comment_user AS cu ON a.id = cu.user_id
+    WHERE id = %(id)s
+    GROUP BY a.id"""
     cursor.execute(query, {'id': user_id})
     return cursor.fetchone()
