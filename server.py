@@ -330,8 +330,10 @@ def display_users():
 def profile_page(user_id):
     """Display user profile route."""
     user = data_handler.get_user_by_id(user_id)
+    reputation = data_handler.get_user_reputation(user_id)
     return render_template("pages/user_profile.html",
-                            user=user)
+                            user=user,
+                            rep=reputation)
 
 
 if __name__ == "__main__":

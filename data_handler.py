@@ -487,9 +487,9 @@ def hash_password(password):
 
 @database_common.connection_handler
 def check_login_password(cursor, username, password):
-    query = """
-    SELECT password FROM accounts
-    WHERE username = %s"""
+    query: str = """
+        SELECT password FROM accounts
+        WHERE username = %s"""
     cursor.execute(query, (username, ))
     db_hashed_password = cursor.fetchone()
     return bcrypt.checkpw(password.encode('utf-8'),
@@ -500,8 +500,8 @@ def check_login_password(cursor, username, password):
 def get_all_users(cursor):
     """Get all registered users."""
     query: str = """
-    SELECT id, username, registrationdate
-    FROM accounts"""
+        SELECT id, username, registrationdate
+        FROM accounts"""
     cursor.execute(query)
     return cursor.fetchall()
 
@@ -510,19 +510,60 @@ def get_all_users(cursor):
 def get_user_by_id(cursor, user_id):
     """Get specific user."""
     query: str = """
-    SELECT a.id, a.username, a.email, a.fname, a.lname, a.registrationdate, COUNT(qu.user_id = %(id)s) AS questions, COUNT(au.user_id = %(id)s) AS answers, COUNT(cu.user_id = %(id)s) AS comments
-    FROM accounts AS a
-    LEFT JOIN question_user AS qu ON a.id = qu.user_id
-    LEFT JOIN answer_user AS au ON a.id = au.user_id
-    LEFT JOIN comment_user AS cu ON a.id = cu.user_id
-    WHERE id = %(id)s
-    GROUP BY a.id"""
+        SELECT a.id, a.username, a.email, a.fname, a.lname, a.registrationdate,
+            (SELECT
+                COUNT(qu.user_id)
+                FROM question_user AS qu
+                WHERE qu.user_id = %(id)s) AS questions,
+            (SELECT
+                COUNT(au.user_id)
+                FROM answer_user AS au
+                WHERE au.user_id = %(id)s) AS answers,
+            (SELECT
+                COUNT(cu.user_id)
+                FROM comment_user AS cu
+                WHERE cu.user_id = %(id)s) AS comments
+        FROM accounts AS a
+        LEFT JOIN question_user AS qu ON a.id = qu.user_id
+        LEFT JOIN answer_user AS au ON a.id = au.user_id
+        LEFT JOIN comment_user AS cu ON a.id = cu.user_id
+        WHERE id = %(id)s
+        GROUP BY a.id"""
     cursor.execute(query, {'id': user_id})
     return cursor.fetchone()
 
 
 @database_common.connection_handler
-def get_user_reputation(user_id):
+def get_user_reputation(cursor, user_id):
     """Calculate reputation of a specific user."""
     query: str = """
-    SELECT acc.id, q.votes_up"""
+        SELECT 
+            SUM((SELECT SUM(q.votes_up) 
+                    FROM question_user AS qu
+                    LEFT JOIN question AS q ON q.id = qu.question_id
+                    WHERE qu.user_id = %(id)s) * 5
+                + -(SELECT SUM(q.votes_down) 
+                    FROM question_user AS qu
+                    LEFT JOIN question AS q ON q.id = qu.question_id
+                    WHERE qu.user_id = %(id)s) * 2) AS q_rep,
+            SUM((SELECT SUM(a.votes_up) 
+                    FROM answer_user AS au
+                    LEFT JOIN answer AS a ON a.id = au.answer_id
+                    WHERE au.user_id = %(id)s) * 10
+                + -(SELECT SUM(a.votes_down) 
+                    FROM answer_user AS au
+                    LEFT JOIN answer AS a ON a.id = au.answer_id
+                    WHERE au.user_id = %(id)s) * 2) AS a_rep,
+            (SELECT SUM(CASE
+                            WHEN a.accepted = TRUE
+                            THEN 15
+                            ELSE 0
+                        END)
+                    FROM answer_user AS au
+                    LEFT JOIN answer AS a ON a.id = au.answer_id
+                    WHERE au.user_id = %(id)s ) AS a_acc_rep
+        FROM accounts AS acc
+        WHERE acc.id = %(id)s
+        GROUP BY acc.id"""
+    cursor.execute(query, {'id': user_id})
+    return cursor.fetchone()
