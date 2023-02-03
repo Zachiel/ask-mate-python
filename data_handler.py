@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 import sys
 from typing import Any
+import bcrypt
 import database_common
 
 ALLOWED_EXTENSIONS: set[str] = {'png', 'jpg', 'jpeg'}
@@ -475,3 +476,21 @@ def add_tag(cursor, question_id, tag):
             INSERT INTO question_tag (question_id, tag_id)
             VALUES (%s, %s)"""
         cursor.execute(query, [question_id, tag_id])
+
+
+def hash_password(password):
+    to_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(to_bytes, salt)
+    hashed = hashed.decode('utf-8')
+    return hashed
+
+@database_common.connection_handler
+def check_login_password(cursor, username, password):
+    query = """
+    SELECT password FROM accounts
+    WHERE username = %s"""
+    cursor.execute(query, (username, ))
+    db_hashed_password = cursor.fetchone()
+    return bcrypt.checkpw(password.encode('utf-8'),
+                            db_hashed_password['password'].encode('utf-8'))
