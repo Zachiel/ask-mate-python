@@ -82,18 +82,26 @@ block content %}
             <div class="col-2 mt-3">
                 <div class="mb-3">
                     <label for="tag" class="form-label">Choose a tag:</label>
-                    <select
-                        class="form-select form-select-sm"
-                        name="tag"
-                        id="tag"
-                    >
-                        <option value="" selected>Select tag</option>
-                        {% for tag in tags %}
-                        <option name="tag" id="tag" value="{{tag['name']}}">
-                            {{tag['name']}}
+                    <select name="tag" id="tag">
+                        {%if current_tag != 'None'%}
+                        <option 
+                                    name="tag"
+                                    id="tag"
+                                    value="{{current_tag}}">{{current_tag}}
                         </option>
+                        {%else%}
+                        <option value="" selected>Select tag</option>
+                        {%endif%}
+                        {% for tag in tags %}
+                            {%if tag['name'] != current_tag%}
+                                <option 
+                                    name="tag"
+                                    id="tag"
+                                    value="{{tag['name']}}">{{tag['name']}}
+                                </option>
+                            {%endif%}
                         {%endfor%}
-                    </select>
+                      </select>
                 </div>
             </div>
             <div class="col">
