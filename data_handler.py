@@ -141,8 +141,8 @@ def add_question_to_database(cursor, title, message, image_path) -> None:
 def add_answer_to_database(cursor, question_id, message, image) -> None:
     """Save user answer into database."""
     query: str = """
-        INSERT INTO answer (submission_time, vote_number, question_id, message, image)
-        VALUES (%s, %s, %s, %s, %s)"""
+        INSERT INTO answer (submission_time, vote_number, question_id, message, accepted, image, edited_count)
+        VALUES (%s, %s, %s, %s, False , %s, 0)"""
     cursor.execute(query, [time_now(), 0, question_id, message, image])
 
 
@@ -545,3 +545,12 @@ def get_question_ids_of_user_id(cursor, user_id):
     WHERE user_id = %(user_id)s"""
     cursor.execute(query, {'user_id': user_id})
     return cursor.fetchall()
+
+
+def check_if_question_of_user(question_id, question_ids_of_current_user):
+    question_of_user: bool = False
+    for element in question_ids_of_current_user:
+        if question_id == str(element['question_id']):
+            question_of_user = True
+            break
+    return question_of_user

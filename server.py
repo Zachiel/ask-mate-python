@@ -72,9 +72,13 @@ def display_question(question_id) -> str:
     answer_comments: list[dict[str, str]] = \
                                     data_handler.get_answer_comments(answer_ids)
     tag= data_handler.get_tag_for_question(question_id)
+    user_id = ''
+    question_ids_of_current_user = []
+    question_of_user = False
     if 'username' in session:
         user_id = data_handler.get_user_id_by_username(session['username'])
-        question_ids_of_current_user = data_handler.get_question_ids_of_user_id(user_id)
+        question_ids_of_current_user = data_handler.get_question_ids_of_user_id(user_id['id'])
+        question_of_user = data_handler.check_if_question_of_user(question_id, question_ids_of_current_user)
     return render_template('pages/display_question.html',
                             question=question[0],
                             answers=answers,
@@ -83,7 +87,7 @@ def display_question(question_id) -> str:
                             count_answers=len(answers),
                             to_string=str,
                             tag = None if tag is None else tag,
-                            question_ids_of_current_user=question_ids_of_current_user)
+                            question_of_user=question_of_user)
 
 
 @app.route('/add_question', methods=['GET', 'POST'])

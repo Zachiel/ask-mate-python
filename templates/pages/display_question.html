@@ -249,14 +249,11 @@
                                                 </button>
                                             </form>
                                         </div>
-                                        <!-- #TODO write that only user who created the question can see this button -->
-                                        
-                                        {% if answer['accepted'] == true %}
+                                        {% if answer['accepted'] %}
                                         <div class="col mx-0 px-0" style="opacity: 0.5;">
                                             Accepted
                                         </div>
-                                        {% else %}
-                                        {% if question['id'] in question_ids_of_current_user %}
+                                        {% elif question_of_user %}
                                         <div class="col mx-0 px-0">
                                             <form
                                                 action="accept_answer/{{answer['id']}}"
@@ -271,7 +268,6 @@
                                                 </button>
                                             </form>
                                         </div>
-                                        {% endif %}
                                         {% endif %}
                                     </div>
                                 </div>
