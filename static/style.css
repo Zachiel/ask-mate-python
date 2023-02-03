@@ -333,3 +333,7 @@ a:active {
 .tag-name {
     text-transform: uppercase;
 }
+
+#tag {
+    background-color: white;
+}

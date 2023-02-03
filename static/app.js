@@ -50,8 +50,7 @@ $(function () {
         $("#search").addClass("open");
         $('#search > form > input[type="search"]').focus();
     });
-    $("#search-fullscreen").keyup(function (event) {
-        event.preventDefault();
+    $("#search-fullscreen").keyup(function () {
         search = $("#search-input");
         searchFullscreen = $("#search-fullscreen");
         search.val(searchFullscreen.val());

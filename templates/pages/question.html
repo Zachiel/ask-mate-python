@@ -78,19 +78,30 @@ block content %}
                 </div>
             </div>
         </div>
-        <div class="col">
-            <label for="tag">Choose a tag:</label>
-
-            <select name="tag" id="tag">
-                <option value="" name="tag" selected>Select tag</option>
-                {% for tag in tags %}
-                <option name="tag" id="tag" value="{{tag['name']}}">
-                    {{tag['name']}}
-                </option>
-                {%endfor%}
-            </select>
-            <p>Do you need another tag? Post it and then use!</p>
-            <a href="/new_tag">Add tag</a>
+        <div class="row align-items-center">
+            <div class="col-2 mt-3">
+                <div class="mb-3">
+                    <label for="tag" class="form-label">Choose a tag:</label>
+                    <select
+                        class="form-select form-select-sm"
+                        name="tag"
+                        id="tag"
+                    >
+                        <option value="" selected>Select tag</option>
+                        {% for tag in tags %}
+                        <option name="tag" id="tag" value="{{tag['name']}}">
+                            {{tag['name']}}
+                        </option>
+                        {%endfor%}
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <p>
+                    Do you need another tag?
+                    <a href="/new_tag">Post it</a> and then use!
+                </p>
+            </div>
         </div>
         <br />
         <button type="submit" class="btn btn-info" form="question">
