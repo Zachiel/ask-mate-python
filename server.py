@@ -7,6 +7,8 @@ from typing import Union, Any
 import uuid
 from flask import Flask, render_template, request, redirect, Response
 import data_handler
+import re
+import hashing
 
 UPLOAD_FOLDER: str = 'static/uploads'
 
@@ -192,6 +194,34 @@ def vote_answer_down(question_id, answer_id) -> Response:
     """Answer downvoting route."""
     data_handler.vote_answer_down(answer_id)
     return redirect("/question/" + question_id)
+
+#TODO pop up after succesful registration
+@app.route("/registration",
+           methods=['POST'])
+def registration_form():
+    if request.method == 'POST':
+        username = request.form.get('usernameValidation')
+        password = request.form.get('validationPassword')
+        email = request.form.get('email-validation')
+        fname = request.form.get('firstNameValidation')
+        lname = request.form.get('lastNameValidation')
+        if data_handler.check_exisiting_username(username) == True:
+            return 'Username already in use!'
+        elif data_handler.check_exisiting_email(email) == True:
+            return 'Email already in use!'
+        elif not username or not password or not email or not fname or not lname:
+            return 'Please fill out the form!'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            return 'Username must contain only characters and numbers!'
+        elif not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{8,}$', password):
+            return 'Invalid password'
+        else:
+            hashed_password = hashing.hash_password(password)
+            registrationDate = data_handler.time_now()
+            data_handler.register_new_user(username, hashed_password, email, fname, lname, registrationDate)
+            print('You have succesfully registered!')
+            return redirect('/')
+    return redirect('/')
 
 
 @app.route("/all_tags")

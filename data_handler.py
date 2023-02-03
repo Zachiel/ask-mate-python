@@ -312,8 +312,37 @@ def extract_sql_comment_count(cursor) -> dict[str, int]:
     cursor.execute(query)
     return cursor.fetchall()
 
-
-
+@database_common.connection_handler
+def check_exisiting_username(cursor, username) -> None:
+    query: str = """
+        SELECT * FROM accounts WHERE username = %(username)s"""
+    cursor.execute(query, {'username': username})
+    account = cursor.fetchone()
+    if account:
+        return True
+    else:
+        return False
+    
+    
+@database_common.connection_handler
+def check_exisiting_email(cursor, email) -> None:
+    query: str = """
+        SELECT * FROM accounts WHERE email = %(email)s"""
+    cursor.execute(query, {'email': email})
+    account = cursor.fetchone()
+    if account:
+        return True
+    else:
+        return False
+    
+    
+@database_common.connection_handler
+def register_new_user(cursor, username, password, email, fname, lname, registrationDate):
+    query: str = """
+    INSERT INTO accounts (username, password, email, fname, lname, registrationDate)
+    VALUES (%s, %s, %s, %s, %s, %s)"""
+    cursor.execute(query, (username, password, email, fname, lname, registrationDate, ))
+        
 @database_common.connection_handler
 def search_for_question(cursor, phrase) -> list[dict[str, str]]:
     """Show latest questions in home page"""
@@ -331,8 +360,7 @@ def search_for_question(cursor, phrase) -> list[dict[str, str]]:
 
 
 def get_answer_count() -> dict[str, str]:
-    """Extract SQL data into key: value pairs.
-    With ID as key and comment count as value."""
+    """With ID as key and comment count as value."""
     # pylint: disable=no-value-for-parameter
     sql_count_data: Any = extract_sql_comment_count()
     comment_count_dict: dict[str, str] = {}
