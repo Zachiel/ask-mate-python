@@ -504,3 +504,12 @@ def get_all_users(cursor):
     FROM accounts"""
     cursor.execute(query)
     return cursor.fetchall()
+
+@database_common.connection_handler
+def get_user_by_id(cursor, user_id):
+    """Get specific user."""
+    query: str = """
+    SELECT username, email, fname, lname, registrationdate
+    FROM accounts
+    WHERE id = %(id)s"""
+    cursor.execute(query, {'id': user_id})
