@@ -32,7 +32,8 @@ CREATE TABLE question (
     id serial NOT NULL,
     submission_time timestamp without time zone,
     view_number integer,
-    vote_number integer,
+    votes_up integer NOT NULL,
+    votes_down integer NOT NULL,
     title text,
     message text,
     image text
@@ -42,7 +43,8 @@ DROP TABLE IF EXISTS public.answer;
 CREATE TABLE answer (
     id serial NOT NULL,
     submission_time timestamp without time zone,
-    vote_number integer,
+    votes_up integer NOT NULL,
+    votes_down integer NOT NULL,
     question_id integer,
     message text,
     image text,
@@ -163,8 +165,8 @@ ALTER TABLE ONLY comment_user
 ALTER TABLE ONLY comment_user
     ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES accounts(id);
 
-INSERT INTO question VALUES (0, '2017-04-28 08:29:00', 29, 7, 'How to make lists in Python?', 'I am totally new to this, any hints?', NULL);
-INSERT INTO question VALUES (1, '2017-04-29 09:19:00', 15, 9, 'Wordpress loading multiple jQuery Versions', 'I developed a plugin that uses the jquery booklet plugin (http://builtbywill.com/booklet/#/) this plugin binds a function to $ so I cann call $(".myBook").booklet();
+INSERT INTO question VALUES (0, '2017-04-28 08:29:00', 29, 7, 2, 'How to make lists in Python?', 'I am totally new to this, any hints?', NULL);
+INSERT INTO question VALUES (1, '2017-04-29 09:19:00', 15, 9, 1, 'Wordpress loading multiple jQuery Versions', 'I developed a plugin that uses the jquery booklet plugin (http://builtbywill.com/booklet/#/) this plugin binds a function to $ so I cann call $(".myBook").booklet();
 
 I could easy managing the loading order with wp_enqueue_script so first I load jquery then I load booklet so everything is fine.
 
@@ -173,12 +175,12 @@ BUT in my theme i also using jquery via webpack so the loading order is now foll
 jquery
 booklet
 app.js (bundled file with webpack, including jquery)', 'static\uploads\197ddde3d1d54ee4b5509e3b36fb88c6.png');
-INSERT INTO question VALUES (2, '2017-05-01 10:41:00', 1364, 57, 'Drawing canvas with an image picked with Cordova Camera Plugin', 'I''m getting an image from device and drawing a canvas with filters using Pixi JS. It works all well using computer to get an image. But when I''m on IOS, it throws errors such as cross origin issue, or that I''m trying to use an unknown format.
+INSERT INTO question VALUES (2, '2017-05-01 10:41:00', 1364, 57, 5, 'Drawing canvas with an image picked with Cordova Camera Plugin', 'I''m getting an image from device and drawing a canvas with filters using Pixi JS. It works all well using computer to get an image. But when I''m on IOS, it throws errors such as cross origin issue, or that I''m trying to use an unknown format.
 ', NULL);
 SELECT pg_catalog.setval('question_id_seq', 2, true);
 
-INSERT INTO answer VALUES (1, '2017-04-28 16:49:00', 4, 1, 'You need to use brackets: my_list = []', NULL, false, 0);
-INSERT INTO answer VALUES (2, '2017-04-25 14:42:00', 35, 1, 'Look it up in the Python docs', 'static\uploads\8b3c75974759436d9e90d2a73cf018fa.png', false, 0);
+INSERT INTO answer VALUES (1, '2017-04-28 16:49:00', 4, 1, 0, 'You need to use brackets: my_list = []', NULL, false, 0);
+INSERT INTO answer VALUES (2, '2017-04-25 14:42:00', 35, 5, 0, 'Look it up in the Python docs', 'static\uploads\8b3c75974759436d9e90d2a73cf018fa.png', true, 0);
 SELECT pg_catalog.setval('answer_id_seq', 2, true);
 
 INSERT INTO comment VALUES (1, 0, NULL, 'Please clarify the question as it is too vague!', '2017-05-01 05:49:00');
@@ -196,7 +198,7 @@ INSERT INTO question_tag VALUES (2, 3);
 
 INSERT INTO accounts VALUES (0, 'HeadAdmin', '$2b$12$4.mUGwYVt9yAFNysWPcdR.1IOrLkQzXSFClCADK9/P6mEbg5wFPk.', 'admin@admin.com', 'AskMate', 'Admin', '1666-06-09');
 INSERT INTO accounts VALUES (1, 'JohnnyP', '$2b$12$aOQ2SzqwfC3DCrWNRaa7xe6fIFPeMvPtf3m3ArHZMl2QUXhD3Mfxu', 'test@test.com', 'Iwan', 'Pavluczenko', '2005-04-02');
-SELECT pg_catalog.setval('accounts_id_seq', 2, true);
+SELECT pg_catalog.setval('accounts_id_seq', 1, true);
 
 INSERT INTO question_user VALUES (0, 0);
 INSERT INTO question_user VALUES (2, 1);

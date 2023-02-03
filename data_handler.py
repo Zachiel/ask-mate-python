@@ -27,7 +27,7 @@ def get_sorted_questions(cursor, sort_by='date',
                                 'title': 'title',
                                 'message': 'message',
                                 'views': 'view_number',
-                                'votes': 'vote_number',
+                                'votes': 'votes_up',
                                 'comments': 'comments',
                                 'descending': 'DESC',
                                 'ascending': 'ASC'}
@@ -132,18 +132,18 @@ def get_question_id_from_title(cursor, title) -> list[dict[str, str]]:
 def add_question_to_database(cursor, title, message, image_path) -> None:
     """Save user question into database."""
     query: str = """
-        INSERT INTO question (submission_time, view_number, vote_number, title, message, image) 
+        INSERT INTO question (submission_time, view_number, votes_up, votes_down, title, message, image) 
         VALUES (%s, %s, %s, %s, %s, %s)"""
-    cursor.execute(query, [time_now(), 0, 0, title, message, image_path])
+    cursor.execute(query, [time_now(), 0, 0, 0, title, message, image_path])
 
 
 @database_common.connection_handler
 def add_answer_to_database(cursor, question_id, message, image) -> None:
     """Save user answer into database."""
     query: str = """
-        INSERT INTO answer (submission_time, vote_number, question_id, message, image)
+        INSERT INTO answer (submission_time, votes_up, votes_down, question_id, message, image, accepted, edited_count)
         VALUES (%s, %s, %s, %s, %s)"""
-    cursor.execute(query, [time_now(), 0, question_id, message, image])
+    cursor.execute(query, [time_now(), 0, 0, question_id, message, image, False, 0])
 
 
 
@@ -191,7 +191,7 @@ def vote_question_up(cursor, question_id) -> None:
     """Add points to a question."""
     query: str = """
         UPDATE question
-        SET vote_number = vote_number + 1
+        SET votes_up = votes_up + 1
         WHERE id=%(id)s"""
     cursor.execute(query, {'id': question_id})
 
@@ -201,7 +201,7 @@ def vote_question_down(cursor, question_id) -> None:
     """Remove points from a question."""
     query: str = """
         UPDATE question
-        SET vote_number = vote_number - 1
+        SET votes_down = votes_down + 1
         WHERE id=%(id)s"""
     cursor.execute(query, {'id': question_id})
 
@@ -211,7 +211,7 @@ def vote_answer_up(cursor, answer_id) -> None:
     """Add points to a question."""
     query: str = """
         UPDATE answer
-        SET vote_number = vote_number + 1
+        SET votes_up = votes_up + 1
         WHERE id=%(id)s"""
     cursor.execute(query, {'id': answer_id})
 
@@ -221,7 +221,7 @@ def vote_answer_down(cursor, answer_id) -> None:
     """Remove points from a question."""
     query: str = """
         UPDATE answer
-        SET vote_number = vote_number - 1
+        SET votes_down = votes_down + 1
         WHERE id=%(id)s"""
     cursor.execute(query, {'id': answer_id})
 
@@ -505,6 +505,7 @@ def get_all_users(cursor):
     cursor.execute(query)
     return cursor.fetchall()
 
+
 @database_common.connection_handler
 def get_user_by_id(cursor, user_id):
     """Get specific user."""
@@ -518,3 +519,10 @@ def get_user_by_id(cursor, user_id):
     GROUP BY a.id"""
     cursor.execute(query, {'id': user_id})
     return cursor.fetchone()
+
+
+@database_common.connection_handler
+def get_user_reputation(user_id):
+    """Calculate reputation of a specific user."""
+    query: str = """
+    SELECT acc.id, q.votes_up"""
