@@ -8,7 +8,6 @@ import uuid
 import re
 from flask import Flask, render_template, request, redirect, Response
 import data_handler
-import hashing
 
 UPLOAD_FOLDER: str = 'static\\uploads'
 
@@ -197,7 +196,7 @@ def vote_answer_down(question_id, answer_id) -> Response:
 
 #TODO pop up after succesful registration
 @app.route("/registration",
-           methods=['POST'])
+            methods=['POST'])
 def registration_form():
     if request.method == 'POST':
         username = request.form.get('usernameValidation')
@@ -216,7 +215,7 @@ def registration_form():
         elif not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{8,}$', password):
             return 'Invalid password'
         else:
-            hashed_password = hashing.hash_password(password)
+            hashed_password = data_handler.hash_password(password)
             registrationDate = data_handler.time_now()
             data_handler.register_new_user(username, hashed_password, email, fname, lname, registrationDate)
             print('You have succesfully registered!')
@@ -318,6 +317,13 @@ def new_tag() -> Union[Response, str]:
         data_handler.add_tag_to_database(tag)
         return redirect("/")
     return render_template('pages/new_tag.html')
+
+
+@app.route("/users")
+def display_users():
+    """Display existing users route."""
+    users = data_handler.get_all_users()
+    return render_template('pages/users.html', users=users)
 
 
 if __name__ == "__main__":

@@ -494,3 +494,13 @@ def check_login_password(cursor, username, password):
     db_hashed_password = cursor.fetchone()
     return bcrypt.checkpw(password.encode('utf-8'),
                             db_hashed_password['password'].encode('utf-8'))
+
+
+@database_common.connection_handler
+def get_all_users(cursor):
+    """Get all registered users."""
+    query: str = """
+    SELECT id, username, registrationdate
+    FROM accounts"""
+    cursor.execute(query)
+    return cursor.fetchall()
