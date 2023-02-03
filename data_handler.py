@@ -294,11 +294,11 @@ def check_exisiting_email(cursor, email) -> None:
     
     
 @database_common.connection_handler
-def register_new_user(cursor, username, password, email, fname, lname):
+def register_new_user(cursor, username, password, email, fname, lname, registrationDate):
     query: str = """
-    INSERT INTO accounts (username, password, email, fname, lname)
-    VALUES (%s, %s, %s, %s, %s)"""
-    cursor.execute(query, (username, password, email, fname, lname, ))
+    INSERT INTO accounts (username, password, email, fname, lname, registrationDate)
+    VALUES (%s, %s, %s, %s, %s, %s)"""
+    cursor.execute(query, (username, password, email, fname, lname, registrationDate, ))
         
 
 def get_answer_count() -> dict[str, str]:

@@ -204,7 +204,8 @@ def registration_form():
             return 'Invalid password'
         else:
             hashed_password = hashing.hash_password(password)
-            data_handler.register_new_user(username, hashed_password, email, fname, lname)
+            registrationDate = data_handler.time_now()
+            data_handler.register_new_user(username, hashed_password, email, fname, lname, registrationDate)
             print('You have succesfully registered!')
             return redirect('/')
     return redirect('/')

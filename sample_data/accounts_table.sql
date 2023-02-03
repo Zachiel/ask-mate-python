@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     email varchar(100) NOT NULL,
     fname varchar(100),
     lname varchar(100),
+    registrationDate date,
     PRIMARY KEY (id)
 
 );
