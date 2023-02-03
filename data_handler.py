@@ -567,3 +567,12 @@ def get_user_reputation(cursor, user_id):
         GROUP BY acc.id"""
     cursor.execute(query, {'id': user_id})
     return cursor.fetchone()
+
+
+def get_all_user_stats():
+    """Get all user question/answer/comment statistics."""
+    users_ids = [user['id'] for user in get_all_users()]
+    users_data = []
+    for user_id in users_ids:
+        users_data.append(get_user_by_id(user_id))
+    return users_data
