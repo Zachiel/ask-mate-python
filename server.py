@@ -6,7 +6,7 @@ import sys
 from typing import Union, Any
 import uuid
 import re
-from flask import Flask, render_template, request, redirect, Response
+from flask import Flask, render_template, request, redirect, Response, session
 import data_handler
 
 UPLOAD_FOLDER: str = 'static\\uploads'
@@ -72,6 +72,9 @@ def display_question(question_id) -> str:
     answer_comments: list[dict[str, str]] = \
                                     data_handler.get_answer_comments(answer_ids)
     tag= data_handler.get_tag_for_question(question_id)
+    if 'username' in session:
+        user_id = data_handler.get_user_id_by_username(session['username'])
+        question_ids_of_current_user = data_handler.get_question_ids_of_user_id(user_id)
     return render_template('pages/display_question.html',
                             question=question[0],
                             answers=answers,
@@ -79,7 +82,8 @@ def display_question(question_id) -> str:
                             answer_comments=answer_comments,
                             count_answers=len(answers),
                             to_string=str,
-                            tag = None if tag is None else tag)
+                            tag = None if tag is None else tag,
+                            question_ids_of_current_user=question_ids_of_current_user)
 
 
 @app.route('/add_question', methods=['GET', 'POST'])
@@ -221,6 +225,14 @@ def registration_form():
             return render_template('pages/success.html')
     return redirect('/')
 
+
+@app.route('/question/<question_id>/accept_answer/<int:answer_id>',
+           methods=['POST'])
+def accept_answer(question_id, answer_id):
+    data_handler.accept_answer_by_id(answer_id)
+    return redirect('/question/'+ question_id)
+
+    
 
 @app.route("/all_tags")
 def search_through_tags():

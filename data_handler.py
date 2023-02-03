@@ -518,3 +518,30 @@ def get_user_by_id(cursor, user_id):
     GROUP BY a.id"""
     cursor.execute(query, {'id': user_id})
     return cursor.fetchone()
+
+
+@database_common.connection_handler
+def accept_answer_by_id(cursor, id):
+    query: str = """
+    UPDATE answer
+    SET accepted = True
+    WHERE id = %(id)s"""
+    cursor.execute(query, {'id': id})
+    
+
+@database_common.connection_handler
+def get_user_id_by_username(cursor, username):
+    query: str = """
+    SELECT id FROM accounts
+    WHERE username = %(username)s"""
+    cursor.execute(query, {'username': username})
+    return cursor.fetchone()
+
+
+@database_common.connection_handler
+def get_question_ids_of_user_id(cursor, user_id):
+    query: str = """
+    SELECT question_id FROM question_user
+    WHERE user_id = %(user_id)s"""
+    cursor.execute(query, {'user_id': user_id})
+    return cursor.fetchall()

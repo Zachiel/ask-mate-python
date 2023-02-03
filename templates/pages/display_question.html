@@ -249,6 +249,30 @@
                                                 </button>
                                             </form>
                                         </div>
+                                        <!-- #TODO write that only user who created the question can see this button -->
+                                        
+                                        {% if answer['accepted'] == true %}
+                                        <div class="col mx-0 px-0" style="opacity: 0.5;">
+                                            Accepted
+                                        </div>
+                                        {% else %}
+                                        {% if question['id'] in question_ids_of_current_user %}
+                                        <div class="col mx-0 px-0">
+                                            <form
+                                                action="accept_answer/{{answer['id']}}"
+                                                method="POST"
+                                            >
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-primary"
+                                                    href="#"
+                                                >
+                                                    Accept
+                                                </button>
+                                            </form>
+                                        </div>
+                                        {% endif %}
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <div class="container-fluid">
