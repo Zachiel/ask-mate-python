@@ -45,11 +45,13 @@
                     <li class="shadow nav-item mx-1">
                         <a href="/" class="nav-link active">Home</a>
                     </li>
+                    {% if logged_in %}
                     <li class="shadow nav-item mx-1">
                         <a href="/add_question" class="nav-link"
                             >Add question</a
                         >
                     </li>
+                    {% endif %} {% if not logged_in %}
                     <li class="shadow nav-item mx-1">
                         <a
                             class="nav-link"
@@ -59,6 +61,7 @@
                             >Sign-in</a
                         >
                     </li>
+                    {% endif %} {% if logged_in %}
                     <li class="shadow nav-item mx-1">
                         <a class="nav-link" href="/logout" role="button"
                             >Logout</a
@@ -70,10 +73,15 @@
                         >
                     </li>
                     <li class="shadow nav-item mx-1">
-                        <a class="nav-link" href="/user/0" role="button"
-                            ><i class="fa-solid fa-user"></i
-                        ></a>
+                        <a
+                            class="nav-link"
+                            href="/user/{{session_user['id']}}"
+                            role="button"
+                            ><i class="fa-solid fa-user me-2"></i
+                            ><span>{{session_user['username']}}</span></a
+                        >
                     </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
