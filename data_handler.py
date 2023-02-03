@@ -513,3 +513,4 @@ def get_user_by_id(cursor, user_id):
     FROM accounts
     WHERE id = %(id)s"""
     cursor.execute(query, {'id': user_id})
+    return cursor.fetchone()
