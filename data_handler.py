@@ -576,3 +576,27 @@ def get_all_user_stats():
     for user_id in users_ids:
         users_data.append(get_user_by_id(user_id))
     return users_data
+
+
+@database_common.connection_handler
+def check_credentials(cursor, login: str, password: str):
+    """Verify user login credentials."""
+    query: str = """
+        SELECT password
+        FROM accounts
+        WHERE username = %(login)s"""
+    cursor.execute(query, {'login': login})
+    user = cursor.fetchone()
+    print(user, file=sys.stderr)
+    return bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8'))
+
+
+@database_common.connection_handler
+def get_id_by_username(cursor, username):
+    """Get user id through their username."""
+    query: str = """
+        SELECT id, username
+        FROM accounts
+        WHERE username = %(username)s"""
+    cursor.execute(query, {'username': username})
+    return cursor.fetchone()
