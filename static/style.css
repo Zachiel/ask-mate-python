@@ -152,6 +152,7 @@ footer {
     border: 2px dashed var(--text-caption);
     padding: 1rem;
     position: relative;
+    max-width: 300px;
 }
 
 .image-area::before {
