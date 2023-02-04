@@ -561,7 +561,7 @@ def decline_answers_by_question_id(cursor, question_id):
     UPDATE answer
     SET accepted = False
     WHERE question_id = %(question_id)s"""
-    cursor.execute(query, {'id': question_id})
+    cursor.execute(query, {'question_id': question_id})
     
 
 @database_common.connection_handler
