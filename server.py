@@ -261,6 +261,7 @@ def registration_form():
 @app.route('/question/<question_id>/accept_answer/<int:answer_id>',
            methods=['POST'])
 def accept_answer(question_id, answer_id):
+    data_handler.decline_answers_by_question_id(question_id)
     data_handler.accept_answer_by_id(answer_id)
     return redirect('/question/'+ question_id)
 
