@@ -560,7 +560,8 @@ def decline_answers_by_question_id(cursor, question_id):
     query: str = """
     UPDATE answer
     SET accepted = False
-    WHERE question_id = %(question_id)s"""
+    WHERE question_id = %(question_id)s
+    AND accepted = True"""
     cursor.execute(query, {'question_id': question_id})
     
 
