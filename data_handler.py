@@ -246,12 +246,16 @@ def delete_question(cursor, question_id) -> None:
     query_question: str = """
         DELETE FROM question
         WHERE id = %(id)s"""
+    query_question_user: str = """
+        DELETE FROM question_user
+        WHERE question_id = %(id)s"""
     for aid in answer_ids:
         cursor.execute(query_answer_comment, {'id': aid})
     cursor.execute(query_comment, {'id': question_id})
     cursor.execute(query_answer, {'id': question_id})
     cursor.execute(query_tag, {'id': question_id})
     cursor.execute(query_question, {'id': question_id})
+    cursor.execute(query_question_user, {'id': question_id})
 
 
 @database_common.connection_handler
