@@ -27,10 +27,14 @@ content %} {# Grid container #}
                             >
                         </td>
                         <td>{{ user['registrationdate'] }}</td>
-                        <td>5</td>
-                        <td>5</td>
-                        <td>5</td>
-                        <td>5</td>
+                        <td>{{ user['questions'] }}</td>
+                        <td>{{ user['answers'] }}</td>
+                        <td>{{ user['comments'] }}</td>
+                        <td>
+                            {{ reps[user['id']]['q_rep'] +
+                            reps[user['id']]['a_rep'] +
+                            reps[user['id']]['a_acc_rep'] }}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

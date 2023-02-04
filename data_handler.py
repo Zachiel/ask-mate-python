@@ -27,7 +27,7 @@ def get_sorted_questions(cursor, sort_by='date',
                                 'title': 'title',
                                 'message': 'message',
                                 'views': 'view_number',
-                                'votes': 'vote_number',
+                                'votes': 'votes_up',
                                 'comments': 'comments',
                                 'descending': 'DESC',
                                 'ascending': 'ASC'}
@@ -132,18 +132,18 @@ def get_question_id_from_title(cursor, title) -> list[dict[str, str]]:
 def add_question_to_database(cursor, title, message, image_path) -> None:
     """Save user question into database."""
     query: str = """
-        INSERT INTO question (submission_time, view_number, vote_number, title, message, image) 
+        INSERT INTO question (submission_time, view_number, votes_up, votes_down, title, message, image) 
         VALUES (%s, %s, %s, %s, %s, %s)"""
-    cursor.execute(query, [time_now(), 0, 0, title, message, image_path])
+    cursor.execute(query, [time_now(), 0, 0, 0, title, message, image_path])
 
 
 @database_common.connection_handler
 def add_answer_to_database(cursor, question_id, message, image) -> None:
     """Save user answer into database."""
     query: str = """
-        INSERT INTO answer (submission_time, vote_number, question_id, message, accepted, image, edited_count)
-        VALUES (%s, %s, %s, %s, False , %s, 0)"""
-    cursor.execute(query, [time_now(), 0, question_id, message, image])
+        INSERT INTO answer (submission_time, votes_up, votes_down, question_id, message, image, accepted, edited_count)
+        VALUES (%s, %s, %s, %s, %s)"""
+    cursor.execute(query, [time_now(), 0, 0, question_id, message, image, False, 0])
 
 
 
@@ -191,7 +191,7 @@ def vote_question_up(cursor, question_id) -> None:
     """Add points to a question."""
     query: str = """
         UPDATE question
-        SET vote_number = vote_number + 1
+        SET votes_up = votes_up + 1
         WHERE id=%(id)s"""
     cursor.execute(query, {'id': question_id})
 
@@ -201,7 +201,7 @@ def vote_question_down(cursor, question_id) -> None:
     """Remove points from a question."""
     query: str = """
         UPDATE question
-        SET vote_number = vote_number - 1
+        SET votes_down = votes_down + 1
         WHERE id=%(id)s"""
     cursor.execute(query, {'id': question_id})
 
@@ -211,7 +211,7 @@ def vote_answer_up(cursor, answer_id) -> None:
     """Add points to a question."""
     query: str = """
         UPDATE answer
-        SET vote_number = vote_number + 1
+        SET votes_up = votes_up + 1
         WHERE id=%(id)s"""
     cursor.execute(query, {'id': answer_id})
 
@@ -221,7 +221,7 @@ def vote_answer_down(cursor, answer_id) -> None:
     """Remove points from a question."""
     query: str = """
         UPDATE answer
-        SET vote_number = vote_number - 1
+        SET votes_down = votes_down + 1
         WHERE id=%(id)s"""
     cursor.execute(query, {'id': answer_id})
 
@@ -487,9 +487,9 @@ def hash_password(password):
 
 @database_common.connection_handler
 def check_login_password(cursor, username, password):
-    query = """
-    SELECT password FROM accounts
-    WHERE username = %s"""
+    query: str = """
+        SELECT password FROM accounts
+        WHERE username = %s"""
     cursor.execute(query, (username, ))
     db_hashed_password = cursor.fetchone()
     return bcrypt.checkpw(password.encode('utf-8'),
@@ -500,22 +500,35 @@ def check_login_password(cursor, username, password):
 def get_all_users(cursor):
     """Get all registered users."""
     query: str = """
-    SELECT id, username, registrationdate
-    FROM accounts"""
+        SELECT id, username, registrationdate
+        FROM accounts"""
     cursor.execute(query)
     return cursor.fetchall()
+
 
 @database_common.connection_handler
 def get_user_by_id(cursor, user_id):
     """Get specific user."""
     query: str = """
-    SELECT a.id, a.username, a.email, a.fname, a.lname, a.registrationdate, COUNT(qu.user_id = %(id)s) AS questions, COUNT(au.user_id = %(id)s) AS answers, COUNT(cu.user_id = %(id)s) AS comments
-    FROM accounts AS a
-    LEFT JOIN question_user AS qu ON a.id = qu.user_id
-    LEFT JOIN answer_user AS au ON a.id = au.user_id
-    LEFT JOIN comment_user AS cu ON a.id = cu.user_id
-    WHERE id = %(id)s
-    GROUP BY a.id"""
+        SELECT a.id, a.username, a.email, a.fname, a.lname, a.registrationdate,
+            (SELECT
+                COUNT(qu.user_id)
+                FROM question_user AS qu
+                WHERE qu.user_id = %(id)s) AS questions,
+            (SELECT
+                COUNT(au.user_id)
+                FROM answer_user AS au
+                WHERE au.user_id = %(id)s) AS answers,
+            (SELECT
+                COUNT(cu.user_id)
+                FROM comment_user AS cu
+                WHERE cu.user_id = %(id)s) AS comments
+        FROM accounts AS a
+        LEFT JOIN question_user AS qu ON a.id = qu.user_id
+        LEFT JOIN answer_user AS au ON a.id = au.user_id
+        LEFT JOIN comment_user AS cu ON a.id = cu.user_id
+        WHERE id = %(id)s
+        GROUP BY a.id"""
     cursor.execute(query, {'id': user_id})
     return cursor.fetchone()
 
@@ -554,3 +567,71 @@ def check_if_question_of_user(question_id, question_ids_of_current_user):
             question_of_user = True
             break
     return question_of_user
+
+@database_common.connection_handler
+def get_user_reputation(cursor, user_id):
+    """Calculate reputation of a specific user."""
+    query: str = """
+        SELECT 
+            SUM((SELECT SUM(q.votes_up) 
+                    FROM question_user AS qu
+                    LEFT JOIN question AS q ON q.id = qu.question_id
+                    WHERE qu.user_id = %(id)s) * 5
+                + -(SELECT SUM(q.votes_down) 
+                    FROM question_user AS qu
+                    LEFT JOIN question AS q ON q.id = qu.question_id
+                    WHERE qu.user_id = %(id)s) * 2) AS q_rep,
+            SUM((SELECT SUM(a.votes_up) 
+                    FROM answer_user AS au
+                    LEFT JOIN answer AS a ON a.id = au.answer_id
+                    WHERE au.user_id = %(id)s) * 10
+                + -(SELECT SUM(a.votes_down) 
+                    FROM answer_user AS au
+                    LEFT JOIN answer AS a ON a.id = au.answer_id
+                    WHERE au.user_id = %(id)s) * 2) AS a_rep,
+            (SELECT SUM(CASE
+                            WHEN a.accepted = TRUE
+                            THEN 15
+                            ELSE 0
+                        END)
+                    FROM answer_user AS au
+                    LEFT JOIN answer AS a ON a.id = au.answer_id
+                    WHERE au.user_id = %(id)s ) AS a_acc_rep
+        FROM accounts AS acc
+        WHERE acc.id = %(id)s
+        GROUP BY acc.id"""
+    cursor.execute(query, {'id': user_id})
+    return cursor.fetchone()
+
+
+def get_all_user_stats():
+    """Get all user question/answer/comment statistics."""
+    users_ids = [user['id'] for user in get_all_users()]
+    users_data = []
+    for user_id in users_ids:
+        users_data.append(get_user_by_id(user_id))
+    return users_data
+
+
+@database_common.connection_handler
+def check_credentials(cursor, login: str, password: str):
+    """Verify user login credentials."""
+    query: str = """
+        SELECT password
+        FROM accounts
+        WHERE username = %(login)s"""
+    cursor.execute(query, {'login': login})
+    user = cursor.fetchone()
+    print(user, file=sys.stderr)
+    return bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8'))
+
+
+@database_common.connection_handler
+def get_id_by_username(cursor, username):
+    """Get user id through their username."""
+    query: str = """
+        SELECT id, username
+        FROM accounts
+        WHERE username = %(username)s"""
+    cursor.execute(query, {'username': username})
+    return cursor.fetchone()

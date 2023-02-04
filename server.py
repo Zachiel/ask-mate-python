@@ -6,7 +6,8 @@ import sys
 from typing import Union, Any
 import uuid
 import re
-from flask import Flask, render_template, request, redirect, Response, session
+from flask import Flask, render_template, request, redirect, Response
+from flask import session, abort
 import data_handler
 
 UPLOAD_FOLDER: str = 'static\\uploads'
@@ -14,6 +15,7 @@ UPLOAD_FOLDER: str = 'static\\uploads'
 app: Flask = Flask(__name__, static_url_path='/static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1000 * 1000
+app.secret_key = b'$2b$12$LejxQfNZY8SxvKE8raOr3.tGE2CDymFMqybBCNKPD1R.lFf9Romqa'
 
 
 def save_image(file) -> Union[str, None]:
@@ -32,18 +34,24 @@ def save_image(file) -> Union[str, None]:
 @app.route("/")
 def hello() -> str:
     """Main page route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     questions: list[dict[str, str]] = data_handler.get_latest_questions()
     comment_count: dict[str, str] = data_handler.get_answer_count()
     return render_template('pages/index.html',
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
                             comment_count=comment_count,
-                            to_string=str)
+                            to_string=str,
+                            session_user=session_user,
+                            logged_in=logged_in)
 
 
 @app.route("/list")
 def list_questions() -> str:
     """Main page route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     questions: list[dict[str, str]] = data_handler.get_sorted_questions()
     comment_count: dict[str, str] = data_handler.get_answer_count()
     sort_by: Union[str, None] = request.args.get('order_by')
@@ -55,12 +63,16 @@ def list_questions() -> str:
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
                             comment_count=comment_count,
-                            to_string=str)
+                            to_string=str,
+                            session_user=session_user,
+                            logged_in=logged_in)
 
 
 @app.route("/question/<question_id>/")
 def display_question(question_id) -> str:
     """Specific question page route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     data_handler.increase_question_view_count(question_id)
     question: list[dict[str, str]] = data_handler.get_question_by_id(
                                                                     question_id)
@@ -87,12 +99,16 @@ def display_question(question_id) -> str:
                             count_answers=len(answers),
                             to_string=str,
                             tag = None if tag is None else tag,
-                            question_of_user=question_of_user)
+                            question_of_user=question_of_user,
+                            session_user=session_user,
+                            logged_in=logged_in)
 
 
 @app.route('/add_question', methods=['GET', 'POST'])
 def new_question() -> Union[Response, str]:
     """Adding new question route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     tags = data_handler.get_tags()
     if request.method == "POST":
         title: Union[str, None] = request.form.get("title")
@@ -105,12 +121,16 @@ def new_question() -> Union[Response, str]:
         adding_question = data_handler.get_question_id_from_title(title)
         data_handler.add_tag(adding_question, tag)
         return redirect('/list')
-    return render_template('pages/question.html', tags=tags)
+    return render_template('pages/question.html', tags=tags,
+    session_user=session_user,
+    logged_in=logged_in)
 
 
 @app.route("/question/<question_id>/edit", methods=['POST','GET'])
 def edit_question(question_id) -> Union[Response, str]:
     """Editing specific question route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     question: list[dict[str, str]] = data_handler.get_question_by_id(
                                                             question_id)
     current_tag = data_handler.get_tag_for_question(question_id)
@@ -127,7 +147,9 @@ def edit_question(question_id) -> Union[Response, str]:
                         question=question[0],
                         to_string=str,
 						current_tag=current_tag,
-						tags=tags)
+						tags=tags,
+                        session_user=session_user,
+                        logged_in=logged_in)
 
 
 @app.route("/question/<question_id>/delete",
@@ -156,19 +178,25 @@ def vote_question_down(question_id) -> Response:
             methods=['GET', 'POST'])
 def new_answer(question_id) -> Union[Response, str]:
     """Adding new answer route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
         data_handler.add_answer_to_database(question_id, message, file_path)
         return redirect("/question/"+question_id)
-    return render_template('pages/answer.html')
+    return render_template('pages/answer.html',
+    session_user=session_user,
+    logged_in=logged_in)
 
 
 @app.route("/question/<question_id>/answer/<answer_id>/edit_answer",
             methods=['GET', 'POST'])
 def edit_answer(question_id, answer_id) -> Union[Response, str]:
     """Edit existing answer route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     answer: list[dict[str, str]] = data_handler.get_answer_by_id(answer_id)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
@@ -176,7 +204,9 @@ def edit_answer(question_id, answer_id) -> Union[Response, str]:
         file_path: Union[str, None] = save_image(file)
         data_handler.edit_answer(question_id, message, file_path)
         return redirect("/question/"+question_id)
-    return render_template('pages/answer.html', answer=answer[0])
+    return render_template('pages/answer.html', answer=answer[0],
+    session_user=session_user,
+    logged_in=logged_in)
 
 
 @app.route("/question/<question_id>/answer/<answer_id>/delete_answer",
@@ -241,57 +271,77 @@ def accept_answer(question_id, answer_id):
 @app.route("/all_tags")
 def search_through_tags():
     """showing all tags to search through them"""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     tags = data_handler.get_tags()
     tags_names = []
     for info in tags:
         tags_names.append(info['name'])
-    return render_template("/pages/tags_page.html/", tags_names=tags_names)
+    return render_template("/pages/tags_page.html/", tags_names=tags_names,
+    session_user=session_user,
+    logged_in=logged_in)
 
 
 @app.route("/question/<question_id>/new-comment",
             methods=["GET", "POST"])
 def new_question_comment(question_id) -> None:
     """Add comment to a question route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         data_handler.add_comment_to_question(question_id, message)
         return redirect("/question/"+question_id)
-    return render_template('pages/comment.html')
+    return render_template('pages/comment.html',
+    session_user=session_user,
+    logged_in=logged_in)
 
 
 @app.route("/question/<question_id>/answer/<answer_id>/new-comment",
             methods=["GET", "POST"])
 def new_answer_comment(question_id, answer_id) -> None:
     """Add comment to an answer route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         data_handler.add_comment_to_answer(answer_id, message)
         return redirect("/question/"+question_id)
-    return render_template('pages/comment.html')
+    return render_template('pages/comment.html',
+    session_user=session_user,
+    logged_in=logged_in)
 
 
 @app.route("/question/<question_id>/comment/<comment_id>/edit-comment",
             methods=["GET", "POST"])
 def edit_question_comment(question_id, comment_id) -> None:
     """Edit comment to a question route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     comment: list[dict[str, str]] = data_handler.get_comment_by_id(comment_id)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         data_handler.edit_comment(comment_id, message)
         return redirect("/question/"+question_id)
-    return render_template('pages/comment.html', comment=comment[0])
+    return render_template('pages/comment.html', comment=comment[0],
+    session_user=session_user,
+    logged_in=logged_in)
 
 
 @app.route("/question/<question_id>/answer/<answer_id>/comment/<comment_id>/edit-comment",
             methods=["GET", "POST"])
 def edit_answer_comment(question_id, answer_id, comment_id) -> None:
     """Edit comment to an answer route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     comment: list[dict[str, str]] = data_handler.get_comment_by_id(comment_id)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
         data_handler.edit_comment(comment_id, message)
         return redirect("/question/"+question_id)
-    return render_template('pages/comment.html', comment=comment[0])
+    return render_template('pages/comment.html', comment=comment[0],
+    session_user=session_user,
+    logged_in=logged_in)
 
 
 @app.route("/question/<question_id>/comment/<comment_id>/delete-comment",
@@ -314,6 +364,8 @@ def search() -> Response:
 @app.route("/tag_page/<tag>")
 def tag_page(tag):
     """show list of questions with specific tag"""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     questions: list[dict[str, str]] = data_handler.get_tagged_questions(tag)
     comment_count: dict[str, str] = data_handler.get_answer_count()
     return render_template("/pages/tag_page.html/",
@@ -321,33 +373,76 @@ def tag_page(tag):
                             questions=questions,
                             time_passed=data_handler.how_much_time_passed,
                             comment_count=comment_count,
-                            to_string=str)
+                            to_string=str,
+                            session_user=session_user,
+                            logged_in=logged_in)
 
 
 @app.route("/new_tag", methods=['GET', 'POST'])
 def new_tag() -> Union[Response, str]:
     """Adding new tag route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     if request.method == "POST":
         tag: Union[str, None] = request.form.get("tag")
         data_handler.add_tag_to_database(tag)
         return redirect("/")
-    return render_template('pages/new_tag.html')
+    return render_template('pages/new_tag.html',
+    session_user=session_user,
+    logged_in=logged_in)
 
 
 @app.route("/users")
 def display_users():
     """Display existing users route."""
-    users = data_handler.get_all_users()
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
+    users = data_handler.get_all_user_stats()
+    reputations = []
+    for user in users:
+        reputations.append(data_handler.get_user_reputation(user['id']))
     return render_template('pages/users.html',
-                            users=users)
+                            users=users,
+                            reps=reputations,
+                            session_user=session_user,
+                            logged_in=logged_in)
 
 
 @app.route("/user/<user_id>")
 def profile_page(user_id):
     """Display user profile route."""
+    session_user = data_handler.get_id_by_username(session.get('user', default=''))
+    logged_in = session.get('logged_in', default=False)
     user = data_handler.get_user_by_id(user_id)
+    reputation = data_handler.get_user_reputation(user_id)
     return render_template("pages/user_profile.html",
-                            user=user)
+                            user=user,
+                            rep=reputation,
+                            session_user=session_user,
+                            logged_in=logged_in)
+
+
+@app.route('/login',
+            methods=['POST', 'GET'])
+def page_login():
+    correct_user = False
+    if request.method == 'POST':
+        login = request.form.get("username")
+        password = request.form.get("password")
+        correct_user = data_handler.check_credentials(login, password)
+        if correct_user:
+            session.clear()
+            session['logged_in'] = True
+            session['user'] = login if login else ''
+            return redirect('/')
+        return abort(401)
+    return abort(403)
+
+
+@app.route('/logout')
+def user_logout():
+    session.clear()
+    return redirect('/')
 
 
 if __name__ == "__main__":
