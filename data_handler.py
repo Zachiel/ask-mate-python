@@ -545,6 +545,15 @@ def accept_answer_by_id(cursor, id):
     WHERE id = %(id)s"""
     cursor.execute(query, {'id': id})
     
+    
+@database_common.connection_handler
+def decline_answer_by_id(cursor, id):
+    query: str = """
+    UPDATE answer
+    SET accepted = False
+    WHERE id = %(id)s"""
+    cursor.execute(query, {'id': id})
+    
 
 @database_common.connection_handler
 def get_user_id_by_username(cursor, username):

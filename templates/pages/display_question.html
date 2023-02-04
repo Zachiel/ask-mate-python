@@ -250,7 +250,27 @@
                                                 </button>
                                             </form>
                                         </div>
-                                        {% if answer['accepted'] %}
+                                        {% if answer['accepted'] and question_of_user %}
+                                        <div class="col mx-0 px-0" style="opacity: 0.5;">
+                                            Accepted
+                                        </div>
+
+                                        <div class="col xs-0 xs-0">
+                                            <form
+                                                action="decline_accepted_answer/{{answer['id']}}"
+                                                method="POST"
+                                            >
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-danger"
+                                                    href="#"
+                                                >
+                                                    x
+                                                </button>
+                                            </form>
+                                        </div>
+                                        
+                                        {% elif answer['accepted'] %}
                                         <div class="col mx-0 px-0" style="opacity: 0.5;">
                                             Accepted
                                         </div>

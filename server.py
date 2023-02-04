@@ -264,6 +264,12 @@ def accept_answer(question_id, answer_id):
     data_handler.accept_answer_by_id(answer_id)
     return redirect('/question/'+ question_id)
 
+
+@app.route('/question/<question_id>/decline_accepted_answer/<int:answer_id>',
+           methods=['POST'])
+def decline_accepted_answer(question_id, answer_id):
+    data_handler.decline_answer_by_id(answer_id)
+    return redirect('/question/'+ question_id)
     
 
 @app.route("/all_tags")
