@@ -84,6 +84,11 @@ def display_question(question_id) -> str:
     answer_comments: list[dict[str, str]] = \
                                     data_handler.get_answer_comments(answer_ids)
     tag= data_handler.get_tag_for_question(question_id)
+    question_ids_of_current_user = []
+    question_of_user = False
+    if logged_in:
+        question_ids_of_current_user = data_handler.get_question_ids_of_user_id(session_user['id'])
+        question_of_user = data_handler.check_if_question_of_user(question_id, question_ids_of_current_user)
     return render_template('pages/display_question.html',
                             question=question[0],
                             answers=answers,
@@ -92,6 +97,7 @@ def display_question(question_id) -> str:
                             count_answers=len(answers),
                             to_string=str,
                             tag = None if tag is None else tag,
+                            question_of_user=question_of_user,
                             session_user=session_user,
                             logged_in=logged_in)
 
@@ -251,6 +257,21 @@ def registration_form():
             return render_template('pages/success.html')
     return redirect('/')
 
+
+@app.route('/question/<question_id>/accept_answer/<int:answer_id>',
+           methods=['POST'])
+def accept_answer(question_id, answer_id):
+    data_handler.decline_answers_by_question_id(question_id)
+    data_handler.accept_answer_by_id(answer_id)
+    return redirect('/question/'+ question_id)
+
+
+@app.route('/question/<question_id>/decline_accepted_answer/<int:answer_id>',
+           methods=['POST'])
+def decline_accepted_answer(question_id, answer_id):
+    data_handler.decline_answer_by_id(answer_id)
+    return redirect('/question/'+ question_id)
+    
 
 @app.route("/all_tags")
 def search_through_tags():

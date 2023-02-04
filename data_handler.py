@@ -246,12 +246,16 @@ def delete_question(cursor, question_id) -> None:
     query_question: str = """
         DELETE FROM question
         WHERE id = %(id)s"""
+    query_question_user: str = """
+        DELETE FROM question_user
+        WHERE question_id = %(id)s"""
     for aid in answer_ids:
         cursor.execute(query_answer_comment, {'id': aid})
     cursor.execute(query_comment, {'id': question_id})
     cursor.execute(query_answer, {'id': question_id})
     cursor.execute(query_tag, {'id': question_id})
     cursor.execute(query_question, {'id': question_id})
+    cursor.execute(query_question_user, {'id': question_id})
 
 
 @database_common.connection_handler
@@ -532,6 +536,60 @@ def get_user_by_id(cursor, user_id):
     cursor.execute(query, {'id': user_id})
     return cursor.fetchone()
 
+
+@database_common.connection_handler
+def accept_answer_by_id(cursor, id):
+    query: str = """
+    UPDATE answer
+    SET accepted = True
+    WHERE id = %(id)s"""
+    cursor.execute(query, {'id': id})
+    
+    
+@database_common.connection_handler
+def decline_answer_by_id(cursor, id):
+    query: str = """
+    UPDATE answer
+    SET accepted = False
+    WHERE id = %(id)s"""
+    cursor.execute(query, {'id': id})
+    
+
+@database_common.connection_handler
+def decline_answers_by_question_id(cursor, question_id):
+    query: str = """
+    UPDATE answer
+    SET accepted = False
+    WHERE question_id = %(question_id)s
+    AND accepted = True"""
+    cursor.execute(query, {'question_id': question_id})
+    
+
+@database_common.connection_handler
+def get_user_id_by_username(cursor, username):
+    query: str = """
+    SELECT id FROM accounts
+    WHERE username = %(username)s"""
+    cursor.execute(query, {'username': username})
+    return cursor.fetchone()
+
+
+@database_common.connection_handler
+def get_question_ids_of_user_id(cursor, user_id):
+    query: str = """
+    SELECT question_id FROM question_user
+    WHERE user_id = %(user_id)s"""
+    cursor.execute(query, {'user_id': user_id})
+    return cursor.fetchall()
+
+
+def check_if_question_of_user(question_id, question_ids_of_current_user):
+    question_of_user: bool = False
+    for element in question_ids_of_current_user:
+        if question_id == str(element['question_id']):
+            question_of_user = True
+            break
+    return question_of_user
 
 @database_common.connection_handler
 def get_user_reputation(cursor, user_id):
