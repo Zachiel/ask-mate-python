@@ -200,7 +200,7 @@ def edit_answer(question_id, answer_id) -> Union[Response, str]:
         message: Union[str, None] = request.form.get("message")
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
-        data_handler.edit_answer(question_id, message, file_path)
+        data_handler.edit_answer(answer_id, message, file_path)
         return redirect("/question/"+question_id)
     return render_template('pages/answer.html', answer=answer[0],
     session_user=session_user,

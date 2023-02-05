@@ -201,13 +201,15 @@ def edit_comment(cursor, comment_id, message) -> None:
 
 
 @database_common.connection_handler
-def edit_answer(cursor, question_id, message) -> None:
+def edit_answer(cursor, answer_id, message, image_path) -> None:
     """Save user answer into database."""
     query: str = """
         UPDATE answer
-        SET message = %(message)s
+        SET message = %(message)s, image = %(image_path)s
         WHERE id = %(id)s"""
-    cursor.execute(query, {'message': message, 'id': question_id})
+    cursor.execute(query, {'message': message, 
+                           'id': answer_id,
+                           'image_path': image_path})
 
 
 @database_common.connection_handler
