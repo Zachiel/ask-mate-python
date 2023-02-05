@@ -353,7 +353,7 @@ def delete_comment(cursor, comment_id) -> None:
 @database_common.connection_handler
 def edit_question(cursor, question_id, title, message, image_path, tag) -> None:
     """Save edits to a question."""
-    tag_id = get_tag_id(tag)
+    tag_id = get_tag_id(tag) if tag else None 
     query: str = """
         UPDATE question
         SET title = %(title)s, message = %(message)s, image = %(image_path)s

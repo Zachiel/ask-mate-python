@@ -136,8 +136,11 @@ def edit_question(question_id) -> Union[Response, str]:
     if request.method == 'POST':
         title: Union[str, None] = request.form.get("title")
         message: Union[str, None] = request.form.get("message")
-        file: Any = request.files['file']
-        file_path: Union[str, None] = save_image(file)
+        if not question[0]['image'] or request.files['file']:
+            file: Any = request.files['file']
+            file_path: Union[str, None] = save_image(file)
+        else:
+            file_path = question[0]['image']
         tag = request.form.get("tag")
         data_handler.edit_question(question_id, title, message, file_path, tag)
         return redirect('/question/'+question_id)
@@ -198,8 +201,11 @@ def edit_answer(question_id, answer_id) -> Union[Response, str]:
     answer: list[dict[str, str]] = data_handler.get_answer_by_id(answer_id)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
-        file: Any = request.files['file']
-        file_path: Union[str, None] = save_image(file)
+        if not answer[0]['image'] or request.files['file']:
+            file: Any = request.files['file']
+            file_path: Union[str, None] = save_image(file)
+        else:
+            file_path = answer[0]['image']
         data_handler.edit_answer(answer_id, message, file_path)
         return redirect("/question/"+question_id)
     return render_template('pages/answer.html', answer=answer[0],
