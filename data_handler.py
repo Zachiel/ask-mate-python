@@ -254,32 +254,49 @@ def vote_answer_down(cursor, answer_id) -> None:
 def delete_question(cursor, question_id) -> None:
     """Delete question from database."""
     answers = get_answers_for_question(question_id)
-    answer_ids = [answer['id'] for answer in answers]
-    query_answer_comment: str = """
-        DELETE FROM comment
-        WHERE answer_id = %(id)s"""
-    query_comment: str = """
-        DELETE FROM comment
-        WHERE question_id = %(id)s"""
-    query_answer: str = """
-        DELETE FROM answer
-        WHERE question_id = %(id)s"""
-    query_tag: str = """
-        DELETE FROM question_tag
-        WHERE question_id = %(id)s"""
-    query_question: str = """
-        DELETE FROM question
-        WHERE id = %(id)s"""
-    query_question_user: str = """
-        DELETE FROM question_user
-        WHERE question_id = %(id)s"""
+    answer_ids = [answer['id'] for answer in answers] if answers else []
+    question_comments = get_comments_for_question(question_id)
+    question_comment_ids = [comment['id'] for comment in question_comments] if question_comments else []
+    answer_comments = []
     for aid in answer_ids:
-        cursor.execute(query_answer_comment, {'id': aid})
-    cursor.execute(query_comment, {'id': question_id})
-    cursor.execute(query_answer, {'id': question_id})
-    cursor.execute(query_tag, {'id': question_id})
-    cursor.execute(query_question, {'id': question_id})
-    cursor.execute(query_question_user, {'id': question_id})
+        answer_comments.extend(get_comments_for_answer(aid))
+    answer_comment_ids = [comment['id'] for comment in answer_comments]
+    delete_comment_user_constraints: str = """
+    DELETE FROM comment_user
+    WHERE comment_id = %(id)s"""
+    delete_answer_user_constraints: str = """
+    DELETE FROM answer_user
+    WHERE answer_id = %(id)s"""
+    delete_question_user_constraints: str = """
+    DELETE FROM question_user
+    WHERE question_id = %(id)s"""
+    delete_question_tag_constraints: str = """
+    DELETE FROM question_tag
+    WHERE question_id = %(id)s"""
+    delete_question_comment: str = """
+    DELETE FROM comment
+    WHERE question_id = %(id)s"""
+    delete_answer_comment: str = """
+    DELETE FROM comment
+    WHERE answer_id = %(id)s"""
+    delete_answer_query: str = """
+    DELETE FROM answer
+    WHERE question_id = %(id)s"""
+    delete_question_query: str = """
+    DELETE FROM question
+    WHERE id = %(id)s"""
+    for cid in answer_comment_ids:
+        cursor.execute(delete_comment_user_constraints, {'id': cid})
+    for aid in answer_ids:
+        cursor.execute(delete_answer_comment, {'id': aid})
+        cursor.execute(delete_answer_user_constraints, {'id': aid})
+    for cid in question_comment_ids:
+        cursor.execute(delete_comment_user_constraints, {'id': cid})
+    cursor.execute(delete_question_comment, {'id': question_id})
+    cursor.execute(delete_answer_query, {'id': question_id})
+    cursor.execute(delete_question_user_constraints, {'id': question_id})
+    cursor.execute(delete_question_tag_constraints, {'id': question_id})
+    cursor.execute(delete_question_query, {'id': question_id})
 
 
 @database_common.connection_handler
