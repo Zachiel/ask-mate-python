@@ -1,0 +1,114 @@
+<header>
+    {# Sticky top navbar #}
+    <nav
+        class="navbar navbar-expand-lg fixed-top d-flex justify-content-around align-items-center"
+    >
+        {# AskMate logo #}
+        <div class="flex-column">
+            <a class="navbar-brand" href="/">
+                <img
+                    id="logo"
+                    class="img-fluid"
+                    src="{{ url_for('static', filename='images/logo.png') }}"
+                    alt="AskMate"
+                />
+            </a>
+        </div>
+        {# Small screen hamburger icon #}
+        <button
+            class="shadow navbar-toggler hidden-lg-up"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapsibleNavId"
+            aria-controls="collapsibleNavId"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <img
+                src="{{ url_for('static', filename='icons/hamburger_icon.svg') }}"
+                alt="menu"
+            />
+        </button>
+        {# Search bar #}
+        <div class="flex-column">
+            <div id="search-bar">
+                <a href="#search">
+                    <input id="search-input" class="rounded-pill" value="" />
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </a>
+            </div>
+        </div>
+        {# Site navigation #}
+        <div class="flex-column">
+            <div class="collapse navbar-collapse" id="collapsibleNavId">
+                <ul class="nav nav-pills">
+                    <li class="shadow nav-item mx-1">
+                        <a href="/" class="nav-link active">Home</a>
+                    </li>
+                    {% if logged_in %}
+                    <li class="shadow nav-item mx-1">
+                        <a href="/add_question" class="nav-link"
+                            >Add question</a
+                        >
+                    </li>
+                    <li class="shadow nav-item mx-1">
+                        <a href="/all_tags" class="nav-link"
+                            >All tags</a
+                        >
+                    </li>
+                    {% endif %} {% if not logged_in %}
+                    <li class="shadow nav-item mx-1">
+                        <a
+                            class="nav-link"
+                            data-bs-toggle="modal"
+                            href="#signinModalToggle"
+                            role="button"
+                            >Sign-in</a
+                        >
+                    </li>
+                    <li class="shadow nav-item mx-1">
+                        <a href="/all_tags" class="nav-link"
+                            >All tags</a
+                        >
+                    </li>
+                    {% endif %} {% if logged_in %}
+                    <li class="shadow nav-item mx-1">
+                        <a class="nav-link" href="/logout" role="button"
+                            >Logout</a
+                        >
+                    </li>
+                    <li class="shadow nav-item mx-1">
+                        <a class="nav-link" href="/users" role="button"
+                            >Users</a
+                        >
+                    </li>
+                    <li class="shadow nav-item mx-1">
+                        <a
+                            class="nav-link"
+                            href="/user/{{session_user['id']}}"
+                            role="button"
+                            ><i class="fa-solid fa-user me-2"></i
+                            ><span>{{session_user['username']}}</span></a
+                        >
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% include 'signin.html' %}
+    <div id="search">
+        <form method="POST">
+            <input
+                id="search-fullscreen"
+                type="search"
+                name="search"
+                value=""
+                placeholder="Search for question..."
+                autocomplete="off"
+            />
+        </form>
+        <hr class="border border-light border-2" />
+        <div class="container-fluid w-100" id="search-result"></div>
+    </div>
+</header>
