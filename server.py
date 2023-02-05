@@ -113,7 +113,7 @@ def new_question() -> Union[Response, str]:
         message: Union[str, None] = request.form.get("message")
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
-        data_handler.add_question_to_database(title, message, file_path)
+        data_handler.add_question_to_database(data_handler.get_user_id_by_username(session_user), title, message, file_path)
 
         tag = request.form.get("tag")
         adding_question = data_handler.get_question_id_from_title(title)
@@ -182,7 +182,7 @@ def new_answer(question_id) -> Union[Response, str]:
         message: Union[str, None] = request.form.get("message")
         file: Any = request.files['file']
         file_path: Union[str, None] = save_image(file)
-        data_handler.add_answer_to_database(question_id, message, file_path)
+        data_handler.add_answer_to_database(data_handler.get_user_id_by_username(session_user), question_id, message, file_path)
         return redirect("/question/"+question_id)
     return render_template('pages/answer.html',
     session_user=session_user,
@@ -295,7 +295,7 @@ def new_question_comment(question_id) -> None:
     logged_in = session.get('logged_in', default=False)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
-        data_handler.add_comment_to_question(question_id, message)
+        data_handler.add_comment_to_question(data_handler.get_user_id_by_username(session_user), question_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html',
     session_user=session_user,
@@ -310,7 +310,7 @@ def new_answer_comment(question_id, answer_id) -> None:
     logged_in = session.get('logged_in', default=False)
     if request.method == "POST":
         message: Union[str, None] = request.form.get("message")
-        data_handler.add_comment_to_answer(answer_id, message)
+        data_handler.add_comment_to_answer(data_handler.get_user_id_by_username(session_user), answer_id, message)
         return redirect("/question/"+question_id)
     return render_template('pages/comment.html',
     session_user=session_user,

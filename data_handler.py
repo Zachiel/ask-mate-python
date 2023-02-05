@@ -129,40 +129,64 @@ def get_question_id_from_title(cursor, title) -> list[dict[str, str]]:
 
 
 @database_common.connection_handler
-def add_question_to_database(cursor, title, message, image_path) -> None:
+def add_question_to_database(cursor, user_id, title, message, image_path) -> None:
     """Save user question into database."""
     query: str = """
         INSERT INTO question (submission_time, view_number, votes_up, votes_down, title, message, image) 
-        VALUES (%s, %s, %s, %s, %s, %s)"""
+        VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+    query2: str = """
+        INSERT INTO question_user (question_id, user_id)
+        VALUES ((
+            SELECT MAX(id)
+            FROM question), %s)"""
     cursor.execute(query, [time_now(), 0, 0, 0, title, message, image_path])
+    cursor.execute(query2, [user_id['id']])
 
 
 @database_common.connection_handler
-def add_answer_to_database(cursor, question_id, message, image) -> None:
+def add_answer_to_database(cursor, user_id, question_id, message, image) -> None:
     """Save user answer into database."""
     query: str = """
         INSERT INTO answer (submission_time, votes_up, votes_down, question_id, message, image, accepted, edited_count)
-        VALUES (%s, %s, %s, %s, %s)"""
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""
+    query2: str = """
+        INSERT INTO answer_user (answer_id, user_id)
+        VALUES ((
+            SELECT MAX(id)
+            FROM answer), %s)"""
     cursor.execute(query, [time_now(), 0, 0, question_id, message, image, False, 0])
+    cursor.execute(query2, [user_id['id']])
 
 
 
 @database_common.connection_handler
-def add_comment_to_question(cursor, question_id, message) -> None:
+def add_comment_to_question(cursor, user_id, question_id, message) -> None:
     """Save user answer into database."""
     query: str = """
         INSERT INTO comment (submission_time, question_id, message, edited_count)
         VALUES (%s, %s, %s, %s)"""
+    query2: str = """
+        INSERT INTO comment_user (comment_id, user_id)
+        VALUES ((
+            SELECT MAX(id)
+            FROM comment), %s)"""
     cursor.execute(query, [time_now(), question_id, message, 0])
+    cursor.execute(query2, [user_id['id']])
 
 
 @database_common.connection_handler
-def add_comment_to_answer(cursor, answer_id, message) -> None:
+def add_comment_to_answer(cursor, user_id, answer_id, message) -> None:
     """Save user answer into database."""
     query: str = """
         INSERT INTO comment (submission_time, answer_id, message, edited_count)
         VALUES (%s, %s, %s, %s)"""
+    query2: str = """
+        INSERT INTO comment_user (comment_id, user_id)
+        VALUES ((
+            SELECT MAX(id)
+            FROM comment), %s)"""
     cursor.execute(query, [time_now(), answer_id, message, 0])
+    cursor.execute(query2, [user_id['id']])
 
 
 @database_common.connection_handler
@@ -570,7 +594,7 @@ def get_user_id_by_username(cursor, username):
     query: str = """
     SELECT id FROM accounts
     WHERE username = %(username)s"""
-    cursor.execute(query, {'username': username})
+    cursor.execute(query, {'username': username['username']})
     return cursor.fetchone()
 
 
