@@ -362,12 +362,28 @@ def edit_question(cursor, question_id, title, message, image_path, tag) -> None:
         UPDATE question_tag
         SET tag_id = %(tag_id)s
         WHERE question_id = %(question_id)s"""
+    query_tag_add: str = """
+        INSERT INTO question_tag (tag_id, question_id)
+        VALUES (%(tag_id)s, %(question_id)s)"""
+    if check_existing_question_tag(question_id):
+        cursor.execute(query_tag, {'question_id': question_id,
+                                'tag_id': tag_id})
+    elif tag_id != None:
+        cursor.execute(query_tag_add, {'question_id': question_id, 'tag_id': tag_id})
     cursor.execute(query, {'title' : title,
                             'message': message,
                             'id': question_id,
                             'image_path': image_path})
-    cursor.execute(query_tag, {'question_id': question_id,
-                                'tag_id': tag_id})
+    
+
+
+@database_common.connection_handler
+def check_existing_question_tag(cursor, id):
+    query: str = """
+        SELECT question_id FROM question_tag
+        WHERE question_id = %(id)s"""
+    cursor.execute(query, {'id': id})
+    return cursor.fetchone()
 
 
 @database_common.connection_handler
