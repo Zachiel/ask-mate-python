@@ -195,9 +195,13 @@ def edit_comment(cursor, comment_id, message) -> None:
     query: str = """
         UPDATE comment
         SET message = %(message)s
+        WHERE id = %(id)s"""
+    query_edited_count: str = """
+        UPDATE comment
         SET edited_count = edited_count + 1
         WHERE id = %(id)s"""
     cursor.execute(query, {'message': message, 'id': comment_id})
+    cursor.execute(query_edited_count, {'id': comment_id})
 
 
 @database_common.connection_handler
