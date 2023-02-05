@@ -319,9 +319,13 @@ def get_comment_ids_by_answer_id(cursor, answer_id):
 @database_common.connection_handler
 def delete_comment(cursor, comment_id) -> None:
     """Delete comment from database."""
+    query1: str = """
+        DELETE FROM comment_user
+        WHERE comment_id = %(id)s"""
     query: str = """
         DELETE FROM comment
         WHERE id = %(id)s"""
+    cursor.execute(query1, {'id': comment_id})
     cursor.execute(query, {'id': comment_id})
 
 
