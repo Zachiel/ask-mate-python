@@ -424,7 +424,6 @@ def profile_page(user_id):
     logged_in = session.get('logged_in', default=False)
     user = data_handler.get_user_by_id(user_id)
     reputation = data_handler.get_user_reputation(user_id)
-    print(reputation, file=sys.stderr)
     for item in reputation:
         if reputation[item] is None:
             reputation[item] = 0

@@ -303,9 +303,7 @@ def delete_answer(cursor, answer_id) -> None:
     cursor.execute(query_comment, {'id': answer_id})
     cursor.execute(query_answer_user, {'id': answer_id})
     cursor.execute(query_answer, {'id': answer_id})
-    
-    
-    
+
 
 @database_common.connection_handler
 def get_comment_ids_by_answer_id(cursor, answer_id):
@@ -380,8 +378,8 @@ def check_exisiting_username(cursor, username):
         return True
     else:
         return False
-    
-    
+
+
 @database_common.connection_handler
 def check_exisiting_email(cursor, email):
     query: str = """
@@ -392,15 +390,16 @@ def check_exisiting_email(cursor, email):
         return True
     else:
         return False
-    
-    
+
+
 @database_common.connection_handler
 def register_new_user(cursor, username, password, email, fname, lname, registrationDate):
     query: str = """
     INSERT INTO accounts (username, password, email, fname, lname, registrationDate)
     VALUES (%s, %s, %s, %s, %s, %s)"""
     cursor.execute(query, (username, password, email, fname, lname, registrationDate, ))
-        
+
+
 @database_common.connection_handler
 def search_for_question(cursor, phrase) -> list[dict[str, str]]:
     """Show latest questions in home page"""
@@ -597,8 +596,8 @@ def accept_answer_by_id(cursor, id):
     SET accepted = True
     WHERE id = %(id)s"""
     cursor.execute(query, {'id': id})
-    
-    
+
+
 @database_common.connection_handler
 def decline_answer_by_id(cursor, id):
     query: str = """
@@ -606,7 +605,7 @@ def decline_answer_by_id(cursor, id):
     SET accepted = False
     WHERE id = %(id)s"""
     cursor.execute(query, {'id': id})
-    
+
 
 @database_common.connection_handler
 def decline_answers_by_question_id(cursor, question_id):
@@ -698,7 +697,6 @@ def check_credentials(cursor, login: str, password: str):
         WHERE username = %(login)s"""
     cursor.execute(query, {'login': login})
     user = cursor.fetchone()
-    print(user, file=sys.stderr)
     return bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8'))
 
 
