@@ -700,7 +700,8 @@ def check_credentials(cursor, login: str, password: str):
         WHERE username = %(login)s"""
     cursor.execute(query, {'login': login})
     user = cursor.fetchone()
-    print(user, file=sys.stderr)
+    if user == None:
+        return False
     return bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8'))
 
 
