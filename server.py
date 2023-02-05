@@ -405,7 +405,11 @@ def display_users():
     users = data_handler.get_all_user_stats()
     reputations = []
     for user in users:
-        reputations.append(data_handler.get_user_reputation(user['id']))
+        user_stats = data_handler.get_user_reputation(user['id'])
+        for item in user_stats:
+            if user_stats[item] is None:
+                user_stats[item] = 0
+        reputations.append(user_stats)
     return render_template('pages/users.html',
                             users=users,
                             reps=reputations,
