@@ -5,87 +5,91 @@
         <h3 class="mb-5">These are questions with {{tag}} tag:</h3>
     </div>
                 <div class="accordion" id="question-accordion">
-                    {% for item in questions %}
-                    <div class="accordion-item">
-                        <h2
-                            class="accordion-header"
-                            id="panelsStayOpen-heading{{ item['id'] }}"
-                        >
-                            <div
-                                class="row justify-content-center align-items-center voting"
-                            >
-                                <div class="col ms-3">
-                                    <form action="question/{{item['id']}}/vote-up" method="POST">
-                                        <button type="submit" class="btn btn-upvote" href="#">
-                                            <i class="fas fa-arrow-up"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                                <div class="col">{{ item['vote_number'] }}</div>
-                                <div class="col">
-                                    <form action="question/{{item['id']}}/vote-down" method="POST">
-                                        <button type="submit" class="btn btn-downvote" href="#">
-                                            <i class="fas fa-arrow-down"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                            <button
-                                class="accordion-button"
-                                type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#panelsStayOpen-collapse{{ item['id'] }}"
-                                aria-expanded="true"
-                                aria-controls="panelsStayOpen-collapse{{ item['id'] }}"
+                    {%if questions == []%}
+                        <p>There are no questions with {{tag}} tag.</p>
+                    {%else%}
+                        {% for item in questions %}
+                        <div class="accordion-item">
+                            <h2
+                                class="accordion-header"
+                                id="panelsStayOpen-heading{{ item['id'] }}"
                             >
                                 <div
-                                    class="row-fluid justify-content-between align-items-center g-2"
+                                    class="row justify-content-center align-items-center voting"
                                 >
+                                    <div class="col ms-3">
+                                        <form action="question/{{item['id']}}/vote-up" method="POST">
+                                            <button type="submit" class="btn btn-upvote" href="#">
+                                                <i class="fas fa-arrow-up"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="col">{{ item['vote_number'] }}</div>
                                     <div class="col">
-                                        <span>{{ item['title'] }}</span>
-                                    </div>
-                                    <div class="col-3">
-                                        <span class="detail text-nowrap"
-                                            >{{ time_passed(item['submission_time'])
-                                            }}</span
-                                        ><span class="detail text-nowrap px-2"
-                                            ><i class="far fa-eye"></i> {{
-                                            item['view_number'] }}</span
-                                        ><span class="detail text-nowrap"
-                                            ><i
-                                                class="fa-regular fa-comment-dots"
-                                            ></i>
-                                            {{ comment_count[to_string(item['id'])] }}</span
-                                        >
+                                        <form action="question/{{item['id']}}/vote-down" method="POST">
+                                            <button type="submit" class="btn btn-downvote" href="#">
+                                                <i class="fas fa-arrow-down"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
-                            </button>
-                        </h2>
-                        <div>
-                            <div
-                                id="panelsStayOpen-collapse{{ item['id'] }}"
-                                class="accordion-collapse collapse"
-                                aria-labelledby="panelsStayOpen-heading{{ item['id'] }}"
-                            >
-                                <div class="row accordion-body">
-                                    <div class="col-9">
-                                        {{ item['message'].replace('\n', '<br />')|safe }}
+                                <button
+                                    class="accordion-button"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#panelsStayOpen-collapse{{ item['id'] }}"
+                                    aria-expanded="true"
+                                    aria-controls="panelsStayOpen-collapse{{ item['id'] }}"
+                                >
+                                    <div
+                                        class="row-fluid justify-content-between align-items-center g-2"
+                                    >
+                                        <div class="col">
+                                            <span>{{ item['title'] }}</span>
+                                        </div>
+                                        <div class="col-3">
+                                            <span class="detail text-nowrap"
+                                                >{{ time_passed(item['submission_time'])
+                                                }}</span
+                                            ><span class="detail text-nowrap px-2"
+                                                ><i class="far fa-eye"></i> {{
+                                                item['view_number'] }}</span
+                                            ><span class="detail text-nowrap"
+                                                ><i
+                                                    class="fa-regular fa-comment-dots"
+                                                ></i>
+                                                {{ comment_count[to_string(item['id'])] }}</span
+                                            >
+                                        </div>
                                     </div>
-                                    <div class="col-3 text-end">
-                                        <img src="{{ item['image'] }}" class="img-fluid rounded" alt="">
+                                </button>
+                            </h2>
+                            <div>
+                                <div
+                                    id="panelsStayOpen-collapse{{ item['id'] }}"
+                                    class="accordion-collapse collapse"
+                                    aria-labelledby="panelsStayOpen-heading{{ item['id'] }}"
+                                >
+                                    <div class="row accordion-body">
+                                        <div class="col-9">
+                                            {{ item['message'].replace('\n', '<br />')|safe }}
+                                        </div>
+                                        <div class="col-3 text-end">
+                                            <img src="{{ item['image'] }}" class="img-fluid rounded" alt="">
+                                        </div>
                                     </div>
-                                </div>
-                                <div>
-                                    <a href="/question/{{ item['id'] }}">
-                                        <button class="btn btn-info ms-3 mb-2">
-                                            Open question
-                                        </button>
-                                    </a>
+                                    <div>
+                                        <a href="/question/{{ item['id'] }}">
+                                            <button class="btn btn-info ms-3 mb-2">
+                                                Open question
+                                            </button>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    {% endfor %}
+                        {% endfor %}
+                    {%endif%}
                 </div>
             </div>
         </div>
