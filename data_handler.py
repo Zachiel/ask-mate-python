@@ -195,19 +195,25 @@ def edit_comment(cursor, comment_id, message) -> None:
     query: str = """
         UPDATE comment
         SET message = %(message)s
+        WHERE id = %(id)s"""
+    query_edited_count: str = """
+        UPDATE comment
         SET edited_count = edited_count + 1
         WHERE id = %(id)s"""
     cursor.execute(query, {'message': message, 'id': comment_id})
+    cursor.execute(query_edited_count, {'id': comment_id})
 
 
 @database_common.connection_handler
-def edit_answer(cursor, question_id, message) -> None:
+def edit_answer(cursor, answer_id, message, image_path) -> None:
     """Save user answer into database."""
     query: str = """
         UPDATE answer
-        SET message = %(message)s
+        SET message = %(message)s, image = %(image_path)s
         WHERE id = %(id)s"""
-    cursor.execute(query, {'message': message, 'id': question_id})
+    cursor.execute(query, {'message': message, 
+                           'id': answer_id,
+                           'image_path': image_path})
 
 
 @database_common.connection_handler
@@ -714,6 +720,8 @@ def check_credentials(cursor, login: str, password: str):
         WHERE username = %(login)s"""
     cursor.execute(query, {'login': login})
     user = cursor.fetchone()
+    if user == None:
+        return False
     return bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8'))
 
 
