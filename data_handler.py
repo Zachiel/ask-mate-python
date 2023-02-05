@@ -261,10 +261,35 @@ def delete_question(cursor, question_id) -> None:
 @database_common.connection_handler
 def delete_answer(cursor, answer_id) -> None:
     """Delete answer from database."""
-    query: str = """
+    query_answer: str = """
         DELETE FROM answer
         WHERE id = %(id)s"""
-    cursor.execute(query, {'id': answer_id})
+    query_answer_user: str = """
+        DELETE FROM answer_user
+        WHERE answer_id = %(id)s"""
+    query_comment: str = """
+        DELETE FROM comment
+        WHERE answer_id = %(id)s"""
+    query_comment_user: str = """
+        DELETE FROM comment_user
+        WHERE comment_id = %(id)s"""
+    comment_ids = get_comment_ids_by_answer_id(answer_id)
+    for comment_id in comment_ids:
+        cursor.execute(query_comment_user, {'id': comment_id['id']})
+    cursor.execute(query_comment, {'id': answer_id})
+    cursor.execute(query_answer_user, {'id': answer_id})
+    cursor.execute(query_answer, {'id': answer_id})
+    
+    
+    
+
+@database_common.connection_handler
+def get_comment_ids_by_answer_id(cursor, answer_id):
+    query: str = """
+        SELECT id FROM comment
+        WHERE answer_id = %(answer_id)s"""
+    cursor.execute(query, {'answer_id': answer_id})
+    return cursor.fetchall()
 
 
 @database_common.connection_handler
