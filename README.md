@@ -4,10 +4,10 @@ AskMate is a Flask-based Q&A site designed to facilitate community-driven knowle
 
 # Development Team
 
-[Piotr Warowny][https://github.com/Zachiel]
-[Hubert Lewandowski][https://github.com/HLGitHuber]
-[Arkadiusz Woźnica][https://github.com/arkadiuszwoznica]
-[Adam Nowicki][https://github.com/AdamNowicki22]
+![Piotr Warowny][https://github.com/Zachiel]
+![Hubert Lewandowski][https://github.com/HLGitHuber]
+![Arkadiusz Woźnica][https://github.com/arkadiuszwoznica]
+![Adam Nowicki][https://github.com/AdamNowicki22]
 
 ## Introduction
 
